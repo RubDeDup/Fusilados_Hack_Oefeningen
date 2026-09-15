@@ -131,16 +131,19 @@
     <iframe id="gameFrame" src="./lockpick/index.html"></iframe>
   </main>
 
-  <script>
+<script>
     function loadGame(element, url) {
       document.getElementById('gameFrame').src = url;
 
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
+      var items = document.querySelectorAll('.nav-item');
+      for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove('active');
+      }
       element.classList.add('active');
     }
   </script>
+</body>
+</html>
 
 </body>
 </html>
