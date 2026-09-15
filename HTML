@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minigames Hub</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #121316;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Nav Header */
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: #16181d;
+      border-bottom: 1px solid #232730;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 10;
+    }
+
+    .brand {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    /* Sidebar Navigation */
+    aside {
+      width: 260px;
+      background-color: #16181d;
+      border-right: 1px solid #232730;
+      padding-top: 80px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-section {
+      padding: 0 16px;
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      color: #f8fafc;
+      background-color: #1e222b;
+    }
+
+    .nav-item.active {
+      color: #fbbf24;
+      background-color: #1e222b;
+      font-weight: 500;
+    }
+
+    .arrow {
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+
+    /* Main Area met Iframe */
+    main {
+      flex-grow: 1;
+      padding-top: 60px;
+      display: flex;
+      height: 100vh;
+      background-color: #0f1013;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">FiveM Practice Hub</div>
+    <div style="font-size: 0.9rem; color: #94a3b8;">Home</div>
+  </header>
+
+  <aside>
+    <div class="sidebar-section">Minigames</div>
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="loadGame(this, 'https://045dave.github.io/Lockpicking/')">
+        Lockpicking <span class="arrow">&gt;</span>
+      </li>
+    </ul>
+  </aside>
+
+  <main>
+    <iframe id="gameFrame" src="https://045dave.github.io/Lockpicking/"></iframe>
+  </main>
+
+  <script>
+    function loadGame(element, url) {
+      document.getElementById('gameFrame').src = url;
+
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      element.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
