@@ -22,14 +22,14 @@ html, body {
 }
 
 /* =========================
-   GTA / STAD ACHTERGROND
+   ACHTERGROND
 ========================= */
 
 body {
     background:
         linear-gradient(
             rgba(8, 10, 12, .35),
-            rgba(8, 10, 12, .78)
+            rgba(8, 10, 12, .80)
         ),
         radial-gradient(
             ellipse at 50% 35%,
@@ -89,7 +89,6 @@ body {
     height: 53%;
 }
 
-/* ramen in gebouwen */
 .building::after {
     content: "";
     position: absolute;
@@ -113,7 +112,6 @@ body {
         );
 }
 
-/* Straat */
 .street {
     position: absolute;
     bottom: 0;
@@ -126,11 +124,8 @@ body {
             rgba(35, 36, 36, .4),
             #080909
         );
-
-    transform: perspective(400px) rotateX(5deg);
 }
 
-/* Auto-achtige schaduw op achtergrond */
 .car-shadow {
     position: absolute;
     bottom: 13%;
@@ -152,15 +147,13 @@ body {
 }
 
 /* =========================
-   UI
+   INTERFACE
 ========================= */
 
 .interface {
     position: absolute;
     inset: 0;
 }
-
-/* Titel */
 
 .title {
     position: absolute;
@@ -202,8 +195,6 @@ body {
     transform: translate(-50%, -50%);
 }
 
-/* buitenste lock */
-
 .lock {
     position: absolute;
 
@@ -233,13 +224,10 @@ body {
         inset 0 0 35px #050505;
 }
 
-/* metalen rand */
-
 .lock::before {
     content: "";
 
     position: absolute;
-
     inset: 14px;
 
     border-radius: 50%;
@@ -247,7 +235,7 @@ body {
     border: 2px solid rgba(255,255,255,.15);
 }
 
-/* binnenste cilinder */
+/* Binnenste cilinder */
 
 .core {
     position: absolute;
@@ -279,13 +267,10 @@ body {
         0 5px 15px rgba(0,0,0,.7);
 }
 
-/* kleine metaalstrepen */
-
 .core::before {
     content: "";
 
     position: absolute;
-
     inset: 18px;
 
     border-radius: 50%;
@@ -293,7 +278,7 @@ body {
     border: 1px solid rgba(255,255,255,.12);
 }
 
-/* sleutelgat */
+/* Sleutelgat */
 
 .keyhole {
     position: absolute;
@@ -351,8 +336,6 @@ body {
         inset 1px 0 1px rgba(255,255,255,.4);
 }
 
-/* handvat */
-
 .pick::after {
     content: "";
 
@@ -391,8 +374,6 @@ body {
     filter: drop-shadow(2px 5px 5px #000);
 }
 
-/* metalen punt */
-
 .driver-tip {
     position: absolute;
 
@@ -412,8 +393,6 @@ body {
 
     border-radius: 2px;
 }
-
-/* rood handvat */
 
 .driver-handle {
     position: absolute;
@@ -489,8 +468,6 @@ body {
     font-weight: bold;
 }
 
-/* pogingen */
-
 .attempts {
     display: flex;
 
@@ -510,34 +487,6 @@ body {
 
 .attempt.used {
     background: #444;
-}
-
-/* =========================
-   WEERSTAND
-========================= */
-
-.resistance {
-    position: absolute;
-
-    left: 50%;
-    bottom: 7%;
-
-    transform: translateX(-50%);
-
-    width: 320px;
-    height: 5px;
-
-    background: rgba(255,255,255,.15);
-}
-
-.resistance-bar {
-    width: 0%;
-
-    height: 100%;
-
-    background: #ddd;
-
-    transition: width .06s linear;
 }
 
 /* =========================
@@ -601,7 +550,7 @@ body {
 }
 
 /* =========================
-   SUCCES / FAILURE
+   RESULTAAT
 ========================= */
 
 .result {
@@ -669,13 +618,14 @@ body {
     background: #444;
 }
 
-/* trillen bij weerstand */
+/* Schudden bij weerstand */
 
 .shake {
     animation: shake .08s linear infinite;
 }
 
 @keyframes shake {
+
     0% {
         transform: translateX(-1px);
     }
@@ -687,34 +637,45 @@ body {
     100% {
         transform: translateX(-1px);
     }
+
 }
 
-/* klein scherm */
+/* Klein scherm */
 
 @media(max-width: 850px) {
 
     .lock-area {
+
         transform:
             translate(-50%, -50%)
             scale(.75);
+
     }
 
     .hud {
+
         right: 2%;
         width: 180px;
+
     }
 
     .title,
     .controls {
+
         left: 3%;
+
     }
+
 }
 </style>
 </head>
 
 <body>
 
-<!-- Achtergrond -->
+<!-- =========================
+     ACHTERGROND
+========================= -->
+
 <div class="city">
 
     <div class="building"></div>
@@ -733,7 +694,7 @@ body {
 
 <div class="interface">
 
-    <!-- Titel -->
+    <!-- TITEL -->
 
     <div class="title">
 
@@ -746,22 +707,28 @@ body {
     </div>
 
 
-    <!-- Bericht -->
+    <!-- MELDING -->
 
-    <div class="message" id="message">
+    <div
+        class="message"
+        id="message">
 
         Zoek het juiste punt...
 
     </div>
 
 
-    <!-- LOCK -->
+    <!-- =========================
+         LOCK
+    ========================= -->
 
     <div class="lock-area">
 
         <div class="lock">
 
-            <div class="core" id="core">
+            <div
+                class="core"
+                id="core">
 
                 <div class="keyhole"></div>
 
@@ -790,7 +757,9 @@ body {
     </div>
 
 
-    <!-- HUD -->
+    <!-- =========================
+         HUD
+    ========================= -->
 
     <div class="hud">
 
@@ -836,7 +805,9 @@ body {
     </div>
 
 
-    <!-- Controls -->
+    <!-- =========================
+         CONTROLS
+    ========================= -->
 
     <div class="controls">
 
@@ -879,19 +850,9 @@ body {
     </div>
 
 
-    <!-- Weerstand -->
-
-    <div class="resistance">
-
-        <div
-            class="resistance-bar"
-            id="resistance">
-        </div>
-
-    </div>
-
-
-    <!-- Resultaat -->
+    <!-- =========================
+         RESULTAAT
+    ========================= -->
 
     <div
         class="result"
@@ -940,9 +901,6 @@ const screwdriver =
 const message =
     document.getElementById("message");
 
-const resistance =
-    document.getElementById("resistance");
-
 const statusText =
     document.getElementById("status");
 
@@ -963,6 +921,76 @@ const attemptsUI =
 
 
 /* ==================================
+   GELUIDEN
+================================== */
+
+/*
+   De bestanden staan in:
+
+   lockpick/sounds/
+*/
+
+const sounds = {
+
+    lockpick:
+        new Audio("sounds/lockpick.mp3"),
+
+    resistance:
+        new Audio("sounds/resistance.mp3"),
+
+    break:
+        new Audio("sounds/break.mp3"),
+
+    success:
+        new Audio("sounds/success.mp3")
+
+};
+
+
+/*
+   Zorg ervoor dat geluiden
+   niet oneindig doorlopen.
+*/
+
+sounds.lockpick.volume = 0.55;
+sounds.resistance.volume = 0.65;
+sounds.break.volume = 0.8;
+sounds.success.volume = 0.8;
+
+
+/*
+   Speel geluid opnieuw vanaf
+   het begin.
+*/
+
+function playSound(sound) {
+
+    try {
+
+        sound.pause();
+
+        sound.currentTime = 0;
+
+        sound.play().catch(() => {
+            /*
+               Browser kan audio blokkeren
+               totdat de speler interactie heeft.
+            */
+        });
+
+    } catch (error) {
+
+        console.log(
+            "Audio error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==================================
    GAME VARIABLES
 ================================== */
 
@@ -978,18 +1006,18 @@ let broken = false;
 
 let targetAngle = 0;
 
-let totalTime = 0;
-
 let startTime = Date.now();
 
 
-/*
-   Hier wordt het geheime punt
-   willekeurig gekozen.
+/* voorkomt dat resistance.mp3
+   elke milliseconde opnieuw speelt */
 
-   De speler kan het dus niet
-   gewoon onthouden.
-*/
+let resistancePlaying = false;
+
+
+/* ==================================
+   NIEUW DOELPUNT
+================================== */
 
 function newTarget() {
 
@@ -1013,10 +1041,6 @@ document.addEventListener(
             return;
 
 
-        /*
-           Midden van de lock
-        */
-
         const centerX =
             window.innerWidth / 2;
 
@@ -1038,10 +1062,6 @@ document.addEventListener(
             ) * 180 / Math.PI;
 
 
-        /*
-           Beperk de beweging
-        */
-
         angle =
             Math.max(
                 -80,
@@ -1059,14 +1079,14 @@ document.addEventListener(
             `rotate(${pickAngle}deg)`;
 
 
-        updateResistance();
+        updateMessage();
 
     }
 );
 
 
 /* ==================================
-   WEERSTAND
+   AFSTAND TOT JUISTE POSITIE
 ================================== */
 
 function getDistance() {
@@ -1078,55 +1098,38 @@ function getDistance() {
 }
 
 
-function updateResistance() {
+/* ==================================
+   TEKST / WEERSTAND
+================================== */
+
+function updateMessage() {
 
     const distance =
         getDistance();
 
 
-    /*
-       Hoe verder weg,
-       hoe meer weerstand.
-    */
-
-    let percentage =
-        Math.min(
-            100,
-            distance * 1.4
-        );
-
-
-    resistance.style.width =
-        percentage + "%";
-
-
     if (distance < 8) {
 
         message.textContent =
-            "✓ Goede positie!";
+            "✓ GOEDE POSITIE";
 
-        resistance.style.opacity =
-            ".25";
+        resistancePlaying = false;
 
     }
 
     else if (distance < 20) {
 
         message.textContent =
-            "Bijna goed...";
+            "BIJNA GOED...";
 
-        resistance.style.opacity =
-            ".6";
+        resistancePlaying = false;
 
     }
 
     else {
 
         message.textContent =
-            "Veel weerstand!";
-
-        resistance.style.opacity =
-            "1";
+            "VEEL WEERSTAND";
 
     }
 
@@ -1134,7 +1137,7 @@ function updateResistance() {
 
 
 /* ==================================
-   A / D SPANNING
+   A / D
 ================================== */
 
 document.addEventListener(
@@ -1180,7 +1183,7 @@ document.addEventListener(
 
 
 /* ==================================
-   LOCK DRAAIEN
+   SPANNING
 ================================== */
 
 function applyTorque(direction) {
@@ -1190,7 +1193,16 @@ function applyTorque(direction) {
 
 
     /*
-       Dicht bij het juiste punt =
+       Geluid bij het draaien.
+    */
+
+    playSound(
+        sounds.lockpick
+    );
+
+
+    /*
+       Dicht bij juiste positie =
        verder kunnen draaien.
     */
 
@@ -1219,17 +1231,36 @@ function applyTorque(direction) {
         );
 
 
+        /*
+           Weerstandsgeluid.
+        */
+
+        if (!resistancePlaying) {
+
+            playSound(
+                sounds.resistance
+            );
+
+            resistancePlaying =
+                true;
+
+        }
+
+
         setTimeout(() => {
 
             core.classList.remove(
                 "shake"
             );
 
+            resistancePlaying =
+                false;
+
         }, 180);
 
 
         /*
-           Kans dat de lockpick breekt
+           Kans dat lockpick breekt.
         */
 
         if (
@@ -1248,7 +1279,8 @@ function applyTorque(direction) {
 
 
     /*
-       Draai de cilinder
+       Alles is goed:
+       cilinder draait.
     */
 
     coreAngle +=
@@ -1299,10 +1331,6 @@ function breakPick() {
         attempts;
 
 
-    /*
-       Laat een poging verdwijnen
-    */
-
     if (attemptsUI[attempts]) {
 
         attemptsUI[attempts]
@@ -1313,7 +1341,20 @@ function breakPick() {
 
 
     /*
-       Reset de lock
+       Breekgeluid
+    */
+
+    playSound(
+        sounds.break
+    );
+
+
+    message.textContent =
+        "✕ LOCKPICK GEBROKEN";
+
+
+    /*
+       Reset lock
     */
 
     coreAngle = 0;
@@ -1327,19 +1368,11 @@ function breakPick() {
         "rotate(35deg)";
 
 
-    message.textContent =
-        "✕ LOCKPICK GEBROKEN";
-
-
-    /*
-       Nieuwe positie
-    */
-
     newTarget();
 
 
     /*
-       Geen pogingen meer
+       Geen lockpicks meer.
     */
 
     if (attempts <= 0) {
@@ -1360,7 +1393,7 @@ function breakPick() {
 
 
 /* ==================================
-   SUCCES
+   OPENEN
 ================================== */
 
 function unlock() {
@@ -1387,14 +1420,22 @@ function unlock() {
         "✓ LOCK GEOPEND";
 
 
+    /*
+       Succesgeluid
+    */
+
+    playSound(
+        sounds.success
+    );
+
+
     showResult(
         true
     );
 
 
     /*
-       Bericht naar eventuele
-       parent iframe.
+       Bericht naar hoofdwebsite.
     */
 
     if (
@@ -1420,7 +1461,7 @@ function unlock() {
 
 function showResult(success) {
 
-    totalTime =
+    const totalTime =
         (
             Date.now()
             - startTime
@@ -1436,6 +1477,7 @@ function showResult(success) {
         resultTitle.textContent =
             "LOCK GEOPEND";
 
+
         resultText.textContent =
             "Goed gedaan! Je hebt het slot geopend in "
             + totalTime.toFixed(1)
@@ -1447,6 +1489,7 @@ function showResult(success) {
 
         resultTitle.textContent =
             "MISLUKT";
+
 
         resultText.textContent =
             "Je hebt geen lockpicks meer. Probeer opnieuw.";
@@ -1472,6 +1515,10 @@ function restartGame() {
 
     pickAngle = 0;
 
+    resistancePlaying =
+        false;
+
+
     startTime =
         Date.now();
 
@@ -1486,10 +1533,6 @@ function restartGame() {
 
     message.textContent =
         "Zoek het juiste punt...";
-
-
-    resistance.style.width =
-        "0%";
 
 
     core.style.transform =
@@ -1521,7 +1564,7 @@ function restartGame() {
 
 
 /* ==================================
-   ESC / SLUITEN
+   ESC
 ================================== */
 
 function closeGame() {
@@ -1543,7 +1586,10 @@ function closeGame() {
 }
 
 
-/* Start */
+/* ==================================
+   START
+================================== */
+
 newTarget();
 
 </script>
