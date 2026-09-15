@@ -1,718 +1,1553 @@
+```html
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lockpick Practice</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<style>
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
 
-  <title>Lockpick Minigame</title>
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #111;
+}
 
+/* =========================
+   GTA / STAD ACHTERGROND
+========================= */
 
-  <style>
+body {
+    background:
+        linear-gradient(
+            rgba(8, 10, 12, .35),
+            rgba(8, 10, 12, .78)
+        ),
+        radial-gradient(
+            ellipse at 50% 35%,
+            #69747a 0%,
+            #343b3f 35%,
+            #151819 75%
+        );
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+.city {
+    position: absolute;
+    inset: 0;
+    filter: blur(3px);
+    opacity: .65;
+}
+
+.building {
+    position: absolute;
+    bottom: 15%;
+    background: #181c1e;
+    border: 1px solid #33383b;
+}
+
+.building:nth-child(1) {
+    left: 0;
+    width: 13%;
+    height: 60%;
+}
+
+.building:nth-child(2) {
+    left: 10%;
+    width: 18%;
+    height: 76%;
+}
+
+.building:nth-child(3) {
+    left: 26%;
+    width: 11%;
+    height: 48%;
+}
+
+.building:nth-child(4) {
+    right: 0;
+    width: 18%;
+    height: 68%;
+}
+
+.building:nth-child(5) {
+    right: 12%;
+    width: 15%;
+    height: 80%;
+}
+
+.building:nth-child(6) {
+    right: 26%;
+    width: 11%;
+    height: 53%;
+}
+
+/* ramen in gebouwen */
+.building::after {
+    content: "";
+    position: absolute;
+    inset: 15px;
+    opacity: .3;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 20px,
+            #777 21px,
+            transparent 22px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 16px,
+            #777 17px,
+            transparent 18px
+        );
+}
+
+/* Straat */
+.street {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 22%;
+
+    background:
+        linear-gradient(
+            rgba(35, 36, 36, .4),
+            #080909
+        );
+
+    transform: perspective(400px) rotateX(5deg);
+}
+
+/* Auto-achtige schaduw op achtergrond */
+.car-shadow {
+    position: absolute;
+    bottom: 13%;
+    left: 18%;
+    width: 64%;
+    height: 90px;
+
+    background: #080909;
+    border-radius: 50%;
+
+    filter: blur(18px);
+    opacity: .8;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.15);
+}
+
+/* =========================
+   UI
+========================= */
+
+.interface {
+    position: absolute;
+    inset: 0;
+}
+
+/* Titel */
+
+.title {
+    position: absolute;
+    top: 7%;
+    left: 6%;
+
+    color: white;
+    text-shadow: 0 2px 7px #000;
+}
+
+.title h1 {
+    margin: 0;
+
+    font-size: 23px;
+    font-weight: 500;
+    letter-spacing: 3px;
+}
+
+.title p {
+    margin: 7px 0 0;
+
+    font-size: 12px;
+    color: #c7c7c7;
+}
+
+/* =========================
+   LOCK
+========================= */
+
+.lock-area {
+    position: absolute;
+
+    width: 450px;
+    height: 450px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+/* buitenste lock */
+
+.lock {
+    position: absolute;
+
+    width: 390px;
+    height: 390px;
+
+    left: 30px;
+    top: 30px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #b5b5b5 0%,
+            #777 20%,
+            #4d4d4d 48%,
+            #292929 75%,
+            #101010 100%
+        );
+
+    border: 8px solid #171717;
+
+    box-shadow:
+        0 0 0 2px #777,
+        0 18px 45px rgba(0,0,0,.8),
+        inset 0 0 35px #050505;
+}
+
+/* metalen rand */
+
+.lock::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 14px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(255,255,255,.15);
+}
+
+/* binnenste cilinder */
+
+.core {
+    position: absolute;
+
+    width: 245px;
+    height: 245px;
+
+    left: 64px;
+    top: 64px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #8d8d8d,
+            #555 48%,
+            #292929 100%
+        );
+
+    border: 6px solid #1d1d1d;
+
+    transform: rotate(0deg);
+
+    transition: transform .06s linear;
+
+    box-shadow:
+        inset 0 0 30px #111,
+        0 5px 15px rgba(0,0,0,.7);
+}
+
+/* kleine metaalstrepen */
+
+.core::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 18px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,.12);
+}
+
+/* sleutelgat */
+
+.keyhole {
+    position: absolute;
+
+    width: 38px;
+    height: 70px;
+
+    left: 97px;
+    top: 82px;
+
+    background: #080808;
+
+    clip-path: polygon(
+        50% 0%,
+        78% 20%,
+        78% 42%,
+        100% 100%,
+        0% 100%,
+        22% 42%,
+        22% 20%
+    );
+
+    box-shadow: inset 0 0 12px #000;
+}
+
+/* =========================
+   LOCKPICK
+========================= */
+
+.pick {
+    position: absolute;
+
+    width: 7px;
+    height: 175px;
+
+    left: 119px;
+    top: 18px;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #714715,
+            #e1b05b,
+            #8a5b20
+        );
+
+    transform-origin: 50% 105px;
+
+    transform: rotate(0deg);
+
+    box-shadow:
+        1px 0 3px #000,
+        inset 1px 0 1px rgba(255,255,255,.4);
+}
+
+/* handvat */
+
+.pick::after {
+    content: "";
+
+    position: absolute;
+
+    width: 12px;
+    height: 40px;
+
+    left: -2.5px;
+    bottom: -17px;
+
+    border-radius: 5px;
+
+    background: #b47727;
+}
+
+/* =========================
+   SCHROEVENDRAAIER
+========================= */
+
+.screwdriver {
+    position: absolute;
+
+    width: 25px;
+    height: 200px;
+
+    right: 15px;
+    bottom: -5px;
+
+    transform-origin: 50% 170px;
+
+    transform: rotate(35deg);
+
+    transition: transform .05s linear;
+
+    filter: drop-shadow(2px 5px 5px #000);
+}
+
+/* metalen punt */
+
+.driver-tip {
+    position: absolute;
+
+    width: 7px;
+    height: 130px;
+
+    left: 9px;
+    top: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            #444,
+            #ddd,
+            #555
+        );
+
+    border-radius: 2px;
+}
+
+/* rood handvat */
+
+.driver-handle {
+    position: absolute;
+
+    width: 34px;
+    height: 75px;
+
+    left: -5px;
+    bottom: 0;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #580606,
+            #dc2922,
+            #700707
+        );
+
+    box-shadow:
+        inset 2px 0 rgba(255,255,255,.15),
+        0 4px 8px #000;
+}
+
+/* =========================
+   HUD
+========================= */
+
+.hud {
+    position: absolute;
+
+    top: 11%;
+    right: 6%;
+
+    width: 220px;
+
+    padding: 16px;
+
+    color: #ddd;
+
+    background: rgba(10,10,10,.68);
+
+    border-left: 2px solid #c8c8c8;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.35);
+}
+
+.hud-title {
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    color: #aaa;
+
+    margin-bottom: 12px;
+}
+
+.stat {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 7px 0;
+
+    border-bottom: 1px solid rgba(255,255,255,.08);
+
+    font-size: 12px;
+}
+
+.stat span:last-child {
+    font-weight: bold;
+}
+
+/* pogingen */
+
+.attempts {
+    display: flex;
+
+    gap: 5px;
+
+    margin-top: 12px;
+}
+
+.attempt {
+    width: 25px;
+    height: 5px;
+
+    background: #ddd;
+
+    transition: .2s;
+}
+
+.attempt.used {
+    background: #444;
+}
+
+/* =========================
+   WEERSTAND
+========================= */
+
+.resistance {
+    position: absolute;
+
+    left: 50%;
+    bottom: 7%;
+
+    transform: translateX(-50%);
+
+    width: 320px;
+    height: 5px;
+
+    background: rgba(255,255,255,.15);
+}
+
+.resistance-bar {
+    width: 0%;
+
+    height: 100%;
+
+    background: #ddd;
+
+    transition: width .06s linear;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+    position: absolute;
+
+    left: 6%;
+    bottom: 7%;
+
+    color: #ddd;
+
+    font-size: 13px;
+
+    line-height: 2;
+
+    text-shadow: 0 2px 5px #000;
+}
+
+.key {
+    display: inline-block;
+
+    min-width: 28px;
+
+    padding: 1px 7px;
+
+    margin-right: 4px;
+
+    border: 1px solid #777;
+
+    border-radius: 3px;
+
+    background: rgba(0,0,0,.7);
+
+    text-align: center;
+
+    font-weight: bold;
+}
+
+/* =========================
+   MELDING
+========================= */
+
+.message {
+    position: absolute;
+
+    top: 8%;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+
+    font-size: 13px;
+
+    text-shadow: 0 2px 5px #000;
+
+    transition: .15s;
+}
+
+/* =========================
+   SUCCES / FAILURE
+========================= */
+
+.result {
+    position: absolute;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0,0,0,.55);
+
+    backdrop-filter: blur(3px);
+}
+
+.result-box {
+    width: 350px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    background: rgba(12,12,12,.92);
+
+    border: 1px solid #777;
+
+    box-shadow: 0 15px 50px #000;
+}
+
+.result-box h2 {
+    margin: 0 0 10px;
+
+    color: white;
+
+    font-size: 24px;
+
+    letter-spacing: 2px;
+}
+
+.result-box p {
+    color: #aaa;
+
+    font-size: 13px;
+}
+
+.restart {
+    margin-top: 18px;
+
+    padding: 10px 25px;
+
+    color: white;
+
+    background: #252525;
+
+    border: 1px solid #777;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.restart:hover {
+    background: #444;
+}
+
+/* trillen bij weerstand */
+
+.shake {
+    animation: shake .08s linear infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(-1px);
     }
 
-
-    body {
-      background-color: #0d0e12;
-      color: #ffffff;
-
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        sans-serif;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      min-height: 100vh;
-
-      overflow: hidden;
+    50% {
+        transform: translateX(1px);
     }
 
+    100% {
+        transform: translateX(-1px);
+    }
+}
 
-    /* =========================
-       GAME CONTAINER
-    ========================= */
+/* klein scherm */
 
-    .container {
-      background: #161922;
+@media(max-width: 850px) {
 
-      padding: 30px;
-
-      border-radius: 16px;
-
-      box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.5);
-
-      text-align: center;
-
-      width: 360px;
-
-      position: relative;
+    .lock-area {
+        transform:
+            translate(-50%, -50%)
+            scale(.75);
     }
 
-
-    h1 {
-      font-size: 1.4rem;
-
-      margin-bottom: 6px;
-
-      letter-spacing: 1px;
+    .hud {
+        right: 2%;
+        width: 180px;
     }
 
-
-    .subtitle {
-      font-size: 0.85rem;
-
-      color: #8a8f9d;
-
-      margin-bottom: 20px;
+    .title,
+    .controls {
+        left: 3%;
     }
-
-
-    /* =========================
-       GAME
-    ========================= */
-
-    .game-box {
-      position: relative;
-
-      width: 250px;
-      height: 250px;
-
-      margin: 0 auto;
-    }
-
-
-    canvas {
-      background: transparent;
-
-      border-radius: 50%;
-    }
-
-
-    /* =========================
-       STAGE TRACKER
-    ========================= */
-
-    .stage-tracker {
-      display: flex;
-
-      justify-content: center;
-
-      gap: 10px;
-
-      margin-top: 20px;
-    }
-
-
-    .dot {
-      width: 14px;
-      height: 14px;
-
-      border-radius: 50%;
-
-      background-color: #2b303c;
-
-      border: 2px solid #3d4454;
-
-      transition: all 0.3s ease;
-    }
-
-
-    .dot.active {
-      background-color: #22c55e;
-
-      border-color: #4ade80;
-
-      box-shadow:
-        0 0 10px rgba(34, 197, 94, 0.6);
-    }
-
-
-    /* =========================
-       INSTRUCTIONS
-    ========================= */
-
-    .instructions {
-      margin-top: 20px;
-
-      font-size: 0.85rem;
-
-      color: #a0a5b5;
-
-      background: #1f2430;
-
-      padding: 8px 12px;
-
-      border-radius: 8px;
-    }
-
-
-    kbd {
-      background: #333a4d;
-
-      padding: 2px 6px;
-
-      border-radius: 4px;
-
-      color: #fff;
-
-      font-weight: bold;
-    }
-
-
-    /* =========================
-       SUCCESS OVERLAY
-    ========================= */
-
-    .overlay {
-      position: absolute;
-
-      top: 0;
-      left: 0;
-
-      width: 100%;
-      height: 100%;
-
-      background: rgba(22, 25, 34, 0.95);
-
-      border-radius: 16px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      justify-content: center;
-
-      align-items: center;
-
-      opacity: 0;
-
-      pointer-events: none;
-
-      transition: opacity 0.4s ease;
-    }
-
-
-    .overlay.show {
-      opacity: 1;
-
-      pointer-events: auto;
-    }
-
-
-    .success-icon {
-      font-size: 3.5rem;
-
-      color: #22c55e;
-
-      margin-bottom: 10px;
-    }
-
-
-    .success-text {
-      color: #8a8f9d;
-
-      margin-top: 5px;
-
-      font-size: 0.9rem;
-    }
-
-
-    /* =========================
-       BUTTON
-    ========================= */
-
-    .btn {
-      margin-top: 18px;
-
-      padding: 10px 20px;
-
-      background: #22c55e;
-
-      color: #fff;
-
-      border: none;
-
-      border-radius: 8px;
-
-      font-weight: bold;
-
-      font-size: 0.95rem;
-
-      cursor: pointer;
-
-      transition: background 0.2s;
-    }
-
-
-    .btn:hover {
-      background: #16a34a;
-    }
-
-  </style>
-
+}
+</style>
 </head>
-
 
 <body>
 
+<!-- Achtergrond -->
+<div class="city">
 
-  <div class="container">
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
 
-    <h1>
-      LOCKPICKING
-    </h1>
+</div>
 
-
-    <p class="subtitle">
-      Kraak het slot
-    </p>
-
-
-    <div class="game-box">
-
-      <canvas
-        id="lockCanvas"
-        width="250"
-        height="250"
-      ></canvas>
-
-    </div>
+<div class="street"></div>
+<div class="car-shadow"></div>
+<div class="overlay"></div>
 
 
-    <!-- VOORTGANG -->
+<div class="interface">
 
-    <div class="stage-tracker">
+    <!-- Titel -->
 
-      <div
-        class="dot"
-        id="dot-0"
-      ></div>
+    <div class="title">
 
-      <div
-        class="dot"
-        id="dot-1"
-      ></div>
+        <h1>LOCKPICK OEFENING</h1>
 
-      <div
-        class="dot"
-        id="dot-2"
-      ></div>
-
-      <div
-        class="dot"
-        id="dot-3"
-      ></div>
+        <p>
+            Oefen je lockpick skills
+        </p>
 
     </div>
 
 
-    <!-- INSTRUCTIES -->
+    <!-- Bericht -->
 
-    <div class="instructions">
+    <div class="message" id="message">
 
-      Druk op
-      <kbd>SPATIE</kbd>
-      in de groene zone
+        Zoek het juiste punt...
 
     </div>
 
 
-    <!-- SUCCESS -->
+    <!-- LOCK -->
+
+    <div class="lock-area">
+
+        <div class="lock">
+
+            <div class="core" id="core">
+
+                <div class="keyhole"></div>
+
+                <div
+                    class="pick"
+                    id="pick">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Schroevendraaier -->
+
+        <div
+            class="screwdriver"
+            id="screwdriver">
+
+            <div class="driver-tip"></div>
+
+            <div class="driver-handle"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- HUD -->
+
+    <div class="hud">
+
+        <div class="hud-title">
+
+            LOCKPICK PRACTICE
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>POGINGEN</span>
+
+            <span id="attemptText">
+                5
+            </span>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>STATUS</span>
+
+            <span id="status">
+                ACTIEF
+            </span>
+
+        </div>
+
+
+        <div class="attempts">
+
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Controls -->
+
+    <div class="controls">
+
+        <div>
+
+            <span class="key">
+                MUIS
+            </span>
+
+            Beweeg de lockpick
+
+        </div>
+
+
+        <div>
+
+            <span class="key">
+                A
+            </span>
+
+            <span class="key">
+                D
+            </span>
+
+            Zet spanning
+
+        </div>
+
+
+        <div>
+
+            <span class="key">
+                ESC
+            </span>
+
+            Stoppen
+
+        </div>
+
+    </div>
+
+
+    <!-- Weerstand -->
+
+    <div class="resistance">
+
+        <div
+            class="resistance-bar"
+            id="resistance">
+        </div>
+
+    </div>
+
+
+    <!-- Resultaat -->
 
     <div
-      class="overlay"
-      id="successOverlay"
-    >
+        class="result"
+        id="result">
 
-      <div class="success-icon">
-        ✓
-      </div>
+        <div class="result-box">
 
+            <h2 id="resultTitle">
+                LOCK GEOPEND
+            </h2>
 
-      <h2>
-        GESLAAGD!
-      </h2>
+            <p id="resultText">
+                Goed gedaan!
+            </p>
 
+            <button
+                class="restart"
+                onclick="restartGame()">
 
-      <p class="success-text">
-        Slot succesvol gekraakt.
-      </p>
+                OPNIEUW OEFENEN
 
+            </button>
 
-      <button
-        class="btn"
-        onclick="resetGame()"
-      >
-        Opnieuw Spelen
-      </button>
+        </div>
 
     </div>
 
-  </div>
+</div>
 
 
-  <script>
+<script>
 
-    /* =========================
-       ELEMENTEN
-    ========================= */
+/* ==================================
+   ELEMENTEN
+================================== */
 
-    const canvas =
-      document.getElementById("lockCanvas");
+const pick =
+    document.getElementById("pick");
 
-    const ctx =
-      canvas.getContext("2d");
+const core =
+    document.getElementById("core");
 
-    const overlay =
-      document.getElementById("successOverlay");
+const screwdriver =
+    document.getElementById("screwdriver");
+
+const message =
+    document.getElementById("message");
+
+const resistance =
+    document.getElementById("resistance");
+
+const statusText =
+    document.getElementById("status");
+
+const attemptText =
+    document.getElementById("attemptText");
+
+const result =
+    document.getElementById("result");
+
+const resultTitle =
+    document.getElementById("resultTitle");
+
+const resultText =
+    document.getElementById("resultText");
+
+const attemptsUI =
+    document.querySelectorAll(".attempt");
 
 
-    /* =========================
-       GAME SETTINGS
-    ========================= */
+/* ==================================
+   GAME VARIABLES
+================================== */
 
-    const totalStages = 4;
+let pickAngle = 0;
 
-    let currentStage = 0;
+let coreAngle = 0;
 
-    let angle = 0;
+let attempts = 5;
 
-    let speed = 2.5;
+let opened = false;
 
-    let targetAngle = 0;
+let broken = false;
 
-    const targetWidth = 35;
+let targetAngle = 0;
 
-    let isGameActive = true;
+let totalTime = 0;
+
+let startTime = Date.now();
 
 
-    /* =========================
-       NIEUWE STAGE
-    ========================= */
+/*
+   Hier wordt het geheime punt
+   willekeurig gekozen.
 
-    function initStage() {
+   De speler kan het dus niet
+   gewoon onthouden.
+*/
 
-      targetAngle =
+function newTarget() {
+
+    targetAngle =
         Math.floor(
-          Math.random() *
-          (360 - targetWidth)
+            Math.random() * 140
+        ) - 70;
+
+}
+
+
+/* ==================================
+   LOCKPICK BEWEGEN
+================================== */
+
+document.addEventListener(
+    "mousemove",
+    function(e) {
+
+        if (opened || broken)
+            return;
+
+
+        /*
+           Midden van de lock
+        */
+
+        const centerX =
+            window.innerWidth / 2;
+
+        const centerY =
+            window.innerHeight / 2;
+
+
+        const dx =
+            e.clientX - centerX;
+
+        const dy =
+            e.clientY - centerY;
+
+
+        let angle =
+            Math.atan2(
+                dy,
+                dx
+            ) * 180 / Math.PI;
+
+
+        /*
+           Beperk de beweging
+        */
+
+        angle =
+            Math.max(
+                -80,
+                Math.min(
+                    80,
+                    angle
+                )
+            );
+
+
+        pickAngle = angle;
+
+
+        pick.style.transform =
+            `rotate(${pickAngle}deg)`;
+
+
+        updateResistance();
+
+    }
+);
+
+
+/* ==================================
+   WEERSTAND
+================================== */
+
+function getDistance() {
+
+    return Math.abs(
+        pickAngle - targetAngle
+    );
+
+}
+
+
+function updateResistance() {
+
+    const distance =
+        getDistance();
+
+
+    /*
+       Hoe verder weg,
+       hoe meer weerstand.
+    */
+
+    let percentage =
+        Math.min(
+            100,
+            distance * 1.4
+        );
+
+
+    resistance.style.width =
+        percentage + "%";
+
+
+    if (distance < 8) {
+
+        message.textContent =
+            "✓ Goede positie!";
+
+        resistance.style.opacity =
+            ".25";
+
+    }
+
+    else if (distance < 20) {
+
+        message.textContent =
+            "Bijna goed...";
+
+        resistance.style.opacity =
+            ".6";
+
+    }
+
+    else {
+
+        message.textContent =
+            "Veel weerstand!";
+
+        resistance.style.opacity =
+            "1";
+
+    }
+
+}
+
+
+/* ==================================
+   A / D SPANNING
+================================== */
+
+document.addEventListener(
+    "keydown",
+    function(e) {
+
+        if (opened || broken)
+            return;
+
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if (
+            key === "a" ||
+            e.key === "ArrowLeft"
+        ) {
+
+            applyTorque(-1);
+
+        }
+
+
+        if (
+            key === "d" ||
+            e.key === "ArrowRight"
+        ) {
+
+            applyTorque(1);
+
+        }
+
+
+        if (e.key === "Escape") {
+
+            closeGame();
+
+        }
+
+    }
+);
+
+
+/* ==================================
+   LOCK DRAAIEN
+================================== */
+
+function applyTorque(direction) {
+
+    const distance =
+        getDistance();
+
+
+    /*
+       Dicht bij het juiste punt =
+       verder kunnen draaien.
+    */
+
+    let allowedRotation =
+        Math.max(
+            5,
+            90 - distance
+        );
+
+
+    /*
+       Te veel weerstand
+    */
+
+    if (
+        Math.abs(coreAngle)
+        >= allowedRotation
+    ) {
+
+        message.textContent =
+            "⚠ TE VEEL WEERSTAND";
+
+
+        core.classList.add(
+            "shake"
+        );
+
+
+        setTimeout(() => {
+
+            core.classList.remove(
+                "shake"
+            );
+
+        }, 180);
+
+
+        /*
+           Kans dat de lockpick breekt
+        */
+
+        if (
+            distance > 25 &&
+            Math.random() < 0.12
+        ) {
+
+            breakPick();
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+       Draai de cilinder
+    */
+
+    coreAngle +=
+        direction * 4;
+
+
+    coreAngle =
+        Math.max(
+            0,
+            Math.min(
+                90,
+                coreAngle
+            )
+        );
+
+
+    core.style.transform =
+        `rotate(${coreAngle}deg)`;
+
+
+    screwdriver.style.transform =
+        `rotate(${35 + coreAngle}deg)`;
+
+
+    /*
+       Succes
+    */
+
+    if (coreAngle >= 90) {
+
+        unlock();
+
+    }
+
+}
+
+
+/* ==================================
+   LOCKPICK BREKEN
+================================== */
+
+function breakPick() {
+
+    attempts--;
+
+
+    attemptText.textContent =
+        attempts;
+
+
+    /*
+       Laat een poging verdwijnen
+    */
+
+    if (attemptsUI[attempts]) {
+
+        attemptsUI[attempts]
+            .classList
+            .add("used");
+
+    }
+
+
+    /*
+       Reset de lock
+    */
+
+    coreAngle = 0;
+
+
+    core.style.transform =
+        "rotate(0deg)";
+
+
+    screwdriver.style.transform =
+        "rotate(35deg)";
+
+
+    message.textContent =
+        "✕ LOCKPICK GEBROKEN";
+
+
+    /*
+       Nieuwe positie
+    */
+
+    newTarget();
+
+
+    /*
+       Geen pogingen meer
+    */
+
+    if (attempts <= 0) {
+
+        broken = true;
+
+        statusText.textContent =
+            "MISLUKT";
+
+
+        showResult(
+            false
         );
 
     }
 
+}
 
-    /* =========================
-       DOTS BIJWERKEN
-    ========================= */
 
-    function updateDots() {
+/* ==================================
+   SUCCES
+================================== */
 
-      for (
-        let i = 0;
-        i < totalStages;
-        i++
-      ) {
+function unlock() {
 
-        const dot =
-          document.getElementById(
-            `dot-${i}`
-          );
+    opened = true;
 
 
-        if (i < currentStage) {
+    coreAngle = 90;
 
-          dot.classList.add("active");
 
-        } else {
+    core.style.transform =
+        "rotate(90deg)";
 
-          dot.classList.remove("active");
 
-        }
+    screwdriver.style.transform =
+        "rotate(125deg)";
 
-      }
 
-    }
+    statusText.textContent =
+        "GEOPEND";
 
 
-    /* =========================
-       TEKENEN
-    ========================= */
+    message.textContent =
+        "✓ LOCK GEOPEND";
 
-    function draw() {
 
-      ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-
-      const centerX =
-        canvas.width / 2;
-
-      const centerY =
-        canvas.height / 2;
-
-      const radius = 88;
-
-
-      /* Achtergrondcirkel */
-
-      ctx.beginPath();
-
-      ctx.arc(
-        centerX,
-        centerY,
-        radius,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.strokeStyle =
-        "#2b303c";
-
-      ctx.lineWidth = 14;
-
-      ctx.stroke();
-
-
-      /* Groene doelzone */
-
-      const startRad =
-        ((targetAngle - 90) *
-          Math.PI) /
-        180;
-
-
-      const endRad =
-        (((targetAngle + targetWidth) - 90) *
-          Math.PI) /
-        180;
-
-
-      ctx.beginPath();
-
-      ctx.arc(
-        centerX,
-        centerY,
-        radius,
-        startRad,
-        endRad
-      );
-
-      ctx.strokeStyle =
-        "#22c55e";
-
-      ctx.lineWidth = 14;
-
-      ctx.stroke();
-
-
-      /* Rode naald */
-
-      const currentRad =
-        ((angle - 90) *
-          Math.PI) /
-        180;
-
-
-      const needleX =
-        centerX +
-        radius *
-        Math.cos(currentRad);
-
-
-      const needleY =
-        centerY +
-        radius *
-        Math.sin(currentRad);
-
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        centerX,
-        centerY
-      );
-
-      ctx.lineTo(
-        needleX,
-        needleY
-      );
-
-      ctx.strokeStyle =
-        "#ef4444";
-
-      ctx.lineWidth = 4;
-
-      ctx.stroke();
-
-
-      /* Middelpunt */
-
-      ctx.beginPath();
-
-      ctx.arc(
-        centerX,
-        centerY,
-        7,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fillStyle =
-        "#ffffff";
-
-      ctx.fill();
-
-
-      /* Naald bewegen */
-
-      if (isGameActive) {
-
-        angle =
-          (angle + speed) % 360;
-
-      }
-
-
-      requestAnimationFrame(draw);
-
-    }
-
-
-    /* =========================
-       SPATIEBALK
-    ========================= */
-
-    window.addEventListener(
-      "keydown",
-      function(e) {
-
-        if (
-          e.code === "Space" &&
-          isGameActive
-        ) {
-
-          e.preventDefault();
-
-
-          /* Zit de naald in de groene zone? */
-
-          if (
-            angle >= targetAngle &&
-            angle <=
-              targetAngle + targetWidth
-          ) {
-
-            currentStage++;
-
-            updateDots();
-
-
-            /* Alles gehaald */
-
-            if (
-              currentStage >=
-              totalStages
-            ) {
-
-              isGameActive = false;
-
-              overlay.classList.add(
-                "show"
-              );
-
-            }
-
-
-            /* Volgende ronde */
-
-            else {
-
-              speed += 0.6;
-
-              initStage();
-
-            }
-
-          }
-
-
-          /* Fout */
-
-          else {
-
-            currentStage = 0;
-
-            speed = 2.5;
-
-            updateDots();
-
-            initStage();
-
-          }
-
-        }
-
-      }
+    showResult(
+        true
     );
 
 
-    /* =========================
-       RESET
-    ========================= */
+    /*
+       Bericht naar eventuele
+       parent iframe.
+    */
 
-    function resetGame() {
+    if (
+        window.parent !== window
+    ) {
 
-      currentStage = 0;
-
-      speed = 2.5;
-
-      angle = 0;
-
-      isGameActive = true;
-
-      overlay.classList.remove(
-        "show"
-      );
-
-      updateDots();
-
-      initStage();
+        window.parent.postMessage(
+            {
+                type:
+                    "lockpickSuccess"
+            },
+            "*"
+        );
 
     }
 
+}
 
-    /* =========================
-       START GAME
-    ========================= */
 
-    initStage();
+/* ==================================
+   RESULTAAT
+================================== */
 
-    updateDots();
+function showResult(success) {
 
-    draw();
+    totalTime =
+        (
+            Date.now()
+            - startTime
+        ) / 1000;
 
-  </script>
 
+    result.style.display =
+        "flex";
+
+
+    if (success) {
+
+        resultTitle.textContent =
+            "LOCK GEOPEND";
+
+        resultText.textContent =
+            "Goed gedaan! Je hebt het slot geopend in "
+            + totalTime.toFixed(1)
+            + " seconden.";
+
+    }
+
+    else {
+
+        resultTitle.textContent =
+            "MISLUKT";
+
+        resultText.textContent =
+            "Je hebt geen lockpicks meer. Probeer opnieuw.";
+
+    }
+
+}
+
+
+/* ==================================
+   OPNIEUW
+================================== */
+
+function restartGame() {
+
+    attempts = 5;
+
+    opened = false;
+
+    broken = false;
+
+    coreAngle = 0;
+
+    pickAngle = 0;
+
+    startTime =
+        Date.now();
+
+
+    attemptText.textContent =
+        "5";
+
+
+    statusText.textContent =
+        "ACTIEF";
+
+
+    message.textContent =
+        "Zoek het juiste punt...";
+
+
+    resistance.style.width =
+        "0%";
+
+
+    core.style.transform =
+        "rotate(0deg)";
+
+
+    screwdriver.style.transform =
+        "rotate(35deg)";
+
+
+    attemptsUI.forEach(
+        element => {
+
+            element.classList.remove(
+                "used"
+            );
+
+        }
+    );
+
+
+    result.style.display =
+        "none";
+
+
+    newTarget();
+
+}
+
+
+/* ==================================
+   ESC / SLUITEN
+================================== */
+
+function closeGame() {
+
+    if (
+        window.parent !== window
+    ) {
+
+        window.parent.postMessage(
+            {
+                type:
+                    "closeLockpick"
+            },
+            "*"
+        );
+
+    }
+
+}
+
+
+/* Start */
+newTarget();
+
+</script>
 
 </body>
-
 </html>
+```
