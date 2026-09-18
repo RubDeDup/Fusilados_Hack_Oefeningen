@@ -1,0 +1,1599 @@
+```html
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lockpick Practice</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #111;
+}
+
+/* =========================
+   ACHTERGROND
+========================= */
+
+body {
+    background:
+        linear-gradient(
+            rgba(8, 10, 12, .35),
+            rgba(8, 10, 12, .80)
+        ),
+        radial-gradient(
+            ellipse at 50% 35%,
+            #69747a 0%,
+            #343b3f 35%,
+            #151819 75%
+        );
+}
+
+.city {
+    position: absolute;
+    inset: 0;
+    filter: blur(3px);
+    opacity: .65;
+}
+
+.building {
+    position: absolute;
+    bottom: 15%;
+    background: #181c1e;
+    border: 1px solid #33383b;
+}
+
+.building:nth-child(1) {
+    left: 0;
+    width: 13%;
+    height: 60%;
+}
+
+.building:nth-child(2) {
+    left: 10%;
+    width: 18%;
+    height: 76%;
+}
+
+.building:nth-child(3) {
+    left: 26%;
+    width: 11%;
+    height: 48%;
+}
+
+.building:nth-child(4) {
+    right: 0;
+    width: 18%;
+    height: 68%;
+}
+
+.building:nth-child(5) {
+    right: 12%;
+    width: 15%;
+    height: 80%;
+}
+
+.building:nth-child(6) {
+    right: 26%;
+    width: 11%;
+    height: 53%;
+}
+
+.building::after {
+    content: "";
+    position: absolute;
+    inset: 15px;
+    opacity: .3;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 20px,
+            #777 21px,
+            transparent 22px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 16px,
+            #777 17px,
+            transparent 18px
+        );
+}
+
+.street {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 22%;
+
+    background:
+        linear-gradient(
+            rgba(35, 36, 36, .4),
+            #080909
+        );
+}
+
+.car-shadow {
+    position: absolute;
+    bottom: 13%;
+    left: 18%;
+    width: 64%;
+    height: 90px;
+
+    background: #080909;
+    border-radius: 50%;
+
+    filter: blur(18px);
+    opacity: .8;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.15);
+}
+
+/* =========================
+   INTERFACE
+========================= */
+
+.interface {
+    position: absolute;
+    inset: 0;
+}
+
+.title {
+    position: absolute;
+    top: 7%;
+    left: 6%;
+
+    color: white;
+    text-shadow: 0 2px 7px #000;
+}
+
+.title h1 {
+    margin: 0;
+
+    font-size: 23px;
+    font-weight: 500;
+    letter-spacing: 3px;
+}
+
+.title p {
+    margin: 7px 0 0;
+
+    font-size: 12px;
+    color: #c7c7c7;
+}
+
+/* =========================
+   LOCK
+========================= */
+
+.lock-area {
+    position: absolute;
+
+    width: 450px;
+    height: 450px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.lock {
+    position: absolute;
+
+    width: 390px;
+    height: 390px;
+
+    left: 30px;
+    top: 30px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #b5b5b5 0%,
+            #777 20%,
+            #4d4d4d 48%,
+            #292929 75%,
+            #101010 100%
+        );
+
+    border: 8px solid #171717;
+
+    box-shadow:
+        0 0 0 2px #777,
+        0 18px 45px rgba(0,0,0,.8),
+        inset 0 0 35px #050505;
+}
+
+.lock::before {
+    content: "";
+
+    position: absolute;
+    inset: 14px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(255,255,255,.15);
+}
+
+/* Binnenste cilinder */
+
+.core {
+    position: absolute;
+
+    width: 245px;
+    height: 245px;
+
+    left: 64px;
+    top: 64px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #8d8d8d,
+            #555 48%,
+            #292929 100%
+        );
+
+    border: 6px solid #1d1d1d;
+
+    transform: rotate(0deg);
+
+    transition: transform .06s linear;
+
+    box-shadow:
+        inset 0 0 30px #111,
+        0 5px 15px rgba(0,0,0,.7);
+}
+
+.core::before {
+    content: "";
+
+    position: absolute;
+    inset: 18px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,.12);
+}
+
+/* Sleutelgat */
+
+.keyhole {
+    position: absolute;
+
+    width: 38px;
+    height: 70px;
+
+    left: 97px;
+    top: 82px;
+
+    background: #080808;
+
+    clip-path: polygon(
+        50% 0%,
+        78% 20%,
+        78% 42%,
+        100% 100%,
+        0% 100%,
+        22% 42%,
+        22% 20%
+    );
+
+    box-shadow: inset 0 0 12px #000;
+}
+
+/* =========================
+   LOCKPICK
+========================= */
+
+.pick {
+    position: absolute;
+
+    width: 7px;
+    height: 175px;
+
+    left: 119px;
+    top: 18px;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #714715,
+            #e1b05b,
+            #8a5b20
+        );
+
+    transform-origin: 50% 105px;
+
+    transform: rotate(0deg);
+
+    box-shadow:
+        1px 0 3px #000,
+        inset 1px 0 1px rgba(255,255,255,.4);
+}
+
+.pick::after {
+    content: "";
+
+    position: absolute;
+
+    width: 12px;
+    height: 40px;
+
+    left: -2.5px;
+    bottom: -17px;
+
+    border-radius: 5px;
+
+    background: #b47727;
+}
+
+/* =========================
+   SCHROEVENDRAAIER
+========================= */
+
+.screwdriver {
+    position: absolute;
+
+    width: 25px;
+    height: 200px;
+
+    right: 15px;
+    bottom: -5px;
+
+    transform-origin: 50% 170px;
+
+    transform: rotate(35deg);
+
+    transition: transform .05s linear;
+
+    filter: drop-shadow(2px 5px 5px #000);
+}
+
+.driver-tip {
+    position: absolute;
+
+    width: 7px;
+    height: 130px;
+
+    left: 9px;
+    top: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            #444,
+            #ddd,
+            #555
+        );
+
+    border-radius: 2px;
+}
+
+.driver-handle {
+    position: absolute;
+
+    width: 34px;
+    height: 75px;
+
+    left: -5px;
+    bottom: 0;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #580606,
+            #dc2922,
+            #700707
+        );
+
+    box-shadow:
+        inset 2px 0 rgba(255,255,255,.15),
+        0 4px 8px #000;
+}
+
+/* =========================
+   HUD
+========================= */
+
+.hud {
+    position: absolute;
+
+    top: 11%;
+    right: 6%;
+
+    width: 220px;
+
+    padding: 16px;
+
+    color: #ddd;
+
+    background: rgba(10,10,10,.68);
+
+    border-left: 2px solid #c8c8c8;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.35);
+}
+
+.hud-title {
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    color: #aaa;
+
+    margin-bottom: 12px;
+}
+
+.stat {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 7px 0;
+
+    border-bottom: 1px solid rgba(255,255,255,.08);
+
+    font-size: 12px;
+}
+
+.stat span:last-child {
+    font-weight: bold;
+}
+
+.attempts {
+    display: flex;
+
+    gap: 5px;
+
+    margin-top: 12px;
+}
+
+.attempt {
+    width: 25px;
+    height: 5px;
+
+    background: #ddd;
+
+    transition: .2s;
+}
+
+.attempt.used {
+    background: #444;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+    position: absolute;
+
+    left: 6%;
+    bottom: 7%;
+
+    color: #ddd;
+
+    font-size: 13px;
+
+    line-height: 2;
+
+    text-shadow: 0 2px 5px #000;
+}
+
+.key {
+    display: inline-block;
+
+    min-width: 28px;
+
+    padding: 1px 7px;
+
+    margin-right: 4px;
+
+    border: 1px solid #777;
+
+    border-radius: 3px;
+
+    background: rgba(0,0,0,.7);
+
+    text-align: center;
+
+    font-weight: bold;
+}
+
+/* =========================
+   MELDING
+========================= */
+
+.message {
+    position: absolute;
+
+    top: 8%;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+
+    font-size: 13px;
+
+    text-shadow: 0 2px 5px #000;
+
+    transition: .15s;
+}
+
+/* =========================
+   RESULTAAT
+========================= */
+
+.result {
+    position: absolute;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0,0,0,.55);
+
+    backdrop-filter: blur(3px);
+}
+
+.result-box {
+    width: 350px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    background: rgba(12,12,12,.92);
+
+    border: 1px solid #777;
+
+    box-shadow: 0 15px 50px #000;
+}
+
+.result-box h2 {
+    margin: 0 0 10px;
+
+    color: white;
+
+    font-size: 24px;
+
+    letter-spacing: 2px;
+}
+
+.result-box p {
+    color: #aaa;
+
+    font-size: 13px;
+}
+
+.restart {
+    margin-top: 18px;
+
+    padding: 10px 25px;
+
+    color: white;
+
+    background: #252525;
+
+    border: 1px solid #777;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.restart:hover {
+    background: #444;
+}
+
+/* Schudden bij weerstand */
+
+.shake {
+    animation: shake .08s linear infinite;
+}
+
+@keyframes shake {
+
+    0% {
+        transform: translateX(-1px);
+    }
+
+    50% {
+        transform: translateX(1px);
+    }
+
+    100% {
+        transform: translateX(-1px);
+    }
+
+}
+
+/* Klein scherm */
+
+@media(max-width: 850px) {
+
+    .lock-area {
+
+        transform:
+            translate(-50%, -50%)
+            scale(.75);
+
+    }
+
+    .hud {
+
+        right: 2%;
+        width: 180px;
+
+    }
+
+    .title,
+    .controls {
+
+        left: 3%;
+
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     ACHTERGROND
+========================= -->
+
+<div class="city">
+
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+    <div class="building"></div>
+
+</div>
+
+<div class="street"></div>
+<div class="car-shadow"></div>
+<div class="overlay"></div>
+
+
+<div class="interface">
+
+    <!-- TITEL -->
+
+    <div class="title">
+
+        <h1>LOCKPICK OEFENING</h1>
+
+        <p>
+            Oefen je lockpick skills
+        </p>
+
+    </div>
+
+
+    <!-- MELDING -->
+
+    <div
+        class="message"
+        id="message">
+
+        Zoek het juiste punt...
+
+    </div>
+
+
+    <!-- =========================
+         LOCK
+    ========================= -->
+
+    <div class="lock-area">
+
+        <div class="lock">
+
+            <div
+                class="core"
+                id="core">
+
+                <div class="keyhole"></div>
+
+                <div
+                    class="pick"
+                    id="pick">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Schroevendraaier -->
+
+        <div
+            class="screwdriver"
+            id="screwdriver">
+
+            <div class="driver-tip"></div>
+
+            <div class="driver-handle"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         HUD
+    ========================= -->
+
+    <div class="hud">
+
+        <div class="hud-title">
+
+            LOCKPICK PRACTICE
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>POGINGEN</span>
+
+            <span id="attemptText">
+                5
+            </span>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>STATUS</span>
+
+            <span id="status">
+                ACTIEF
+            </span>
+
+        </div>
+
+
+        <div class="attempts">
+
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+            <div class="attempt"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         CONTROLS
+    ========================= -->
+
+    <div class="controls">
+
+        <div>
+
+            <span class="key">
+                MUIS
+            </span>
+
+            Beweeg de lockpick
+
+        </div>
+
+
+        <div>
+
+            <span class="key">
+                A
+            </span>
+
+            <span class="key">
+                D
+            </span>
+
+            Zet spanning
+
+        </div>
+
+
+        <div>
+
+            <span class="key">
+                ESC
+            </span>
+
+            Stoppen
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         RESULTAAT
+    ========================= -->
+
+    <div
+        class="result"
+        id="result">
+
+        <div class="result-box">
+
+            <h2 id="resultTitle">
+                LOCK GEOPEND
+            </h2>
+
+            <p id="resultText">
+                Goed gedaan!
+            </p>
+
+            <button
+                class="restart"
+                onclick="restartGame()">
+
+                OPNIEUW OEFENEN
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==================================
+   ELEMENTEN
+================================== */
+
+const pick =
+    document.getElementById("pick");
+
+const core =
+    document.getElementById("core");
+
+const screwdriver =
+    document.getElementById("screwdriver");
+
+const message =
+    document.getElementById("message");
+
+const statusText =
+    document.getElementById("status");
+
+const attemptText =
+    document.getElementById("attemptText");
+
+const result =
+    document.getElementById("result");
+
+const resultTitle =
+    document.getElementById("resultTitle");
+
+const resultText =
+    document.getElementById("resultText");
+
+const attemptsUI =
+    document.querySelectorAll(".attempt");
+
+
+/* ==================================
+   GELUIDEN
+================================== */
+
+/*
+   De bestanden staan in:
+
+   lockpick/sounds/
+*/
+
+const sounds = {
+
+    lockpick:
+        new Audio("sounds/lockpick.mp3"),
+
+    resistance:
+        new Audio("sounds/resistance.mp3"),
+
+    break:
+        new Audio("sounds/break.mp3"),
+
+    success:
+        new Audio("sounds/success.mp3")
+
+};
+
+
+/*
+   Zorg ervoor dat geluiden
+   niet oneindig doorlopen.
+*/
+
+sounds.lockpick.volume = 0.55;
+sounds.resistance.volume = 0.65;
+sounds.break.volume = 0.8;
+sounds.success.volume = 0.8;
+
+
+/*
+   Speel geluid opnieuw vanaf
+   het begin.
+*/
+
+function playSound(sound) {
+
+    try {
+
+        sound.pause();
+
+        sound.currentTime = 0;
+
+        sound.play().catch(() => {
+            /*
+               Browser kan audio blokkeren
+               totdat de speler interactie heeft.
+            */
+        });
+
+    } catch (error) {
+
+        console.log(
+            "Audio error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==================================
+   GAME VARIABLES
+================================== */
+
+let pickAngle = 0;
+
+let coreAngle = 0;
+
+let attempts = 5;
+
+let opened = false;
+
+let broken = false;
+
+let targetAngle = 0;
+
+let startTime = Date.now();
+
+
+/* voorkomt dat resistance.mp3
+   elke milliseconde opnieuw speelt */
+
+let resistancePlaying = false;
+
+
+/* ==================================
+   NIEUW DOELPUNT
+================================== */
+
+function newTarget() {
+
+    targetAngle =
+        Math.floor(
+            Math.random() * 140
+        ) - 70;
+
+}
+
+
+/* ==================================
+   LOCKPICK BEWEGEN
+================================== */
+
+document.addEventListener(
+    "mousemove",
+    function(e) {
+
+        if (opened || broken)
+            return;
+
+
+        const centerX =
+            window.innerWidth / 2;
+
+        const centerY =
+            window.innerHeight / 2;
+
+
+        const dx =
+            e.clientX - centerX;
+
+        const dy =
+            e.clientY - centerY;
+
+
+        let angle =
+            Math.atan2(
+                dy,
+                dx
+            ) * 180 / Math.PI;
+
+
+        angle =
+            Math.max(
+                -80,
+                Math.min(
+                    80,
+                    angle
+                )
+            );
+
+
+        pickAngle = angle;
+
+
+        pick.style.transform =
+            `rotate(${pickAngle}deg)`;
+
+
+        updateMessage();
+
+    }
+);
+
+
+/* ==================================
+   AFSTAND TOT JUISTE POSITIE
+================================== */
+
+function getDistance() {
+
+    return Math.abs(
+        pickAngle - targetAngle
+    );
+
+}
+
+
+/* ==================================
+   TEKST / WEERSTAND
+================================== */
+
+function updateMessage() {
+
+    const distance =
+        getDistance();
+
+
+    if (distance < 8) {
+
+        message.textContent =
+            "✓ GOEDE POSITIE";
+
+        resistancePlaying = false;
+
+    }
+
+    else if (distance < 20) {
+
+        message.textContent =
+            "BIJNA GOED...";
+
+        resistancePlaying = false;
+
+    }
+
+    else {
+
+        message.textContent =
+            "VEEL WEERSTAND";
+
+    }
+
+}
+
+
+/* ==================================
+   A / D
+================================== */
+
+document.addEventListener(
+    "keydown",
+    function(e) {
+
+        if (opened || broken)
+            return;
+
+
+        const key =
+            e.key.toLowerCase();
+
+
+        if (
+            key === "a" ||
+            e.key === "ArrowLeft"
+        ) {
+
+            applyTorque(-1);
+
+        }
+
+
+        if (
+            key === "d" ||
+            e.key === "ArrowRight"
+        ) {
+
+            applyTorque(1);
+
+        }
+
+
+        if (e.key === "Escape") {
+
+            closeGame();
+
+        }
+
+    }
+);
+
+
+/* ==================================
+   SPANNING
+================================== */
+
+function applyTorque(direction) {
+
+    const distance =
+        getDistance();
+
+
+    /*
+       Geluid bij het draaien.
+    */
+
+    playSound(
+        sounds.lockpick
+    );
+
+
+    /*
+       Dicht bij juiste positie =
+       verder kunnen draaien.
+    */
+
+    let allowedRotation =
+        Math.max(
+            5,
+            90 - distance
+        );
+
+
+    /*
+       Te veel weerstand
+    */
+
+    if (
+        Math.abs(coreAngle)
+        >= allowedRotation
+    ) {
+
+        message.textContent =
+            "⚠ TE VEEL WEERSTAND";
+
+
+        core.classList.add(
+            "shake"
+        );
+
+
+        /*
+           Weerstandsgeluid.
+        */
+
+        if (!resistancePlaying) {
+
+            playSound(
+                sounds.resistance
+            );
+
+            resistancePlaying =
+                true;
+
+        }
+
+
+        setTimeout(() => {
+
+            core.classList.remove(
+                "shake"
+            );
+
+            resistancePlaying =
+                false;
+
+        }, 180);
+
+
+        /*
+           Kans dat lockpick breekt.
+        */
+
+        if (
+            distance > 25 &&
+            Math.random() < 0.12
+        ) {
+
+            breakPick();
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+       Alles is goed:
+       cilinder draait.
+    */
+
+    coreAngle +=
+        direction * 4;
+
+
+    coreAngle =
+        Math.max(
+            0,
+            Math.min(
+                90,
+                coreAngle
+            )
+        );
+
+
+    core.style.transform =
+        `rotate(${coreAngle}deg)`;
+
+
+    screwdriver.style.transform =
+        `rotate(${35 + coreAngle}deg)`;
+
+
+    /*
+       Succes
+    */
+
+    if (coreAngle >= 90) {
+
+        unlock();
+
+    }
+
+}
+
+
+/* ==================================
+   LOCKPICK BREKEN
+================================== */
+
+function breakPick() {
+
+    attempts--;
+
+
+    attemptText.textContent =
+        attempts;
+
+
+    if (attemptsUI[attempts]) {
+
+        attemptsUI[attempts]
+            .classList
+            .add("used");
+
+    }
+
+
+    /*
+       Breekgeluid
+    */
+
+    playSound(
+        sounds.break
+    );
+
+
+    message.textContent =
+        "✕ LOCKPICK GEBROKEN";
+
+
+    /*
+       Reset lock
+    */
+
+    coreAngle = 0;
+
+
+    core.style.transform =
+        "rotate(0deg)";
+
+
+    screwdriver.style.transform =
+        "rotate(35deg)";
+
+
+    newTarget();
+
+
+    /*
+       Geen lockpicks meer.
+    */
+
+    if (attempts <= 0) {
+
+        broken = true;
+
+        statusText.textContent =
+            "MISLUKT";
+
+
+        showResult(
+            false
+        );
+
+    }
+
+}
+
+
+/* ==================================
+   OPENEN
+================================== */
+
+function unlock() {
+
+    opened = true;
+
+
+    coreAngle = 90;
+
+
+    core.style.transform =
+        "rotate(90deg)";
+
+
+    screwdriver.style.transform =
+        "rotate(125deg)";
+
+
+    statusText.textContent =
+        "GEOPEND";
+
+
+    message.textContent =
+        "✓ LOCK GEOPEND";
+
+
+    /*
+       Succesgeluid
+    */
+
+    playSound(
+        sounds.success
+    );
+
+
+    showResult(
+        true
+    );
+
+
+    /*
+       Bericht naar hoofdwebsite.
+    */
+
+    if (
+        window.parent !== window
+    ) {
+
+        window.parent.postMessage(
+            {
+                type:
+                    "lockpickSuccess"
+            },
+            "*"
+        );
+
+    }
+
+}
+
+
+/* ==================================
+   RESULTAAT
+================================== */
+
+function showResult(success) {
+
+    const totalTime =
+        (
+            Date.now()
+            - startTime
+        ) / 1000;
+
+
+    result.style.display =
+        "flex";
+
+
+    if (success) {
+
+        resultTitle.textContent =
+            "LOCK GEOPEND";
+
+
+        resultText.textContent =
+            "Goed gedaan! Je hebt het slot geopend in "
+            + totalTime.toFixed(1)
+            + " seconden.";
+
+    }
+
+    else {
+
+        resultTitle.textContent =
+            "MISLUKT";
+
+
+        resultText.textContent =
+            "Je hebt geen lockpicks meer. Probeer opnieuw.";
+
+    }
+
+}
+
+
+/* ==================================
+   OPNIEUW
+================================== */
+
+function restartGame() {
+
+    attempts = 5;
+
+    opened = false;
+
+    broken = false;
+
+    coreAngle = 0;
+
+    pickAngle = 0;
+
+    resistancePlaying =
+        false;
+
+
+    startTime =
+        Date.now();
+
+
+    attemptText.textContent =
+        "5";
+
+
+    statusText.textContent =
+        "ACTIEF";
+
+
+    message.textContent =
+        "Zoek het juiste punt...";
+
+
+    core.style.transform =
+        "rotate(0deg)";
+
+
+    screwdriver.style.transform =
+        "rotate(35deg)";
+
+
+    attemptsUI.forEach(
+        element => {
+
+            element.classList.remove(
+                "used"
+            );
+
+        }
+    );
+
+
+    result.style.display =
+        "none";
+
+
+    newTarget();
+
+}
+
+
+/* ==================================
+   ESC
+================================== */
+
+function closeGame() {
+
+    if (
+        window.parent !== window
+    ) {
+
+        window.parent.postMessage(
+            {
+                type:
+                    "closeLockpick"
+            },
+            "*"
+        );
+
+    }
+
+}
+
+
+/* ==================================
+   START
+================================== */
+
+newTarget();
+
+</script>
+
+</body>
+</html>
+```
