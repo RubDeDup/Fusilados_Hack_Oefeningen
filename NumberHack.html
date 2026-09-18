@@ -124,7 +124,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      z-index: 100; /* Zorgt dat het altijd bovenop het grid ligt */
+      z-index: 100;
     }
 
     .overlay.show {
@@ -156,7 +156,7 @@
     }
   </style>
 </head>
-<body>
+<body onclick="window.focus()">
 
   <div class="container">
     <div class="header-title">Connecting to Host</div>
@@ -170,7 +170,7 @@
     <div class="grid" id="grid"></div>
 
     <div class="instructions">
-      Gebruik <kbd>Pijltoetsen</kbd> of <kbd>Muis</kbd> & Druk op <kbd>ENTER</kbd> om te bevestigen
+      Klik met <kbd>Muis</kbd> of gebruik <kbd>Pijltoetsen</kbd> + <kbd>ENTER</kbd>
     </div>
 
     <!-- Geslaagd / Mislukt Overlayscherm -->
@@ -209,6 +209,7 @@
   }
 
   function startGame() {
+    window.focus();
     overlay.classList.remove('show');
     clearInterval(timerInterval);
     clearInterval(moveInterval);
@@ -239,7 +240,7 @@
     renderGrid();
     startTimer();
 
-    // Elke 2 seconden verschuiven alle nummers naar links
+    // Elke 2 seconden schuiven alle nummers naar links
     moveInterval = setInterval(() => {
       if (!isGameActive) return;
       
@@ -301,7 +302,7 @@
       e.preventDefault();
       hoveredIndex = Math.max(hoveredIndex - cols, 0);
       renderGrid();
-    } else if (e.key === 'Enter') {
+    } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       checkSelection(hoveredIndex);
     }
