@@ -21,24 +21,17 @@
       overflow: hidden;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
     header {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       height: 60px;
-
       background-color: #16181d;
       border-bottom: 1px solid #232730;
-
       display: flex;
       justify-content: space-between;
       align-items: center;
-
       padding: 0 24px;
       z-index: 10;
     }
@@ -54,35 +47,24 @@
       color: #94a3b8;
     }
 
-    /* =========================
-       SIDEBAR
-    ========================= */
-
     aside {
       width: 260px;
       height: 100vh;
-
       background-color: #16181d;
       border-right: 1px solid #232730;
-
       padding-top: 80px;
-
       display: flex;
       flex-direction: column;
-
       flex-shrink: 0;
     }
 
     .sidebar-section {
       padding: 0 16px;
       margin-bottom: 8px;
-
       font-size: 0.75rem;
       font-weight: 700;
-
       text-transform: uppercase;
       letter-spacing: 0.05em;
-
       color: #94a3b8;
     }
 
@@ -94,16 +76,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       padding: 10px 24px;
-
       color: #94a3b8;
       text-decoration: none;
-
       font-size: 0.9rem;
-
       cursor: pointer;
-
       transition: all 0.2s ease;
     }
 
@@ -123,28 +100,18 @@
       opacity: 0.5;
     }
 
-    /* =========================
-       MAIN
-    ========================= */
-
     main {
       flex-grow: 1;
-
       padding-top: 60px;
-
       height: 100vh;
-
       background-color: #0f1013;
-
       display: flex;
     }
 
     iframe {
       width: 100%;
       height: 100%;
-
       border: none;
-
       display: block;
     }
   </style>
@@ -152,75 +119,45 @@
 
 <body>
 
-  <!-- HEADER -->
   <header>
-    <div class="brand">
-      FiveM Practice Hub
-    </div>
-
-    <div class="home">
-      Home
-    </div>
+    <div class="brand">FiveM Practice Hub</div>
+    <div class="home">Home</div>
   </header>
 
-
-  <!-- SIDEBAR -->
   <aside>
-
-    <div class="sidebar-section">
-      Minigames
-    </div>
+    <div class="sidebar-section">Minigames</div>
 
     <ul class="nav-list">
-
-      <li
-        class="nav-item active"
-        onclick="loadGame(this, 'Lockpicking.html')"
-      >
+      <li class="nav-item active" onclick="loadGame(this, 'Lockpicking.html')">
         <span>Lockpicking</span>
         <span class="arrow">&gt;</span>
       </li>
 
-      <!-- TOEGEVOEGDE MINIGAME: MEMORY GRID -->
-      <li
-        class="nav-item"
-        onclick="loadGame(this, 'Memory.html')"
-      >
+      <li class="nav-item" onclick="loadGame(this, 'Memory.html')">
         <span>Memory Grid</span>
         <span class="arrow">&gt;</span>
       </li>
 
+      <li class="nav-item" onclick="loadGame(this, 'NumberHack.html')">
+        <span>Number Hack</span>
+        <span class="arrow">&gt;</span>
+      </li>
     </ul>
-
   </aside>
 
-
-  <!-- MAIN CONTENT -->
   <main>
-
-    <iframe
-      id="gameFrame"
-      src="Lockpicking.html"
-      title="Minigame Frame"
-    ></iframe>
-
+    <iframe id="gameFrame" src="Lockpicking.html" title="Minigame Frame"></iframe>
   </main>
-
 
   <script>
     function loadGame(element, url) {
-
-      // Laad de gekozen minigame
       document.getElementById("gameFrame").src = url;
 
-      // Verwijder active van alle menu-items
       const items = document.querySelectorAll(".nav-item");
-
       items.forEach(function(item) {
         item.classList.remove("active");
       });
 
-      // Maak het aangeklikte item actief
       element.classList.add("active");
     }
   </script>
