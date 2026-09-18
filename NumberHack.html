@@ -108,13 +108,14 @@
       font-weight: bold;
     }
 
+    /* Geslaagd / Mislukt Overlayscherm */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.97);
       border-radius: 12px;
       display: flex;
       flex-direction: column;
@@ -123,6 +124,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
+      z-index: 100; /* Zorgt dat het altijd bovenop het grid ligt */
     }
 
     .overlay.show {
@@ -136,8 +138,8 @@
     }
 
     .btn {
-      margin-top: 15px;
-      padding: 10px 20px;
+      margin-top: 18px;
+      padding: 10px 22px;
       background: #0284c7;
       color: #fff;
       border: none;
@@ -146,6 +148,7 @@
       cursor: pointer;
       font-family: inherit;
       font-size: 0.95rem;
+      transition: background 0.2s;
     }
 
     .btn:hover {
@@ -170,6 +173,7 @@
       Gebruik <kbd>Pijltoetsen</kbd> of <kbd>Muis</kbd> & Druk op <kbd>ENTER</kbd> om te bevestigen
     </div>
 
+    <!-- Geslaagd / Mislukt Overlayscherm -->
     <div class="overlay" id="overlay">
       <div class="status-icon" id="statusIcon">✓</div>
       <h2 id="overlayTitle" style="color: #22c55e;">SYSTEM HACKED</h2>
@@ -211,18 +215,21 @@
     isGameActive = true;
     timeLeft = 100;
 
+    // Genereer doelreeks
     targetSequence = [];
     for (let i = 0; i < targetLength; i++) {
       targetSequence.push(generateNumber());
     }
     targetBox.innerText = targetSequence.join(' ');
 
+    // Vul het grid met willekeurige getallen
     const totalCells = rows * cols;
     gridNumbers = [];
     for (let i = 0; i < totalCells; i++) {
       gridNumbers.push(generateNumber());
     }
 
+    // Plaats de doelreeks op een willekeurige geldige startpositie
     const randomPos = Math.floor(Math.random() * (totalCells - targetLength));
     for (let i = 0; i < targetLength; i++) {
       gridNumbers[randomPos + i] = targetSequence[i];
@@ -232,6 +239,7 @@
     renderGrid();
     startTimer();
 
+    // Elke 2 seconden verschuiven alle nummers naar links
     moveInterval = setInterval(() => {
       if (!isGameActive) return;
       
@@ -271,7 +279,7 @@
     });
   }
 
-  // Luister naar toetsenbord (Pijltoetsen + Enter)
+  // Toetsenbordbesturing
   window.addEventListener('keydown', (e) => {
     if (!isGameActive) return;
 
@@ -300,6 +308,8 @@
   });
 
   function checkSelection(index) {
+    if (!isGameActive) return;
+
     const selectedSeq = gridNumbers.slice(index, index + targetLength);
     const isCorrect = selectedSeq.join(' ') === targetSequence.join(' ');
 
@@ -321,7 +331,7 @@
       overlaySub.innerText = "Verkeerde combinatie gekozen.";
     }
 
-    setTimeout(() => overlay.classList.add('show'), 300);
+    overlay.classList.add('show');
   }
 
   function startTimer() {
