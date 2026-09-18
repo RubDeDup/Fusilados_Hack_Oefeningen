@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Matching Hack</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0d0e12;
+      color: #ffffff;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: #11161b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      width: 480px;
+      position: relative;
+    }
+
+    .header-title {
+      font-size: 0.85rem;
+      color: #38bdf8;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    /* Target display */
+    .target-box {
+      background-color: #0b1319;
+      border: 1px solid #0284c7;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 6px;
+      color: #38bdf8;
+      margin-bottom: 15px;
+    }
+
+    /* Timer bar */
+    .timer-container {
+      width: 100%;
+      height: 6px;
+      background-color: #1e293b;
+      border-radius: 3px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 100%;
+      background-color: #38bdf8;
+      transition: width 0.1s linear;
+    }
+
+    /* Grid layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      background: #090d12;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .cell {
+      padding: 8px 0;
+      font-size: 0.95rem;
+      color: #64748b;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cell.highlight {
+      background-color: #0284c7;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    .cell.correct {
+      background-color: #22c55e !important;
+      color: #ffffff !important;
+    }
+
+    .cell.wrong {
+      background-color: #ef4444 !important;
+      color: #ffffff !important;
+    }
+
+    /* Overlay scherm */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #0369a1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-title">Connecting to Host</div>
+    
+    <div class="target-box" id="targetBox">00 00 00 00</div>
+
+    <div class="timer-container">
+      <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="overlay" id="overlay">
+      <h2 id="overlayTitle" style="color: #22c55e;">SYSTEM HACKED</h2>
+      <p id="overlaySub" style="color: #94a3b8; margin-top: 5px; font-size: 0.9rem;">Verbinding succesvol opgesteld.</p>
+      <button class="btn" onclick="startGame()">Opnieuw Proberen</button>
+    </div>
+  </div>
+
+<script>
+  const grid = document.getElementById('grid');
+  const targetBox = document.getElementById('targetBox');
+  const timerBar = document.getElementById('timerBar');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+
+  const rows = 8;
+  const cols = 8;
+  const targetLength = 4; // 4 paar getallen
+  let targetSequence = [];
+  let gridNumbers = [];
+  let targetStartIndex = -1;
+  let hoveredIndex = 0;
+  
+  let timeLeft = 100;
+  let timerInterval;
+  let moveInterval;
+  let isGameActive = false;
+
+  function generateNumber() {
+    const num = Math.floor(Math.random() * 90) + 10;
+    return num.toString();
+  }
+
+  function startGame() {
+    overlay.classList.remove('show');
+    clearInterval(timerInterval);
+    clearInterval(moveInterval);
+    isGameActive = true;
+    timeLeft = 100;
+
+    // Genereer doelreeks
+    targetSequence = [];
+    for (let i = 0; i < targetLength; i++) {
+      targetSequence.push(generateNumber());
+    }
+    targetBox.innerText = targetSequence.join(' ');
+
+    // Genereer grid getallen
+    gridNumbers = [];
+    const totalCells = rows * cols;
+    for (let i = 0; i < totalCells; i++) {
+      gridNumbers.push(generateNumber());
+    }
+
+    // Plaats doelreeks op een willekeurige horizontale positie
+    const randomRow = Math.floor(Math.random() * rows);
+    const randomCol = Math.floor(Math.random() * (cols - targetLength + 1));
+    targetStartIndex = randomRow * cols + randomCol;
+
+    for (let i = 0; i < targetLength; i++) {
+      gridNumbers[targetStartIndex + i] = targetSequence[i];
+    }
+
+    renderGrid();
+    startTimer();
+
+    // Laat de getallen om de paar seconden lichtjes veranderen/verschuiven
+    moveInterval = setInterval(() => {
+      if (!isGameActive) return;
+      shuffleNonTargetNumbers();
+      renderGrid();
+    }, 2000);
+  }
+
+  function shuffleNonTargetNumbers() {
+    for (let i = 0; i < gridNumbers.length; i++) {
+      // Sla de echte doel-indices over
+      if (i >= targetStartIndex && i < targetStartIndex + targetLength) continue;
+      if (Math.random() > 0.6) {
+        gridNumbers[i] = generateNumber();
+      }
+    }
+  }
+
+  function renderGrid() {
+    grid.innerHTML = '';
+    gridNumbers.forEach((num, idx) => {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.innerText = num;
+
+      // Highlight de selectie van 4 getallen op rij
+      if (idx >= hoveredIndex && idx < hoveredIndex + targetLength && (hoveredIndex % cols) <= cols - targetLength) {
+        cell.classList.add('highlight');
+      }
+
+      cell.addEventListener('mouseenter', () => {
+        if (!isGameActive) return;
+        const col = idx % cols;
+        if (col <= cols - targetLength) {
+          hoveredIndex = idx;
+        } else {
+          hoveredIndex = idx - (col - (cols - targetLength));
+        }
+        renderGrid();
+      });
+
+      cell.addEventListener('click', () => {
+        if (!isGameActive) return;
+        checkSelection(hoveredIndex);
+      });
+
+      grid.appendChild(cell);
+    });
+  }
+
+  function checkSelection(index) {
+    isGameActive = false;
+    clearInterval(timerInterval);
+    clearInterval(moveInterval);
+
+    if (index === targetStartIndex) {
+      // Goed!
+      overlayTitle.innerText = "SYSTEM HACKED";
+      overlayTitle.style.color = "#22c55e";
+      setTimeout(() => overlay.classList.add('show'), 400);
+    } else {
+      // Fout!
+      overlayTitle.innerText = "ACCESS DENIED";
+      overlayTitle.style.color = "#ef4444";
+      setTimeout(() => overlay.classList.add('show'), 400);
+    }
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timeLeft -= 0.8;
+      timerBar.style.width = `${Math.max(0, timeLeft)}%`;
+
+      if (timeLeft <= 0) {
+        isGameActive = false;
+        clearInterval(timerInterval);
+        clearInterval(moveInterval);
+        overlayTitle.innerText = "TIME EXPIRED";
+        overlayTitle.style.color = "#ef4444";
+        overlay.classList.add('show');
+      }
+    }, 100);
+  }
+
+  startGame();
+</script>
+
+</body>
+</html>
