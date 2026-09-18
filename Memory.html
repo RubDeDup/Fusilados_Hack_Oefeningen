@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Grid Hack</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0d0e12;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: #161922;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      width: 420px;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    p.subtitle {
+      font-size: 0.85rem;
+      color: #8a8f9d;
+      margin-bottom: 20px;
+    }
+
+    /* Het 6x6 Raster */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      width: 360px;
+      height: 360px;
+      margin: 0 auto;
+      background-color: #1e222d;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .tile {
+      background-color: #3b5998; /* Typische FiveM blauwe kleur */
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .tile:hover {
+      opacity: 0.9;
+    }
+
+    .tile:active {
+      transform: scale(0.95);
+    }
+
+    /* Witte geheugen-tegel */
+    .tile.active {
+      background-color: #e2e8f0;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Goed geklikt */
+    .tile.correct {
+      background-color: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+    }
+
+    /* Fout geklikt */
+    .tile.wrong {
+      background-color: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+
+    .status-bar {
+      margin-top: 18px;
+      font-size: 0.9rem;
+      color: #a0a5b5;
+      min-height: 24px;
+    }
+
+    /* Overlay scherm */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(22, 25, 34, 0.95);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .success-icon {
+      font-size: 3.5rem;
+      color: #22c55e;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      margin-top: 18px;
+      padding: 10px 20px;
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>MEMORY GRID</h1>
+    <p class="subtitle">Onthoud de witte vakjes</p>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="status-bar" id="status">Voorbereiden...</div>
+
+    <!-- Geslaagd Scherm -->
+    <div class="overlay" id="successOverlay">
+      <div class="success-icon">✓</div>
+      <h2>HACK GESLAAGD!</h2>
+      <p style="color: #8a8f9d; margin-top: 5px; font-size: 0.9rem;">Geheugentest succesvol afgerond.</p>
+      <button class="btn" onclick="startGame()">Opnieuw Spelen</button>
+    </div>
+  </div>
+
+<script>
+  const gridContainer = document.getElementById('grid');
+  const statusText = document.getElementById('status');
+  const overlay = document.getElementById('successOverlay');
+
+  const gridSize = 36; // 6x6
+  const activeCount = 10; // Aantal witte vakjes
+  const showTime = 3000; // Tijd in ms dat vakjes wit blijven (3 sec)
+
+  let activeTiles = [];
+  let clickedTiles = [];
+  let isClickable = false;
+
+  function createGrid() {
+    gridContainer.innerHTML = '';
+    for (let i = 0; i < gridSize; i++) {
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.dataset.index = i;
+      tile.addEventListener('click', handleTileClick);
+      gridContainer.appendChild(tile);
+    }
+  }
+
+  function startGame() {
+    overlay.classList.remove('show');
+    clickedTiles = [];
+    isClickable = false;
+    statusText.innerText = "Onthoud de vakjes!";
+
+    const tiles = document.querySelectorAll('.tile');
+    tiles.forEach(tile => {
+      tile.className = 'tile';
+    });
+
+    // Genereer willekeurige unieke indexen voor witte vakjes
+    activeTiles = [];
+    while (activeTiles.length < activeCount) {
+      const rand = Math.floor(Math.random() * gridSize);
+      if (!activeTiles.includes(rand)) {
+        activeTiles.push(rand);
+      }
+    }
+
+    // Toon de witte vakjes
+    activeTiles.forEach(index => {
+      tiles[index].classList.add('active');
+    });
+
+    // Na de showTime, verberg de vakjes weer
+    setTimeout(() => {
+      activeTiles.forEach(index => {
+        tiles[index].classList.remove('active');
+      });
+      isClickable = true;
+      statusText.innerText = "Duid de juiste vakjes aan!";
+    }, showTime);
+  }
+
+  function handleTileClick(e) {
+    if (!isClickable) return;
+
+    const tile = e.target;
+    const index = parseInt(tile.dataset.index);
+
+    // Voorkom dubbel klikken op hetzelfde al gekozen vakje
+    if (clickedTiles.includes(index)) return;
+
+    if (activeTiles.includes(index)) {
+      // Goed geklikt!
+      tile.classList.add('correct');
+      clickedTiles.push(index);
+
+      // Check of alle vakjes zijn gevonden
+      if (clickedTiles.length === activeTiles.length) {
+        isClickable = false;
+        statusText.innerText = "Klaar!";
+        setTimeout(() => {
+          overlay.classList.add('show');
+        }, 500);
+      }
+    } else {
+      // Fout geklikt! Reset de game
+      tile.classList.add('wrong');
+      isClickable = false;
+      statusText.innerText = "Fout! Probeer opnieuw...";
+
+      // Toon alsnog alle juiste vakjes
+      activeTiles.forEach(i => {
+        const t = document.querySelector(`[data-index='${i}']`);
+        if (!t.classList.contains('correct')) {
+          t.classList.add('active');
+        }
+      });
+
+      setTimeout(() => {
+        startGame();
+      }, 2000);
+    }
+  }
+
+  // Initialiseren
+  createGrid();
+  startGame();
+</script>
+
+</body>
+</html>
