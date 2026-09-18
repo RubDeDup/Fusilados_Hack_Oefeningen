@@ -94,7 +94,20 @@
       font-weight: bold;
     }
 
-    /* Geslaagd / Mislukt Overlay */
+    .instructions {
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    kbd {
+      background: #1e293b;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
     .overlay {
       position: absolute;
       top: 0;
@@ -153,7 +166,10 @@
 
     <div class="grid" id="grid"></div>
 
-    <!-- Geslaagd / Mislukt Overlayscherm -->
+    <div class="instructions">
+      Gebruik <kbd>Pijltoetsen</kbd> of <kbd>Muis</kbd> & Druk op <kbd>ENTER</kbd> om te bevestigen
+    </div>
+
     <div class="overlay" id="overlay">
       <div class="status-icon" id="statusIcon">✓</div>
       <h2 id="overlayTitle" style="color: #22c55e;">SYSTEM HACKED</h2>
@@ -173,7 +189,7 @@
 
   const rows = 7;
   const cols = 8;
-  const targetLength = 4; // 4 getallen in de doelreeks
+  const targetLength = 4;
   
   let targetSequence = [];
   let gridNumbers = [];
@@ -195,34 +211,30 @@
     isGameActive = true;
     timeLeft = 100;
 
-    // Genereer doelreeks
     targetSequence = [];
     for (let i = 0; i < targetLength; i++) {
       targetSequence.push(generateNumber());
     }
     targetBox.innerText = targetSequence.join(' ');
 
-    // Vul het grid met willekeurige getallen
     const totalCells = rows * cols;
     gridNumbers = [];
     for (let i = 0; i < totalCells; i++) {
       gridNumbers.push(generateNumber());
     }
 
-    // Plaats de doelreeks op een willekeurige geldige startpositie
     const randomPos = Math.floor(Math.random() * (totalCells - targetLength));
     for (let i = 0; i < targetLength; i++) {
       gridNumbers[randomPos + i] = targetSequence[i];
     }
 
+    hoveredIndex = 0;
     renderGrid();
     startTimer();
 
-    // Elke 2 seconden verschuiven alle nummers 1 plek naar links
     moveInterval = setInterval(() => {
       if (!isGameActive) return;
       
-      // Schuif de hele array naar links (eerste element gaat naar het einde)
       const firstNum = gridNumbers.shift();
       gridNumbers.push(firstNum);
       
@@ -232,29 +244,26 @@
 
   function renderGrid() {
     grid.innerHTML = '';
+    const maxIdx = gridNumbers.length - targetLength;
+
     gridNumbers.forEach((num, idx) => {
       const cell = document.createElement('div');
       cell.classList.add('cell');
       cell.innerText = num;
 
-      // Markeer de 4 opeenvolgende cellen onder de muis
       if (idx >= hoveredIndex && idx < hoveredIndex + targetLength) {
         cell.classList.add('highlight');
       }
 
       cell.addEventListener('mouseenter', () => {
         if (!isGameActive) return;
-        // Zorg dat de highlight niet buiten de lengte van de array valt
-        if (idx <= gridNumbers.length - targetLength) {
-          hoveredIndex = idx;
-        } else {
-          hoveredIndex = gridNumbers.length - targetLength;
-        }
+        hoveredIndex = Math.min(idx, maxIdx);
         renderGrid();
       });
 
       cell.addEventListener('click', () => {
         if (!isGameActive) return;
+        hoveredIndex = Math.min(idx, maxIdx);
         checkSelection(hoveredIndex);
       });
 
@@ -262,8 +271,35 @@
     });
   }
 
+  // Luister naar toetsenbord (Pijltoetsen + Enter)
+  window.addEventListener('keydown', (e) => {
+    if (!isGameActive) return;
+
+    const maxIdx = gridNumbers.length - targetLength;
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      hoveredIndex = Math.min(hoveredIndex + 1, maxIdx);
+      renderGrid();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      hoveredIndex = Math.max(hoveredIndex - 1, 0);
+      renderGrid();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      hoveredIndex = Math.min(hoveredIndex + cols, maxIdx);
+      renderGrid();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      hoveredIndex = Math.max(hoveredIndex - cols, 0);
+      renderGrid();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      checkSelection(hoveredIndex);
+    }
+  });
+
   function checkSelection(index) {
-    // Haal de gekozen reeks op
     const selectedSeq = gridNumbers.slice(index, index + targetLength);
     const isCorrect = selectedSeq.join(' ') === targetSequence.join(' ');
 
