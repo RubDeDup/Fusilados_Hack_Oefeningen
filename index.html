@@ -175,9 +175,18 @@
 
       <li
         class="nav-item active"
-        onclick="loadGame(this, './lockpick/index.html')"
+        onclick="loadGame(this, 'Lockpicking.html')"
       >
         <span>Lockpicking</span>
+        <span class="arrow">&gt;</span>
+      </li>
+
+      <!-- TOEGEVOEGDE MINIGAME: MEMORY GRID -->
+      <li
+        class="nav-item"
+        onclick="loadGame(this, 'Memory.html')"
+      >
+        <span>Memory Grid</span>
         <span class="arrow">&gt;</span>
       </li>
 
@@ -191,8 +200,8 @@
 
     <iframe
       id="gameFrame"
-      src="./lockpick/index.html"
-      title="Lockpick Minigame"
+      src="Lockpicking.html"
+      title="Minigame Frame"
     ></iframe>
 
   </main>
