@@ -44,7 +44,7 @@
       margin-bottom: 15px;
     }
 
-    /* DVD Canvas Area */
+    /* DVD Bouncing Canvas Area */
     #gameCanvas {
       background-color: #0b0c10;
       border: 2px solid #232730;
@@ -61,7 +61,7 @@
       min-height: 24px;
     }
 
-    /* Geslaagd Overlayscherm */
+    /* Overlay scherm */
     .overlay {
       position: absolute;
       top: 0;
@@ -130,7 +130,6 @@
 
     <div class="status-bar" id="status">Onthoud de nummers...</div>
 
-    <!-- Geslaagd / Mislukt Overlay -->
     <div class="overlay" id="overlay">
       <div class="status-icon" id="statusIcon">✓</div>
       <h2 id="overlayTitle" style="color: #22c55e;">GESLAAGD!</h2>
@@ -153,7 +152,7 @@
   
   let boxes = [];
   let nextExpected = 1;
-  let phase = 'MEMORIZE'; // MEMORIZE -> MOVE_HIDDEN -> CLICK
+  let phase = 'MEMORIZE';
   let animationFrameId;
 
   function startGame() {
@@ -162,25 +161,25 @@
     phase = 'MEMORIZE';
     statusText.innerText = "Onthoud de nummers van de blokjes!";
 
-    // Genereer 3 blokjes op willekeurige posities met een unieke snelheid
+    // Genereer 3 stuiterende blokjes met een eigen richting/snelheid
     boxes = [];
     for (let i = 1; i <= totalBoxes; i++) {
       boxes.push({
         number: i,
         x: Math.random() * (canvas.width - boxSize - 40) + 20,
         y: Math.random() * (canvas.height - boxSize - 40) + 20,
-        dx: (Math.random() < 0.5 ? 1 : -1) * (2 + Math.random() * 1.5),
-        dy: (Math.random() < 0.5 ? 1 : -1) * (2 + Math.random() * 1.5),
+        dx: (Math.random() < 0.5 ? 1 : -1) * (2.2 + Math.random() * 1.5),
+        dy: (Math.random() < 0.5 ? 1 : -1) * (2.2 + Math.random() * 1.5),
         clicked: false
       });
     }
 
-    // Fase 1: Onthoudfase (2.5 seconden met nummers zichtbaar)
+    // Na 2.5 seconden verdwijnen de nummers terwijl ze doordraaien/stuiteren
     setTimeout(() => {
       phase = 'MOVE_HIDDEN';
       statusText.innerText = "Blijf de blokjes volgen...";
 
-      // Fase 2: Doorstuiteren zonder nummers (2 seconden)
+      // Na nog eens 2 seconden stoppen de blokjes en mag je klikken
       setTimeout(() => {
         phase = 'CLICK';
         statusText.innerText = "Klik op de blokjes in volgorde (1 ➔ 2 ➔ 3)!";
@@ -194,12 +193,11 @@
 
   function updatePositions() {
     boxes.forEach(box => {
-      // Beweeg alleen als we nog in de bewegingsfases zitten
       if (phase === 'MEMORIZE' || phase === 'MOVE_HIDDEN') {
         box.x += box.dx;
         box.y += box.dy;
 
-        // Stuiter op de randen van het canvas (zoals een DVD logo)
+        // Kaats af op de randen van het canvas
         if (box.x <= 0 || box.x + boxSize >= canvas.width) box.dx *= -1;
         if (box.y <= 0 || box.y + boxSize >= canvas.height) box.dy *= -1;
       }
@@ -210,17 +208,16 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     boxes.forEach(box => {
-      // Teken het blokje
       ctx.fillStyle = box.clicked ? '#22c55e' : '#3b5998';
       ctx.beginPath();
-      ctx.roundRect(box.x, box.y, box.size || boxSize, box.size || boxSize, 8);
+      ctx.roundRect(box.x, box.y, boxSize, boxSize, 8);
       ctx.fill();
 
       ctx.strokeStyle = box.clicked ? '#ffffff' : '#38bdf8';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Teken het nummer (alleen tijdens MEMORIZE fase of als het blokje al goed geklikt is)
+      // Nummer alleen tonen in de eerste fase of als hij al goed geklikt is
       if (phase === 'MEMORIZE' || box.clicked) {
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 22px sans-serif';
@@ -237,7 +234,6 @@
     animationFrameId = requestAnimationFrame(animate);
   }
 
-  // Luister naar muisklikken op de stuiterende blokjes
   canvas.addEventListener('click', (e) => {
     if (phase !== 'CLICK') return;
 
@@ -251,17 +247,14 @@
           clickY >= box.y && clickY <= box.y + boxSize) {
 
         if (box.number === nextExpected) {
-          // Goed geklikt!
           box.clicked = true;
           nextExpected++;
 
           if (nextExpected > totalBoxes) {
-            // Allemaal goed!
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             showEndScreen(true, "GESLAAGD!", `Code van de kluis: ${randomCode}`);
           }
         } else {
-          // Verkeerde volgorde geklikt!
           showEndScreen(false, "MISLUKT!", "Verkeerde volgorde geklikt.");
         }
       }
