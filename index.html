@@ -21,10 +21,7 @@
       overflow: hidden;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
+    /* HEADER */
     header {
       position: absolute;
       top: 0;
@@ -57,10 +54,7 @@
       color: #fbbf24;
     }
 
-    /* =========================
-       SIDEBAR
-    ========================= */
-
+    /* SIDEBAR */
     aside {
       width: 260px;
       height: 100vh;
@@ -114,10 +108,7 @@
       opacity: 0.5;
     }
 
-    /* =========================
-       MAIN
-    ========================= */
-
+    /* MAIN */
     main {
       flex-grow: 1;
       padding-top: 60px;
@@ -137,22 +128,15 @@
 
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="brand">FiveM Practice Hub</div>
     <div class="home-btn" onclick="openHome()">Home</div>
   </header>
 
-  <!-- SIDEBAR -->
   <aside>
     <div class="sidebar-section">Minigames</div>
 
     <ul class="nav-list">
-      <li class="nav-item" onclick="loadGame(this, 'Lockpicking.html')">
-        <span>Lockpicking</span>
-        <span class="arrow">&gt;</span>
-      </li>
-
       <li class="nav-item" onclick="loadGame(this, 'Memory.html')">
         <span>Memory Grid</span>
         <span class="arrow">&gt;</span>
@@ -175,7 +159,6 @@
     </ul>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main>
     <iframe id="gameFrame" src="Home.html" title="Minigame Hub"></iframe>
   </main>
@@ -202,7 +185,6 @@
       });
     }
 
-    // Functie zodat kaarten op Home.html de games kunnen openen
     function loadGameFromHome(url) {
       const items = document.querySelectorAll(".nav-item");
       items.forEach(function(item) {
