@@ -20,6 +20,7 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      position: relative;
     }
 
     .container {
@@ -108,7 +109,6 @@
       font-weight: bold;
     }
 
-    /* Geslaagd / Mislukt Overlayscherm */
     .overlay {
       position: absolute;
       top: 0;
@@ -154,6 +154,16 @@
     .btn:hover {
       background: #0369a1;
     }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body onclick="window.focus()">
@@ -173,7 +183,6 @@
       Klik met <kbd>Muis</kbd> of gebruik <kbd>Pijltoetsen</kbd> + <kbd>ENTER</kbd>
     </div>
 
-    <!-- Geslaagd / Mislukt Overlayscherm -->
     <div class="overlay" id="overlay">
       <div class="status-icon" id="statusIcon">✓</div>
       <h2 id="overlayTitle" style="color: #22c55e;">SYSTEM HACKED</h2>
@@ -181,6 +190,8 @@
       <button class="btn" onclick="startGame()">Opnieuw Spelen</button>
     </div>
   </div>
+
+  <div class="watermark">Created by RubDeDup</div>
 
 <script>
   const grid = document.getElementById('grid');
@@ -216,21 +227,18 @@
     isGameActive = true;
     timeLeft = 100;
 
-    // Genereer doelreeks
     targetSequence = [];
     for (let i = 0; i < targetLength; i++) {
       targetSequence.push(generateNumber());
     }
     targetBox.innerText = targetSequence.join(' ');
 
-    // Vul het grid met willekeurige getallen
     const totalCells = rows * cols;
     gridNumbers = [];
     for (let i = 0; i < totalCells; i++) {
       gridNumbers.push(generateNumber());
     }
 
-    // Plaats de doelreeks op een willekeurige geldige startpositie
     const randomPos = Math.floor(Math.random() * (totalCells - targetLength));
     for (let i = 0; i < targetLength; i++) {
       gridNumbers[randomPos + i] = targetSequence[i];
@@ -240,7 +248,6 @@
     renderGrid();
     startTimer();
 
-    // Elke 2 seconden schuiven alle nummers naar links
     moveInterval = setInterval(() => {
       if (!isGameActive) return;
       
@@ -280,7 +287,6 @@
     });
   }
 
-  // Toetsenbordbesturing
   window.addEventListener('keydown', (e) => {
     if (!isGameActive) return;
 
