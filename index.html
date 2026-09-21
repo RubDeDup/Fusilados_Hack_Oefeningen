@@ -21,6 +21,10 @@
       overflow: hidden;
     }
 
+    /* =========================
+       HEADER
+    ========================= */
+
     header {
       position: absolute;
       top: 0;
@@ -52,6 +56,10 @@
     .home-btn:hover {
       color: #fbbf24;
     }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
 
     aside {
       width: 260px;
@@ -106,6 +114,10 @@
       opacity: 0.5;
     }
 
+    /* =========================
+       MAIN
+    ========================= */
+
     main {
       flex-grow: 1;
       padding-top: 60px;
@@ -125,11 +137,13 @@
 
 <body>
 
+  <!-- HEADER -->
   <header>
     <div class="brand">FiveM Practice Hub</div>
     <div class="home-btn" onclick="openHome()">Home</div>
   </header>
 
+  <!-- SIDEBAR -->
   <aside>
     <div class="sidebar-section">Minigames</div>
 
@@ -153,11 +167,16 @@
         <span>WT Hack</span>
         <span class="arrow">&gt;</span>
       </li>
+
+      <li class="nav-item" onclick="loadGame(this, 'Winkel_DVD_Hack.html')">
+        <span>Winkel DVD Hack</span>
+        <span class="arrow">&gt;</span>
+      </li>
     </ul>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main>
-    <!-- Standaard startpagina ingesteld op Home.html -->
     <iframe id="gameFrame" src="Home.html" title="Minigame Hub"></iframe>
   </main>
 
@@ -188,7 +207,7 @@
       const items = document.querySelectorAll(".nav-item");
       items.forEach(function(item) {
         item.classList.remove("active");
-        if (item.getAttribute("onclick").includes(url)) {
+        if (item.getAttribute("onclick") && item.getAttribute("onclick").includes(url)) {
           item.classList.add("active");
         }
       });
