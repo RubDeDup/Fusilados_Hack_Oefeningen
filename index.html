@@ -64,6 +64,7 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
+      position: relative;
     }
 
     .sidebar-section {
@@ -108,7 +109,7 @@
       opacity: 0.5;
     }
 
-    /* MAIN */
+    /* MAIN CONTENT */
     main {
       flex-grow: 1;
       padding-top: 60px;
@@ -127,13 +128,12 @@
     /* WATERMARK */
     .watermark {
       position: absolute;
-      bottom: 12px;
+      bottom: 15px;
       left: 20px;
       font-size: 0.75rem;
       color: #475569;
       letter-spacing: 1px;
       pointer-events: none;
-      z-index: 20;
     }
   </style>
 </head>
@@ -166,6 +166,11 @@
 
       <li class="nav-item" onclick="loadGame(this, 'Winkel_DVD_Hack.html')">
         <span>Winkel DVD Hack</span>
+        <span class="arrow">&gt;</span>
+      </li>
+
+      <li class="nav-item" onclick="loadGame(this, 'Bobcat_1.html')">
+        <span>Bobcat 1</span>
         <span class="arrow">&gt;</span>
       </li>
     </ul>
