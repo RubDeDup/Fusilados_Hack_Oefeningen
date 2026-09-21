@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WT Phone Hack</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b0c10;
+      color: #ffffff;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Telefoon behuizing */
+    .phone {
+      width: 520px;
+      height: 380px;
+      background: #1f232a;
+      border-radius: 28px;
+      padding: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      background: #090a0f;
+      border-radius: 16px;
+      border: 2px solid #2d333f;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Header met doelen & timer */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .code-box {
+      background: #12161f;
+      border: 1px solid #22c55e;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: #22c55e;
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 4px;
+    }
+
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 3px;
+      flex-grow: 1;
+      background: #050608;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #1a1e26;
+    }
+
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #22c55e; /* Groene NoPixel stijl */
+      border-radius: 3px;
+      user-select: none;
+    }
+
+    /* Selectie kaders */
+    .cell.left-selected {
+      background-color: rgba(56, 189, 248, 0.35);
+      border: 1px solid #38bdf8;
+    }
+
+    .cell.right-selected {
+      background-color: rgba(168, 85, 247, 0.35);
+      border: 1px solid #a855f7;
+    }
+
+    .cell.found {
+      background-color: rgba(34, 197, 94, 0.4);
+      border: 1px solid #22c55e;
+    }
+
+    /* Instructies onderaan */
+    .instructions {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: #94a3b8;
+    }
+
+    kbd {
+      background: #1e2430;
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #38bdf8;
+    }
+
+    /* Start & Success Overlays */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(9, 10, 15, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .overlay h2 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .btn {
+      margin-top: 15px;
+      padding: 8px 18px;
+      background: #22c55e;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+<body onclick="window.focus()">
+
+  <div class="phone">
+    <div class="screen">
+      
+      <!-- HEADER -->
+      <div class="header">
+        <div class="code-box" id="leftCodeDisplay">1 3 C 9</div>
+        <div class="timer" id="timerDisplay">40.00s</div>
+        <div class="code-box" id="rightCodeDisplay">5 B D 7</div>
+      </div>
+
+      <!-- RASTER -->
+      <div class="grid" id="grid"></div>
+
+      <!-- INSTRUCTIES -->
+      <div class="instructions">
+        <span><kbd>W A S D</kbd> + <kbd>SPATIE</kbd> (Linker Code)</span>
+        <span><kbd>PIJLTOETSEN</kbd> + <kbd>ENTER</kbd> (Rechter Code)</span>
+      </div>
+
+      <!-- OVERLAY SCHERM -->
+      <div class="overlay show" id="overlay">
+        <h2 id="overlayTitle" style="color: #22c55e;">Hack starten...</h2>
+        <p id="overlaySub" style="color: #94a3b8; font-size: 0.85rem;">Vind de constante codes</p>
+        <button class="btn" id="startBtn" onclick="startGame()">Start Hack</button>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  const grid = document.getElementById('grid');
+  const leftCodeDisplay = document.getElementById('leftCodeDisplay');
+  const rightCodeDisplay = document.getElementById('rightCodeDisplay');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlaySub = document.getElementById('overlaySub');
+  const startBtn = document.getElementById('startBtn');
+
+  const rows = 10;
+  const cols = 12;
+  const chars = "0123456789ABCDEF";
+
+  let leftTarget = [];
+  let rightTarget = [];
+  
+  let leftPos = 0;
+  let rightPos = cols - 4;
+
+  let leftFound = false;
+  let rightFound = false;
+
+  let gridData = [];
+  let leftTargetIndex = -1;
+  let rightTargetIndex = -1;
+
+  let timeLeft = 40.0;
+  let timerInterval;
+  let noiseInterval;
+  let isGameActive = false;
+
+  function randomChar() {
+    return chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  function randomCode() {
+    return [randomChar(), randomChar(), randomChar(), randomChar()];
+  }
+
+  function startGame() {
+    window.focus();
+    overlay.classList.remove('show');
+    clearInterval(timerInterval);
+    clearInterval(noiseInterval);
+
+    isGameActive = true;
+    leftFound = false;
+    rightFound = false;
+    timeLeft = 40.0;
+
+    leftTarget = randomCode();
+    rightTarget = randomCode();
+
+    leftCodeDisplay.innerText = leftTarget.join(' ');
+    rightCodeDisplay.innerText = rightTarget.join(' ');
+
+    const totalCells = rows * cols;
+    gridData = [];
+    for (let i = 0; i < totalCells; i++) {
+      gridData.push(randomChar());
+    }
+
+    // Plaats linker constante code op willekeurige plek
+    leftTargetIndex = getRandomStartIndex();
+    for (let i = 0; i < 4; i++) {
+      gridData[leftTargetIndex + i] = leftTarget[i];
+    }
+
+    // Plaats rechter constante code op willekeurige plek (niet overlappend)
+    do {
+      rightTargetIndex = getRandomStartIndex();
+    } while (Math.abs(rightTargetIndex - leftTargetIndex) < 4);
+
+    for (let i = 0; i < 4; i++) {
+      gridData[rightTargetIndex + i] = rightTarget[i];
+    }
+
+    leftPos = 0;
+    rightPos = cols - 4;
+
+    renderGrid();
+    startTimer();
+
+    // Ruisanimatie: verander alle NIET-doeltekens om de 150ms
+    noiseInterval = setInterval(() => {
+      if (!isGameActive) return;
+
+      for (let i = 0; i < totalCells; i++) {
+        // Sla de constante doelcodes over
+        if (i >= leftTargetIndex && i < leftTargetIndex + 4) continue;
+        if (i >= rightTargetIndex && i < rightTargetIndex + 4) continue;
+
+        if (Math.random() > 0.4) {
+          gridData[i] = randomChar();
+        }
+      }
+      renderGrid();
+    }, 150);
+  }
+
+  function getRandomStartIndex() {
+    const r = Math.floor(Math.random() * rows);
+    const c = Math.floor(Math.random() * (cols - 3));
+    return r * cols + c;
+  }
+
+  function renderGrid() {
+    grid.innerHTML = '';
+
+    gridData.forEach((char, idx) => {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.innerText = char;
+
+      // Markeer reeds gevonden codes
+      if (leftFound && idx >= leftTargetIndex && idx < leftTargetIndex + 4) {
+        cell.classList.add('found');
+      }
+      if (rightFound && idx >= rightTargetIndex && idx < rightTargetIndex + 4) {
+        cell.classList.add('found');
+      }
+
+      // Markeer huidige WASD selectie
+      if (!leftFound && idx >= leftPos && idx < leftPos + 4 && (leftPos % cols) <= cols - 4) {
+        cell.classList.add('left-selected');
+      }
+
+      // Markeer huidige Pijltoetsen selectie
+      if (!rightFound && idx >= rightPos && idx < rightPos + 4 && (rightPos % cols) <= cols - 4) {
+        cell.classList.add('right-selected');
+      }
+
+      grid.appendChild(cell);
+    });
+  }
+
+  // Besturing
+  window.addEventListener('keydown', (e) => {
+    if (!isGameActive) return;
+
+    const key = e.key.toLowerCase();
+
+    // WASD Besturing (Linker Code)
+    if (!leftFound) {
+      if (key === 'a' && leftPos % cols > 0) leftPos--;
+      if (key === 'd' && leftPos % cols < cols - 4) leftPos++;
+      if (key === 'w' && leftPos >= cols) leftPos -= cols;
+      if (key === 's' && leftPos < (rows - 1) * cols) leftPos += cols;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (leftPos === leftTargetIndex) {
+          leftFound = true;
+          checkWin();
+        }
+      }
+    }
+
+    // Pijltoetsen Besturing (Rechter Code)
+    if (!rightFound) {
+      if (e.key === 'ArrowLeft' && rightPos % cols > 0) rightPos--;
+      if (e.key === 'ArrowRight' && rightPos % cols < cols - 4) rightPos++;
+      if (e.key === 'ArrowUp' && rightPos >= cols) rightPos -= cols;
+      if (e.key === 'ArrowDown' && rightPos < (rows - 1) * cols) rightPos += cols;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (rightPos === rightTargetIndex) {
+          rightFound = true;
+          checkWin();
+        }
+      }
+    }
+
+    renderGrid();
+  });
+
+  function checkWin() {
+    if (leftFound && rightFound) {
+      endGame(true, "Success", "Systeem succesvol gehackt!");
+    }
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timeLeft -= 0.05;
+      timerDisplay.innerText = `${Math.max(0, timeLeft).toFixed(2)}s`;
+
+      if (timeLeft <= 0) {
+        endGame(false, "Mislukt", "Tijd is verlopen!");
+      }
+    }, 50);
+  }
+
+  function endGame(success, title, sub) {
+    isGameActive = false;
+    clearInterval(timerInterval);
+    clearInterval(noiseInterval);
+
+    overlayTitle.innerText = title;
+    overlayTitle.style.color = success ? "#22c55e" : "#ef4444";
+    overlaySub.innerText = sub;
+    startBtn.innerText = "Opnieuw Spelen";
+    overlay.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
