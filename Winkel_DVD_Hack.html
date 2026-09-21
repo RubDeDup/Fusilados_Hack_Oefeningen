@@ -20,6 +20,7 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      position: relative;
     }
 
     .container {
@@ -44,7 +45,6 @@
       margin-bottom: 15px;
     }
 
-    /* DVD Bouncing Canvas Area */
     #gameCanvas {
       background-color: #0b0c10;
       border: 2px solid #232730;
@@ -61,7 +61,6 @@
       min-height: 24px;
     }
 
-    /* Overlay scherm */
     .overlay {
       position: absolute;
       top: 0;
@@ -118,6 +117,16 @@
     .btn:hover {
       background: #16a34a;
     }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -137,6 +146,8 @@
       <button class="btn" onclick="startGame()">Opnieuw Spelen</button>
     </div>
   </div>
+
+  <div class="watermark">Created by RubDeDup</div>
 
 <script>
   const canvas = document.getElementById('gameCanvas');
@@ -161,25 +172,22 @@
     phase = 'MEMORIZE';
     statusText.innerText = "Onthoud de nummers van de blokjes!";
 
-    // Tragere snelheid ingesteld (tussen 0.8 en 1.4)
     boxes = [];
     for (let i = 1; i <= totalBoxes; i++) {
       boxes.push({
         number: i,
         x: Math.random() * (canvas.width - boxSize - 40) + 20,
         y: Math.random() * (canvas.height - boxSize - 40) + 20,
-        dx: (Math.random() < 0.5 ? 1 : -1) * (0.6 + Math.random() * 0.4),
-        dy: (Math.random() < 0.5 ? 1 : -1) * (0.6 + Math.random() * 0.4),
+        dx: (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.6),
+        dy: (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.6),
         clicked: false
       });
     }
 
-    // Na 2.5 seconden verdwijnen de nummers
     setTimeout(() => {
       phase = 'MOVE_HIDDEN';
       statusText.innerText = "Blijf de blokjes volgen...";
 
-      // Na 2 seconden stoppen de blokjes en kan er geklikt worden
       setTimeout(() => {
         phase = 'CLICK';
         statusText.innerText = "Klik op de blokjes in volgorde (1 ➔ 2 ➔ 3)!";
@@ -197,7 +205,6 @@
         box.x += box.dx;
         box.y += box.dy;
 
-        // Kaats af op de randen van het canvas
         if (box.x <= 0 || box.x + boxSize >= canvas.width) box.dx *= -1;
         if (box.y <= 0 || box.y + boxSize >= canvas.height) box.dy *= -1;
       }
