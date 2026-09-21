@@ -20,9 +20,9 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      position: relative;
     }
 
-    /* Telefoon behuizing */
     .phone {
       width: 520px;
       height: 380px;
@@ -46,7 +46,6 @@
       overflow: hidden;
     }
 
-    /* Header met doelen & timer */
     .header {
       display: flex;
       justify-content: space-between;
@@ -71,7 +70,6 @@
       color: #38bdf8;
     }
 
-    /* Grid Layout */
     .grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -89,12 +87,11 @@
       align-items: center;
       font-size: 0.8rem;
       font-weight: bold;
-      color: #22c55e; /* Groene NoPixel stijl */
+      color: #22c55e;
       border-radius: 3px;
       user-select: none;
     }
 
-    /* Selectie kaders */
     .cell.left-selected {
       background-color: rgba(56, 189, 248, 0.35);
       border: 1px solid #38bdf8;
@@ -110,7 +107,6 @@
       border: 1px solid #22c55e;
     }
 
-    /* Instructies onderaan */
     .instructions {
       margin-top: 8px;
       display: flex;
@@ -126,7 +122,6 @@
       color: #38bdf8;
     }
 
-    /* Start & Success Overlays */
     .overlay {
       position: absolute;
       top: 0;
@@ -169,6 +164,16 @@
     .btn:hover {
       background: #16a34a;
     }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body onclick="window.focus()">
@@ -176,23 +181,19 @@
   <div class="phone">
     <div class="screen">
       
-      <!-- HEADER -->
       <div class="header">
         <div class="code-box" id="leftCodeDisplay">1 3 C 9</div>
         <div class="timer" id="timerDisplay">40.00s</div>
         <div class="code-box" id="rightCodeDisplay">5 B D 7</div>
       </div>
 
-      <!-- RASTER -->
       <div class="grid" id="grid"></div>
 
-      <!-- INSTRUCTIES -->
       <div class="instructions">
         <span><kbd>W A S D</kbd> + <kbd>SPATIE</kbd> (Linker Code)</span>
         <span><kbd>PIJLTOETSEN</kbd> + <kbd>ENTER</kbd> (Rechter Code)</span>
       </div>
 
-      <!-- OVERLAY SCHERM -->
       <div class="overlay show" id="overlay">
         <h2 id="overlayTitle" style="color: #22c55e;">Hack starten...</h2>
         <p id="overlaySub" style="color: #94a3b8; font-size: 0.85rem;">Vind de constante codes</p>
@@ -201,6 +202,8 @@
 
     </div>
   </div>
+
+  <div class="watermark">Created by RubDeDup</div>
 
 <script>
   const grid = document.getElementById('grid');
@@ -265,13 +268,11 @@
       gridData.push(randomChar());
     }
 
-    // Plaats linker constante code op willekeurige plek
     leftTargetIndex = getRandomStartIndex();
     for (let i = 0; i < 4; i++) {
       gridData[leftTargetIndex + i] = leftTarget[i];
     }
 
-    // Plaats rechter constante code op willekeurige plek (niet overlappend)
     do {
       rightTargetIndex = getRandomStartIndex();
     } while (Math.abs(rightTargetIndex - leftTargetIndex) < 4);
@@ -286,12 +287,10 @@
     renderGrid();
     startTimer();
 
-    // Ruisanimatie: verander alle NIET-doeltekens om de 150ms
     noiseInterval = setInterval(() => {
       if (!isGameActive) return;
 
       for (let i = 0; i < totalCells; i++) {
-        // Sla de constante doelcodes over
         if (i >= leftTargetIndex && i < leftTargetIndex + 4) continue;
         if (i >= rightTargetIndex && i < rightTargetIndex + 4) continue;
 
@@ -317,7 +316,6 @@
       cell.classList.add('cell');
       cell.innerText = char;
 
-      // Markeer reeds gevonden codes
       if (leftFound && idx >= leftTargetIndex && idx < leftTargetIndex + 4) {
         cell.classList.add('found');
       }
@@ -325,12 +323,10 @@
         cell.classList.add('found');
       }
 
-      // Markeer huidige WASD selectie
       if (!leftFound && idx >= leftPos && idx < leftPos + 4 && (leftPos % cols) <= cols - 4) {
         cell.classList.add('left-selected');
       }
 
-      // Markeer huidige Pijltoetsen selectie
       if (!rightFound && idx >= rightPos && idx < rightPos + 4 && (rightPos % cols) <= cols - 4) {
         cell.classList.add('right-selected');
       }
@@ -339,13 +335,11 @@
     });
   }
 
-  // Besturing
   window.addEventListener('keydown', (e) => {
     if (!isGameActive) return;
 
     const key = e.key.toLowerCase();
 
-    // WASD Besturing (Linker Code)
     if (!leftFound) {
       if (key === 'a' && leftPos % cols > 0) leftPos--;
       if (key === 'd' && leftPos % cols < cols - 4) leftPos++;
@@ -360,7 +354,6 @@
       }
     }
 
-    // Pijltoetsen Besturing (Rechter Code)
     if (!rightFound) {
       if (e.key === 'ArrowLeft' && rightPos % cols > 0) rightPos--;
       if (e.key === 'ArrowRight' && rightPos % cols < cols - 4) rightPos++;
