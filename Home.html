@@ -17,6 +17,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       padding: 40px;
       min-height: 100vh;
+      overflow-y: auto; /* Zorgt voor een scrollbalk wanneer er meer dan 4 kaarten zijn */
       position: relative;
     }
 
@@ -51,11 +52,25 @@
       margin-bottom: 20px;
     }
 
+    /* Grid geforceerd op exact 4 kolommen */
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
+    }
+
+    /* Responsieve weergave voor kleinere schermen */
+    @media (max-width: 1200px) {
+      .games-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .games-grid {
+        grid-template-columns: repeat(1, 1fr);
+      }
     }
 
     .card {
