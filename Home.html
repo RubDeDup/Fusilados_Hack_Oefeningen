@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practice Hub - Home</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    body {
+      background-color: #0f1013;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, #1e222b 0%, #16181d 100%);
+      border: 1px solid #232730;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .welcome-banner h1 {
+      font-size: 2rem;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .welcome-banner p {
+      color: #94a3b8;
+      font-size: 1rem;
+      line-height: 1.5;
+      max-width: 650px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fbbf24;
+      margin-bottom: 20px;
+    }
+
+    /* Grid met Game Cards */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: #16181d;
+      border: 1px solid #232730;
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 1.2rem;
+      color: #f8fafc;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .tag {
+      background: #1e222b;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #a0a5b5;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="welcome-banner">
+    <h1>Welkom bij FiveM Practice Hub 👋</h1>
+    <p>Oefen hier al je FiveM hacks en minigames. Kies een minigame uit het zijmenu of klik op een van de kaarten hieronder om direct te starten.</p>
+  </div>
+
+  <div class="section-title">Beschikbare Minigames</div>
+
+  <div class="games-grid">
+    
+    <!-- Lockpicking -->
+    <div class="card" onclick="openGame('Lockpicking.html')">
+      <div>
+        <div class="card-icon">🔓</div>
+        <h3>Lockpicking</h3>
+        <p>Timing minigame. Druk op spatie zodra de rode naald de groene zone raakt.</p>
+      </div>
+      <div class="card-footer">
+        <span>Speel Nu &rarr;</span>
+        <span class="tag">Spatie</span>
+      </div>
+    </div>
+
+    <!-- Memory Grid -->
+    <div class="card" onclick="openGame('Memory.html')">
+      <div>
+        <div class="card-icon">🧠</div>
+        <h3>Memory Grid</h3>
+        <p>Onthoud de witte vakjes op het 6x6 raster en klik ze daarna uit het geheugen aan.</p>
+      </div>
+      <div class="card-footer">
+        <span>Speel Nu &rarr;</span>
+        <span class="tag">Muis</span>
+      </div>
+    </div>
+
+    <!-- Number Hack -->
+    <div class="card" onclick="openGame('NumberHack.html')">
+      <div>
+        <div class="card-icon">🔢</div>
+        <h3>Number Hack</h3>
+        <p>Vind de getallenreeks in het schuifraster voor de tijd om is.</p>
+      </div>
+      <div class="card-footer">
+        <span>Speel Nu &rarr;</span>
+        <span class="tag">Pijltoetsen + Enter</span>
+      </div>
+    </div>
+
+    <!-- WT Hack -->
+    <div class="card" onclick="openGame('WT_Hack.html')">
+      <div>
+        <div class="card-icon">📱</div>
+        <h3>WT Hack</h3>
+        <p>Zoek de twee constante codes in de ruis met WASD en Pijltoetsen.</p>
+      </div>
+      <div class="card-footer">
+        <span>Speel Nu &rarr;</span>
+        <span class="tag">WASD / Pijlen</span>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  function openGame(url) {
+    // Verwijst de hoofdsite iframe door naar de gekozen game
+    window.parent.loadGameFromHome(url);
+  }
+</script>
+
+</body>
+</html>
