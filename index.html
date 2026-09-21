@@ -42,9 +42,15 @@
       color: #fff;
     }
 
-    .home {
+    .home-btn {
       font-size: 0.9rem;
       color: #94a3b8;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .home-btn:hover {
+      color: #fbbf24;
     }
 
     aside {
@@ -121,14 +127,14 @@
 
   <header>
     <div class="brand">FiveM Practice Hub</div>
-    <div class="home">Home</div>
+    <div class="home-btn" onclick="openHome()">Home</div>
   </header>
 
   <aside>
     <div class="sidebar-section">Minigames</div>
 
     <ul class="nav-list">
-      <li class="nav-item active" onclick="loadGame(this, 'Lockpicking.html')">
+      <li class="nav-item" onclick="loadGame(this, 'Lockpicking.html')">
         <span>Lockpicking</span>
         <span class="arrow">&gt;</span>
       </li>
@@ -142,11 +148,17 @@
         <span>Number Hack</span>
         <span class="arrow">&gt;</span>
       </li>
+
+      <li class="nav-item" onclick="loadGame(this, 'WT_Hack.html')">
+        <span>WT Hack</span>
+        <span class="arrow">&gt;</span>
+      </li>
     </ul>
   </aside>
 
   <main>
-    <iframe id="gameFrame" src="Lockpicking.html" title="Minigame Frame"></iframe>
+    <!-- Standaard startpagina ingesteld op Home.html -->
+    <iframe id="gameFrame" src="Home.html" title="Minigame Hub"></iframe>
   </main>
 
   <script>
@@ -158,7 +170,29 @@
         item.classList.remove("active");
       });
 
-      element.classList.add("active");
+      if (element) {
+        element.classList.add("active");
+      }
+    }
+
+    function openHome() {
+      document.getElementById("gameFrame").src = "Home.html";
+      const items = document.querySelectorAll(".nav-item");
+      items.forEach(function(item) {
+        item.classList.remove("active");
+      });
+    }
+
+    // Functie zodat kaarten op Home.html de games kunnen openen
+    function loadGameFromHome(url) {
+      const items = document.querySelectorAll(".nav-item");
+      items.forEach(function(item) {
+        item.classList.remove("active");
+        if (item.getAttribute("onclick").includes(url)) {
+          item.classList.add("active");
+        }
+      });
+      document.getElementById("gameFrame").src = url;
     }
   </script>
 
