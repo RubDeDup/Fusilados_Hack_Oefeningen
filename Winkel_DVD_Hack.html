@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winkel DVD Hack</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0d0e12;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: #161922;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      width: 440px;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    p.subtitle {
+      font-size: 0.85rem;
+      color: #8a8f9d;
+      margin-bottom: 20px;
+    }
+
+    /* 4x4 Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 12px;
+      width: 360px;
+      height: 360px;
+      margin: 0 auto;
+      background-color: #1e222d;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .tile {
+      background-color: #2b303c;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #38bdf8;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .tile:hover {
+      background-color: #384152;
+    }
+
+    .tile:active {
+      transform: scale(0.95);
+    }
+
+    /* Zichtbaar nummer tijdens de memoriseerfase */
+    .tile.visible {
+      background-color: #3b5998;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    .tile.correct {
+      background-color: #22c55e !important;
+      color: #fff !important;
+    }
+
+    .tile.wrong {
+      background-color: #ef4444 !important;
+      color: #fff !important;
+    }
+
+    .status-bar {
+      margin-top: 18px;
+      font-size: 0.9rem;
+      color: #a0a5b5;
+      min-height: 24px;
+    }
+
+    /* Overlay scherm bij succes */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(22, 25, 34, 0.95);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .success-icon {
+      font-size: 3rem;
+      color: #22c55e;
+      margin-bottom: 10px;
+    }
+
+    .vault-code {
+      font-size: 1.2rem;
+      color: #38bdf8;
+      margin-top: 8px;
+      font-family: monospace;
+      letter-spacing: 2px;
+      background: #0d0e12;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #2b303c;
+    }
+
+    .btn {
+      margin-top: 18px;
+      padding: 10px 20px;
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>WINKEL DVD HACK</h1>
+    <p class="subtitle">Onthoud de volgorde der cijfers</p>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="status-bar" id="status">Bereiden...</div>
+
+    <!-- Geslaagd Scherm -->
+    <div class="overlay" id="successOverlay">
+      <div class="success-icon">✓</div>
+      <h2>GESLAAGD!</h2>
+      <div class="vault-code" id="vaultCodeText">Code van de kluis: ----</div>
+      <button class="btn" onclick="startGame()">Opnieuw Spelen</button>
+    </div>
+  </div>
+
+<script>
+  const gridContainer = document.getElementById('grid');
+  const statusText = document.getElementById('status');
+  const overlay = document.getElementById('successOverlay');
+  const vaultCodeText = document.getElementById('vaultCodeText');
+
+  const gridSize = 16; // 4x4 grid
+  const totalSteps = 4; // Aantal cijfers om te onthouden (1 t/m 4)
+  
+  let sequence = []; // Bevat de tile indices in volgorde 1, 2, 3, 4
+  let nextExpected = 1;
+  let isClickable = false;
+
+  function createGrid() {
+    gridContainer.innerHTML = '';
+    for (let i = 0; i < gridSize; i++) {
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.dataset.index = i;
+      tile.addEventListener('click', handleTileClick);
+      gridContainer.appendChild(tile);
+    }
+  }
+
+  function startGame() {
+    overlay.classList.remove('show');
+    nextExpected = 1;
+    isClickable = false;
+    statusText.innerText = "Onthoud de volgorde...";
+
+    const tiles = document.querySelectorAll('.tile');
+    tiles.forEach(tile => {
+      tile.innerText = '';
+      tile.className = 'tile';
+    });
+
+    // Kies willekeurige unieke cellen voor de volgorde 1 t/m totalSteps
+    sequence = [];
+    while (sequence.length < totalSteps) {
+      const rand = Math.floor(Math.random() * gridSize);
+      if (!sequence.includes(rand)) {
+        sequence.push(rand);
+      }
+    }
+
+    // Toon de nummers op de tegels
+    sequence.forEach((tileIndex, idx) => {
+      tiles[tileIndex].innerText = idx + 1;
+      tiles[tileIndex].classList.add('visible');
+    });
+
+    // Verberg de nummers na 2.5 seconden
+    setTimeout(() => {
+      tiles.forEach(tile => {
+        tile.innerText = '';
+        tile.classList.remove('visible');
+      });
+      isClickable = true;
+      statusText.innerText = "Klik in de juiste volgorde (1 t/m 4)!";
+    }, 2500);
+  }
+
+  function handleTileClick(e) {
+    if (!isClickable) return;
+
+    const tile = e.target;
+    const index = parseInt(tile.dataset.index);
+
+    // Check of geklikte tegel de juiste volgende in de volgorde is
+    const expectedTileIndex = sequence[nextExpected - 1];
+
+    if (index === expectedTileIndex) {
+      // Correct!
+      tile.innerText = nextExpected;
+      tile.classList.add('correct');
+      nextExpected++;
+
+      // Check of de volledige reeks gehaald is
+      if (nextExpected > totalSteps) {
+        isClickable = false;
+        statusText.innerText = "Kluis ontgrendeld!";
+        
+        // Genereer willekeurige kluiscode zoals in de video
+        const randomVaultCode = Math.floor(1000 + Math.random() * 9000);
+        vaultCodeText.innerText = `Code van de kluis: ${randomVaultCode}`;
+
+        setTimeout(() => {
+          overlay.classList.add('show');
+        }, 500);
+      }
+    } else {
+      // Fout!
+      tile.classList.add('wrong');
+      isClickable = false;
+      statusText.innerText = "Fout! Opnieuw starten...";
+
+      // Laat even zien waar ze stonden
+      sequence.forEach((tileIndex, idx) => {
+        const t = document.querySelector(`[data-index='${tileIndex}']`);
+        t.innerText = idx + 1;
+        t.classList.add('visible');
+      });
+
+      setTimeout(() => {
+        startGame();
+      }, 2000);
+    }
+  }
+
+  createGrid();
+  startGame();
+</script>
+
+</body>
+</html>
