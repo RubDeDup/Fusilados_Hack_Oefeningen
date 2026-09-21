@@ -161,25 +161,25 @@
     phase = 'MEMORIZE';
     statusText.innerText = "Onthoud de nummers van de blokjes!";
 
-    // Genereer 3 stuiterende blokjes met een eigen richting/snelheid
+    // Tragere snelheid ingesteld (tussen 0.8 en 1.4)
     boxes = [];
     for (let i = 1; i <= totalBoxes; i++) {
       boxes.push({
         number: i,
         x: Math.random() * (canvas.width - boxSize - 40) + 20,
         y: Math.random() * (canvas.height - boxSize - 40) + 20,
-        dx: (Math.random() < 0.5 ? 1 : -1) * (2.2 + Math.random() * 1.5),
-        dy: (Math.random() < 0.5 ? 1 : -1) * (2.2 + Math.random() * 1.5),
+        dx: (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.6),
+        dy: (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.6),
         clicked: false
       });
     }
 
-    // Na 2.5 seconden verdwijnen de nummers terwijl ze doordraaien/stuiteren
+    // Na 2.5 seconden verdwijnen de nummers
     setTimeout(() => {
       phase = 'MOVE_HIDDEN';
       statusText.innerText = "Blijf de blokjes volgen...";
 
-      // Na nog eens 2 seconden stoppen de blokjes en mag je klikken
+      // Na 2 seconden stoppen de blokjes en kan er geklikt worden
       setTimeout(() => {
         phase = 'CLICK';
         statusText.innerText = "Klik op de blokjes in volgorde (1 ➔ 2 ➔ 3)!";
@@ -217,7 +217,6 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Nummer alleen tonen in de eerste fase of als hij al goed geklikt is
       if (phase === 'MEMORIZE' || box.clicked) {
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 22px sans-serif';
