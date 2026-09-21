@@ -123,13 +123,25 @@
       border: none;
       display: block;
     }
+
+    /* WATERMARK */
+    .watermark {
+      position: absolute;
+      bottom: 12px;
+      left: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+      z-index: 20;
+    }
   </style>
 </head>
 
 <body>
 
   <header>
-    <div class="brand">Fusilados Hub</div>
+    <div class="brand">Fusilados hub</div>
     <div class="home-btn" onclick="openHome()">Home</div>
   </header>
 
@@ -157,6 +169,8 @@
         <span class="arrow">&gt;</span>
       </li>
     </ul>
+
+    <div class="watermark">Created by RubDeDup</div>
   </aside>
 
   <main>
