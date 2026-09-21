@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lockpicking Minigame</title>
+  <title>Lockpick Oefening</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,8 +12,8 @@
     }
 
     body {
-      background-color: #0d0e12;
-      color: #ffffff;
+      background-color: #0f1013;
+      color: #e2e8f0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
@@ -23,82 +23,70 @@
     }
 
     .container {
-      background: #161922;
-      padding: 30px;
+      background: #16181d;
+      border: 1px solid #232730;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      text-align: center;
-      width: 420px;
+      padding: 30px;
+      width: 600px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       position: relative;
     }
 
-    h1 {
-      font-size: 1.3rem;
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }
-
-    p.subtitle {
-      font-size: 0.85rem;
-      color: #8a8f9d;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 20px;
     }
 
-    /* Lockpick Circle Area */
-    .lock-container {
+    .title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .feedback {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #94a3b8;
+      min-height: 20px;
+    }
+
+    .game-area {
       position: relative;
-      width: 260px;
-      height: 260px;
-      margin: 0 auto 20px auto;
+      width: 320px;
+      height: 320px;
+      margin: 0 auto;
     }
 
     canvas {
-      background-color: #12141c;
-      border-radius: 50%;
-      border: 4px solid #232730;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
       display: block;
     }
 
-    /* Voortgangsbolletjes */
-    .stages {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 15px;
+    /* Instructies links-onder */
+    .controls-panel {
+      position: absolute;
+      bottom: 25px;
+      left: 25px;
+      background: rgba(18, 19, 22, 0.8);
+      border: 1px solid #232730;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: #94a3b8;
     }
 
-    .stage-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background-color: #2b303c;
-      border: 2px solid #3b4252;
-      transition: all 0.2s ease;
-    }
-
-    .stage-dot.active {
-      background-color: #fbbf24;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
-    }
-
-    .stage-dot.completed {
-      background-color: #22c55e;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
-    }
-
-    .status-bar {
-      font-size: 0.9rem;
-      color: #a0a5b5;
-      min-height: 24px;
+    .controls-panel div {
+      margin-bottom: 4px;
     }
 
     kbd {
-      background: #2b303c;
-      padding: 2px 6px;
-      border-radius: 4px;
+      background: #232730;
       color: #fbbf24;
-      font-size: 0.85rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: bold;
     }
 
     /* Overlay scherm */
@@ -108,7 +96,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(22, 25, 34, 0.96);
+      background: rgba(15, 16, 19, 0.95);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -117,7 +105,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      z-index: 10;
+      z-index: 50;
     }
 
     .overlay.show {
@@ -125,22 +113,15 @@
       pointer-events: auto;
     }
 
-    .status-icon {
-      font-size: 3.5rem;
-      margin-bottom: 8px;
-    }
-
     .btn {
-      margin-top: 18px;
-      padding: 10px 22px;
+      margin-top: 15px;
+      padding: 10px 20px;
       background: #22c55e;
-      color: #fff;
+      color: #000;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       font-weight: bold;
-      font-size: 0.95rem;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
     .btn:hover {
@@ -151,189 +132,193 @@
 <body onclick="window.focus()">
 
   <div class="container">
-    <h1>LOCKPICKING</h1>
-    <p class="subtitle">Druk op <kbd>SPATIE</kbd> in de groene zone</p>
-
-    <div class="lock-container">
-      <canvas id="lockCanvas" width="260" height="260"></canvas>
+    <div class="header">
+      <div class="title">Lockpick Oefening</div>
+      <div class="feedback" id="feedbackText"></div>
     </div>
 
-    <div class="stages">
-      <div class="stage-dot active" id="dot1"></div>
-      <div class="stage-dot" id="dot2"></div>
-      <div class="stage-dot" id="dot3"></div>
-      <div class="stage-dot" id="dot4"></div>
+    <div class="game-area">
+      <canvas id="lockCanvas" width="320" height="320"></canvas>
     </div>
 
-    <div class="status-bar" id="status">Fase 1 van 4</div>
+    <div class="controls-panel">
+      <div><kbd>Muis</kbd> Beweeg de lockpick</div>
+      <div><kbd>A</kbd> <kbd>D</kbd> Zet opening</div>
+      <div><kbd>ESC</kbd> Stoppen</div>
+    </div>
 
-    <!-- Overlay Scherm -->
     <div class="overlay" id="overlay">
-      <div class="status-icon" id="statusIcon">✓</div>
-      <h2 id="overlayTitle" style="color: #22c55e;">SLOT GEKRAAKT!</h2>
-      <p id="overlaySub" style="color: #94a3b8; margin-top: 5px; font-size: 0.85rem;">Alle fases succesvol doorlopen.</p>
-      <button class="btn" onclick="startGame()">Opnieuw Proberen</button>
+      <h2 id="overlayTitle" style="color: #22c55e; font-size: 1.8rem; margin-bottom: 10px;">LOCK GEOPEND</h2>
+      <p id="overlaySub" style="color: #94a3b8; font-size: 0.9rem;">Goed gedaan!</p>
+      <button class="btn" onclick="initGame()">OPNIEUW OEFENEN</button>
     </div>
   </div>
 
 <script>
   const canvas = document.getElementById('lockCanvas');
   const ctx = canvas.getContext('2d');
-  const statusText = document.getElementById('status');
+  const feedbackText = document.getElementById('feedbackText');
   const overlay = document.getElementById('overlay');
   const overlayTitle = document.getElementById('overlayTitle');
   const overlaySub = document.getElementById('overlaySub');
-  const statusIcon = document.getElementById('statusIcon');
 
-  const totalStages = 4;
-  let currentStage = 1;
   let isGameActive = false;
-  let animId = null;
+  let animFrame = null;
+  let startTime = 0;
 
-  let angle = 0;
-  let speed = 0.04;
-  let zoneStart = 0;
-  let zoneSize = 0.5; // In radialen (~30 graden)
+  // Fysica variabelen
+  let pickAngle = 0; // Hoek van de pick (-90 tot 90 deg)
+  let targetAngle = 0; // De "sweet spot"
+  let cylinderAngle = 0; // Huidige rotatie van de cilinder
+  let keyTurning = false;
 
-  function setRandomZone() {
-    // Genereer groene zone op een willekeurige plek in de cirkel
-    zoneStart = Math.random() * (Math.PI * 2 - zoneSize);
-  }
-
-  function startGame() {
+  function initGame() {
     window.focus();
     overlay.classList.remove('show');
-    if (animId) cancelAnimationFrame(animId);
+    if (animFrame) cancelAnimationFrame(animFrame);
 
-    currentStage = 1;
     isGameActive = true;
-    angle = 0;
-    speed = 0.04;
+    pickAngle = 0;
+    cylinderAngle = 0;
+    keyTurning = false;
+    feedbackText.innerText = "";
+    startTime = Date.now();
 
-    updateDots();
-    setRandomZone();
-    statusText.innerText = "Fase 1 van 4";
+    // Genereer willekeurige juiste hoek tussen -80 en 80 graden
+    targetAngle = (Math.random() * 160) - 80;
 
     animate();
   }
 
-  function updateDots() {
-    for (let i = 1; i <= totalStages; i++) {
-      const dot = document.getElementById(`dot${i}`);
-      dot.className = 'stage-dot';
-      if (i < currentStage) {
-        dot.classList.add('completed');
-      } else if (i === currentStage) {
-        dot.classList.add('active');
-      }
+  // Muisbeweging voor de lockpick
+  window.addEventListener('mousemove', (e) => {
+    if (!isGameActive) return;
+    const rect = canvas.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const rad = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+    let deg = rad * (180 / Math.PI) + 90;
+
+    // Beperk hoek
+    if (deg > 180) deg -= 360;
+    pickAngle = Math.max(-85, Math.min(85, deg));
+  });
+
+  // A / D toetsen voor het draaien van de sleutel/opening
+  window.addEventListener('keydown', (e) => {
+    if (!isGameActive) return;
+    if (e.key === 'a' || e.key === 'A' || e.key === 'd' || e.key === 'D') {
+      keyTurning = true;
     }
-  }
+  });
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = 95;
-
-    // 1. Cirkel achtergrond spoor
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = '#1e222d';
-    ctx.lineWidth = 14;
-    ctx.stroke();
-
-    // 2. Groene Hit-Zone
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, zoneStart, zoneStart + zoneSize);
-    ctx.strokeStyle = '#22c55e';
-    ctx.lineWidth = 14;
-    ctx.stroke();
-
-    // 3. Draaiende Naald (Rood)
-    const needleX = centerX + Math.cos(angle) * radius;
-    const needleY = centerY + Math.sin(angle) * radius;
-
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-    ctx.fillStyle = '#ef4444';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.lineTo(needleX, needleY);
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-  }
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'a' || e.key === 'A' || e.key === 'd' || e.key === 'D') {
+      keyTurning = false;
+    }
+  });
 
   function animate() {
     if (!isGameActive) return;
 
-    angle += speed;
-    if (angle >= Math.PI * 2) {
-      angle -= Math.PI * 2;
+    // Bereken afstand tot de juiste plek
+    const diff = Math.abs(pickAngle - targetAngle);
+    const tolerance = 12; // Marge waarin de cilinder volledig kan draaien
+    const maxCylinder = 90; // Volledig geopend bij 90 graden
+
+    let targetCylinder = 0;
+
+    if (keyTurning) {
+      if (diff < tolerance) {
+        // Goede positie: Draai helemaal open
+        targetCylinder = maxCylinder;
+        feedbackText.innerText = "✓ GOEDE POSITIE";
+        feedbackText.style.color = "#22c55e";
+      } else {
+        // Beperkte rotatie gebaseerd op hoe dichtbij je bent
+        const allowedPercent = Math.max(0, 1 - (diff / 90));
+        targetCylinder = maxCylinder * allowedPercent * 0.4;
+        feedbackText.innerText = "⚠ TE VEEL WEERSTAND";
+        feedbackText.style.color = "#ef4444";
+      }
+    } else {
+      feedbackText.innerText = "";
+    }
+
+    // Soepele overgang
+    cylinderAngle += (targetCylinder - cylinderAngle) * 0.2;
+
+    // Check of het slot volledig geopend is
+    if (cylinderAngle >= 88) {
+      isGameActive = false;
+      feedbackText.innerText = "";
+      const timeTaken = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      overlayTitle.innerText = "LOCK GEOPEND";
+      overlayTitle.style.color = "#22c55e";
+      overlaySub.innerText = `Goed gedaan! Je hebt het slot geopend in ${timeTaken}s.`;
+      
+      cancelAnimationFrame(animFrame);
+      overlay.classList.add('show');
+      return;
     }
 
     draw();
-    animId = requestAnimationFrame(animate);
+    animFrame = requestAnimationFrame(animate);
   }
 
-  function checkHit() {
-    if (!isGameActive) return;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
 
-    // Normaliseer hoek tussen 0 en 2*PI
-    let normalizedAngle = angle % (Math.PI * 2);
-    if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
+    // 1. Buitenste Behuizing
+    ctx.beginPath();
+    ctx.arc(cx, cy, 120, 0, Math.PI * 2);
+    ctx.fillStyle = '#232730';
+    ctx.fill();
 
-    const inZone = normalizedAngle >= zoneStart && normalizedAngle <= (zoneStart + zoneSize);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(cylinderAngle * Math.PI / 180);
 
-    if (inZone) {
-      // Goed geklikt!
-      currentStage++;
-      updateDots();
+    // 2. Draaiende Cilinder
+    ctx.beginPath();
+    ctx.arc(0, 0, 80, 0, Math.PI * 2);
+    ctx.fillStyle = '#3b4252';
+    ctx.fill();
 
-      if (currentStage > totalStages) {
-        // GEWONNEN: Stop animatie direct om "spacen" te voorkomen
-        isGameActive = false;
-        cancelAnimationFrame(animId);
-        showEndScreen(true, "SLOT GEKRAAKT!", "Alle 4 de fases succesvol doorlopen.");
-      } else {
-        // Volgende fase: Snelheid verhogen
-        speed += 0.015;
-        setRandomZone();
-        statusText.innerText = `Fase ${currentStage} van 4`;
-      }
-    } else {
-      // MISLUKT: Stop animatie
-      isGameActive = false;
-      cancelAnimationFrame(animId);
-      showEndScreen(false, "LOCKPICK GEBROKEN!", "Je sloeg op het verkeerde moment.");
-    }
+    // Sleutelgat
+    ctx.beginPath();
+    ctx.rect(-6, -10, 12, 40);
+    ctx.fillStyle = '#0f1013';
+    ctx.fill();
+
+    ctx.restore();
+
+    // 3. Lockpick Naald
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(pickAngle * Math.PI / 180);
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -100);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Rood handvat onderaan
+    ctx.beginPath();
+    ctx.arc(0, 110, 12, 0, Math.PI * 2);
+    ctx.fillStyle = '#ef4444';
+    ctx.fill();
+
+    ctx.restore();
   }
 
-  function showEndScreen(success, title, sub) {
-    statusIcon.innerText = success ? "✓" : "✕";
-    statusIcon.style.color = success ? "#22c55e" : "#ef4444";
-    overlayTitle.innerText = title;
-    overlayTitle.style.color = success ? "#22c55e" : "#ef4444";
-    overlaySub.innerText = sub;
-
-    setTimeout(() => overlay.classList.add('show'), 200);
-  }
-
-  // Luister naar Spatiewaarde en Muisklik
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
-      e.preventDefault();
-      checkHit();
-    }
-  });
-
-  canvas.addEventListener('click', () => {
-    checkHit();
-  });
-
-  startGame();
+  initGame();
 </script>
 
 </body>
