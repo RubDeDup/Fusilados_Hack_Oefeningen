@@ -24,94 +24,51 @@
 
     .container {
       background: #161922;
-      padding: 30px;
+      padding: 25px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       text-align: center;
-      width: 440px;
+      width: 580px;
       position: relative;
     }
 
     h1 {
       font-size: 1.3rem;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       letter-spacing: 1px;
     }
 
     p.subtitle {
       font-size: 0.85rem;
       color: #8a8f9d;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
-    /* 4x4 Grid */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 12px;
-      width: 360px;
-      height: 360px;
-      margin: 0 auto;
-      background-color: #1e222d;
-      padding: 16px;
+    /* DVD Canvas Area */
+    #gameCanvas {
+      background-color: #0b0c10;
+      border: 2px solid #232730;
       border-radius: 12px;
-    }
-
-    .tile {
-      background-color: #2b303c;
-      border-radius: 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #38bdf8;
+      display: block;
+      margin: 0 auto;
       cursor: pointer;
-      user-select: none;
-      transition: background-color 0.15s ease, transform 0.1s ease;
-    }
-
-    .tile:hover {
-      background-color: #384152;
-    }
-
-    .tile:active {
-      transform: scale(0.95);
-    }
-
-    /* Zichtbaar nummer tijdens de memoriseerfase */
-    .tile.visible {
-      background-color: #3b5998;
-      color: #ffffff;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-    }
-
-    .tile.correct {
-      background-color: #22c55e !important;
-      color: #fff !important;
-    }
-
-    .tile.wrong {
-      background-color: #ef4444 !important;
-      color: #fff !important;
     }
 
     .status-bar {
-      margin-top: 18px;
+      margin-top: 15px;
       font-size: 0.9rem;
       color: #a0a5b5;
       min-height: 24px;
     }
 
-    /* Overlay scherm bij succes */
+    /* Geslaagd Overlayscherm */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(22, 25, 34, 0.95);
+      background: rgba(22, 25, 34, 0.96);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -120,6 +77,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.4s ease;
+      z-index: 10;
     }
 
     .overlay.show {
@@ -127,16 +85,15 @@
       pointer-events: auto;
     }
 
-    .success-icon {
-      font-size: 3rem;
-      color: #22c55e;
-      margin-bottom: 10px;
+    .status-icon {
+      font-size: 3.5rem;
+      margin-bottom: 8px;
     }
 
     .vault-code {
       font-size: 1.2rem;
       color: #38bdf8;
-      margin-top: 8px;
+      margin-top: 10px;
       font-family: monospace;
       letter-spacing: 2px;
       background: #0d0e12;
@@ -147,7 +104,7 @@
 
     .btn {
       margin-top: 18px;
-      padding: 10px 20px;
+      padding: 10px 22px;
       background: #22c55e;
       color: #fff;
       border: none;
@@ -167,131 +124,160 @@
 
   <div class="container">
     <h1>WINKEL DVD HACK</h1>
-    <p class="subtitle">Onthoud de volgorde der cijfers</p>
+    <p class="subtitle">Onthoud de nummers van de stuiterende blokjes</p>
 
-    <div class="grid" id="grid"></div>
+    <canvas id="gameCanvas" width="520" height="320"></canvas>
 
-    <div class="status-bar" id="status">Bereiden...</div>
+    <div class="status-bar" id="status">Onthoud de nummers...</div>
 
-    <!-- Geslaagd Scherm -->
-    <div class="overlay" id="successOverlay">
-      <div class="success-icon">✓</div>
-      <h2>GESLAAGD!</h2>
+    <!-- Geslaagd / Mislukt Overlay -->
+    <div class="overlay" id="overlay">
+      <div class="status-icon" id="statusIcon">✓</div>
+      <h2 id="overlayTitle" style="color: #22c55e;">GESLAAGD!</h2>
       <div class="vault-code" id="vaultCodeText">Code van de kluis: ----</div>
       <button class="btn" onclick="startGame()">Opnieuw Spelen</button>
     </div>
   </div>
 
 <script>
-  const gridContainer = document.getElementById('grid');
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
   const statusText = document.getElementById('status');
-  const overlay = document.getElementById('successOverlay');
-  const vaultCodeText = document.getElementById('vaultCodeText');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlaySub = document.getElementById('vaultCodeText');
+  const statusIcon = document.getElementById('statusIcon');
 
-  const gridSize = 16; // 4x4 grid
-  const totalSteps = 4; // Aantal cijfers om te onthouden (1 t/m 4)
+  const boxSize = 50;
+  const totalBoxes = 3;
   
-  let sequence = []; // Bevat de tile indices in volgorde 1, 2, 3, 4
+  let boxes = [];
   let nextExpected = 1;
-  let isClickable = false;
-
-  function createGrid() {
-    gridContainer.innerHTML = '';
-    for (let i = 0; i < gridSize; i++) {
-      const tile = document.createElement('div');
-      tile.classList.add('tile');
-      tile.dataset.index = i;
-      tile.addEventListener('click', handleTileClick);
-      gridContainer.appendChild(tile);
-    }
-  }
+  let phase = 'MEMORIZE'; // MEMORIZE -> MOVE_HIDDEN -> CLICK
+  let animationFrameId;
 
   function startGame() {
     overlay.classList.remove('show');
     nextExpected = 1;
-    isClickable = false;
-    statusText.innerText = "Onthoud de volgorde...";
+    phase = 'MEMORIZE';
+    statusText.innerText = "Onthoud de nummers van de blokjes!";
 
-    const tiles = document.querySelectorAll('.tile');
-    tiles.forEach(tile => {
-      tile.innerText = '';
-      tile.className = 'tile';
-    });
-
-    // Kies willekeurige unieke cellen voor de volgorde 1 t/m totalSteps
-    sequence = [];
-    while (sequence.length < totalSteps) {
-      const rand = Math.floor(Math.random() * gridSize);
-      if (!sequence.includes(rand)) {
-        sequence.push(rand);
-      }
+    // Genereer 3 blokjes op willekeurige posities met een unieke snelheid
+    boxes = [];
+    for (let i = 1; i <= totalBoxes; i++) {
+      boxes.push({
+        number: i,
+        x: Math.random() * (canvas.width - boxSize - 40) + 20,
+        y: Math.random() * (canvas.height - boxSize - 40) + 20,
+        dx: (Math.random() < 0.5 ? 1 : -1) * (2 + Math.random() * 1.5),
+        dy: (Math.random() < 0.5 ? 1 : -1) * (2 + Math.random() * 1.5),
+        clicked: false
+      });
     }
 
-    // Toon de nummers op de tegels
-    sequence.forEach((tileIndex, idx) => {
-      tiles[tileIndex].innerText = idx + 1;
-      tiles[tileIndex].classList.add('visible');
-    });
-
-    // Verberg de nummers na 2.5 seconden
+    // Fase 1: Onthoudfase (2.5 seconden met nummers zichtbaar)
     setTimeout(() => {
-      tiles.forEach(tile => {
-        tile.innerText = '';
-        tile.classList.remove('visible');
-      });
-      isClickable = true;
-      statusText.innerText = "Klik in de juiste volgorde (1 t/m 4)!";
-    }, 2500);
-  }
+      phase = 'MOVE_HIDDEN';
+      statusText.innerText = "Blijf de blokjes volgen...";
 
-  function handleTileClick(e) {
-    if (!isClickable) return;
-
-    const tile = e.target;
-    const index = parseInt(tile.dataset.index);
-
-    // Check of geklikte tegel de juiste volgende in de volgorde is
-    const expectedTileIndex = sequence[nextExpected - 1];
-
-    if (index === expectedTileIndex) {
-      // Correct!
-      tile.innerText = nextExpected;
-      tile.classList.add('correct');
-      nextExpected++;
-
-      // Check of de volledige reeks gehaald is
-      if (nextExpected > totalSteps) {
-        isClickable = false;
-        statusText.innerText = "Kluis ontgrendeld!";
-        
-        // Genereer willekeurige kluiscode zoals in de video
-        const randomVaultCode = Math.floor(1000 + Math.random() * 9000);
-        vaultCodeText.innerText = `Code van de kluis: ${randomVaultCode}`;
-
-        setTimeout(() => {
-          overlay.classList.add('show');
-        }, 500);
-      }
-    } else {
-      // Fout!
-      tile.classList.add('wrong');
-      isClickable = false;
-      statusText.innerText = "Fout! Opnieuw starten...";
-
-      // Laat even zien waar ze stonden
-      sequence.forEach((tileIndex, idx) => {
-        const t = document.querySelector(`[data-index='${tileIndex}']`);
-        t.innerText = idx + 1;
-        t.classList.add('visible');
-      });
-
+      // Fase 2: Doorstuiteren zonder nummers (2 seconden)
       setTimeout(() => {
-        startGame();
+        phase = 'CLICK';
+        statusText.innerText = "Klik op de blokjes in volgorde (1 ➔ 2 ➔ 3)!";
       }, 2000);
-    }
+
+    }, 2500);
+
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    animate();
   }
 
-  createGrid();
+  function updatePositions() {
+    boxes.forEach(box => {
+      // Beweeg alleen als we nog in de bewegingsfases zitten
+      if (phase === 'MEMORIZE' || phase === 'MOVE_HIDDEN') {
+        box.x += box.dx;
+        box.y += box.dy;
+
+        // Stuiter op de randen van het canvas (zoals een DVD logo)
+        if (box.x <= 0 || box.x + boxSize >= canvas.width) box.dx *= -1;
+        if (box.y <= 0 || box.y + boxSize >= canvas.height) box.dy *= -1;
+      }
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    boxes.forEach(box => {
+      // Teken het blokje
+      ctx.fillStyle = box.clicked ? '#22c55e' : '#3b5998';
+      ctx.beginPath();
+      ctx.roundRect(box.x, box.y, box.size || boxSize, box.size || boxSize, 8);
+      ctx.fill();
+
+      ctx.strokeStyle = box.clicked ? '#ffffff' : '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Teken het nummer (alleen tijdens MEMORIZE fase of als het blokje al goed geklikt is)
+      if (phase === 'MEMORIZE' || box.clicked) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(box.number, box.x + boxSize / 2, box.y + boxSize / 2);
+      }
+    });
+  }
+
+  function animate() {
+    updatePositions();
+    draw();
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  // Luister naar muisklikken op de stuiterende blokjes
+  canvas.addEventListener('click', (e) => {
+    if (phase !== 'CLICK') return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    boxes.forEach(box => {
+      if (!box.clicked && 
+          clickX >= box.x && clickX <= box.x + boxSize &&
+          clickY >= box.y && clickY <= box.y + boxSize) {
+
+        if (box.number === nextExpected) {
+          // Goed geklikt!
+          box.clicked = true;
+          nextExpected++;
+
+          if (nextExpected > totalBoxes) {
+            // Allemaal goed!
+            const randomCode = Math.floor(1000 + Math.random() * 9000);
+            showEndScreen(true, "GESLAAGD!", `Code van de kluis: ${randomCode}`);
+          }
+        } else {
+          // Verkeerde volgorde geklikt!
+          showEndScreen(false, "MISLUKT!", "Verkeerde volgorde geklikt.");
+        }
+      }
+    });
+  });
+
+  function showEndScreen(success, title, subText) {
+    statusIcon.innerText = success ? "✓" : "✕";
+    statusIcon.style.color = success ? "#22c55e" : "#ef4444";
+    overlayTitle.innerText = title;
+    overlayTitle.style.color = success ? "#22c55e" : "#ef4444";
+    overlaySub.innerText = subText;
+    
+    setTimeout(() => overlay.classList.add('show'), 300);
+  }
+
   startGame();
 </script>
 
