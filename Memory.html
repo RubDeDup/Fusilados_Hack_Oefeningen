@@ -20,91 +20,88 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      position: relative;
     }
 
     .container {
       background: #161922;
-      padding: 30px;
+      padding: 25px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       text-align: center;
-      width: 420px;
+      width: 440px;
       position: relative;
     }
 
     h1 {
-      font-size: 1.4rem;
-      margin-bottom: 6px;
+      font-size: 1.3rem;
+      margin-bottom: 4px;
       letter-spacing: 1px;
     }
 
     p.subtitle {
       font-size: 0.85rem;
       color: #8a8f9d;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
-    /* Het 6x6 Raster */
     .grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-      width: 360px;
-      height: 360px;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 8px;
+      width: 340px;
+      height: 340px;
       margin: 0 auto;
-      background-color: #1e222d;
+      background-color: #11131a;
       padding: 12px;
       border-radius: 12px;
+      border: 1px solid #232730;
     }
 
     .tile {
-      background-color: #3b5998; /* Typische FiveM blauwe kleur */
+      background-color: #1e222d;
       border-radius: 6px;
       cursor: pointer;
+      user-select: none;
       transition: background-color 0.15s ease, transform 0.1s ease;
     }
 
     .tile:hover {
-      opacity: 0.9;
+      background-color: #2b303c;
     }
 
     .tile:active {
       transform: scale(0.95);
     }
 
-    /* Witte geheugen-tegel */
     .tile.active {
-      background-color: #e2e8f0;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+      background-color: #ffffff !important;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     }
 
-    /* Goed geklikt */
     .tile.correct {
-      background-color: #22c55e;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+      background-color: #22c55e !important;
     }
 
-    /* Fout geklikt */
     .tile.wrong {
-      background-color: #ef4444;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      background-color: #ef4444 !important;
     }
 
     .status-bar {
-      margin-top: 18px;
+      margin-top: 15px;
       font-size: 0.9rem;
       color: #a0a5b5;
       min-height: 24px;
     }
 
-    /* Overlay scherm */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(22, 25, 34, 0.95);
+      background: rgba(22, 25, 34, 0.96);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -113,6 +110,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.4s ease;
+      z-index: 10;
     }
 
     .overlay.show {
@@ -120,15 +118,14 @@
       pointer-events: auto;
     }
 
-    .success-icon {
+    .status-icon {
       font-size: 3.5rem;
-      color: #22c55e;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .btn {
       margin-top: 18px;
-      padding: 10px 20px;
+      padding: 10px 22px;
       background: #22c55e;
       color: #fff;
       border: none;
@@ -142,38 +139,51 @@
     .btn:hover {
       background: #16a34a;
     }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>MEMORY GRID</h1>
-    <p class="subtitle">Onthoud de witte vakjes</p>
+    <h1>MEMORY GRID HACK</h1>
+    <p class="subtitle">Onthoud de oplichtende vakjes</p>
 
     <div class="grid" id="grid"></div>
 
-    <div class="status-bar" id="status">Voorbereiden...</div>
+    <div class="status-bar" id="status">Onthoud het patroon...</div>
 
-    <!-- Geslaagd Scherm -->
-    <div class="overlay" id="successOverlay">
-      <div class="success-icon">✓</div>
-      <h2>HACK GESLAAGD!</h2>
-      <p style="color: #8a8f9d; margin-top: 5px; font-size: 0.9rem;">Geheugentest succesvol afgerond.</p>
+    <div class="overlay" id="overlay">
+      <div class="status-icon" id="statusIcon">✓</div>
+      <h2 id="overlayTitle" style="color: #22c55e;">SYSTEM HACKED</h2>
+      <p id="overlaySub" style="color: #94a3b8; font-size: 0.85rem; margin-top: 5px;">Patroon succesvol gereproduceerd.</p>
       <button class="btn" onclick="startGame()">Opnieuw Spelen</button>
     </div>
   </div>
 
+  <div class="watermark">Created by RubDeDup</div>
+
 <script>
   const gridContainer = document.getElementById('grid');
   const statusText = document.getElementById('status');
-  const overlay = document.getElementById('successOverlay');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlaySub = document.getElementById('overlaySub');
+  const statusIcon = document.getElementById('statusIcon');
 
-  const gridSize = 36; // 6x6
-  const activeCount = 10; // Aantal witte vakjes
-  const showTime = 3000; // Tijd in ms dat vakjes wit blijven (3 sec)
-
-  let activeTiles = [];
-  let clickedTiles = [];
+  const gridSize = 36;
+  const targetCount = 12;
+  
+  let targetPattern = [];
+  let userPattern = [];
   let isClickable = false;
 
   function createGrid() {
@@ -189,37 +199,30 @@
 
   function startGame() {
     overlay.classList.remove('show');
-    clickedTiles = [];
+    userPattern = [];
     isClickable = false;
-    statusText.innerText = "Onthoud de vakjes!";
+    statusText.innerText = "Onthoud het patroon...";
 
     const tiles = document.querySelectorAll('.tile');
-    tiles.forEach(tile => {
-      tile.className = 'tile';
-    });
+    tiles.forEach(tile => tile.className = 'tile');
 
-    // Genereer willekeurige unieke indexen voor witte vakjes
-    activeTiles = [];
-    while (activeTiles.length < activeCount) {
+    targetPattern = [];
+    while (targetPattern.length < targetCount) {
       const rand = Math.floor(Math.random() * gridSize);
-      if (!activeTiles.includes(rand)) {
-        activeTiles.push(rand);
+      if (!targetPattern.includes(rand)) {
+        targetPattern.push(rand);
       }
     }
 
-    // Toon de witte vakjes
-    activeTiles.forEach(index => {
-      tiles[index].classList.add('active');
+    targetPattern.forEach(idx => {
+      tiles[idx].classList.add('active');
     });
 
-    // Na de showTime, verberg de vakjes weer
     setTimeout(() => {
-      activeTiles.forEach(index => {
-        tiles[index].classList.remove('active');
-      });
+      tiles.forEach(tile => tile.classList.remove('active'));
       isClickable = true;
-      statusText.innerText = "Duid de juiste vakjes aan!";
-    }, showTime);
+      statusText.innerText = "Klik op de onthouden vakjes!";
+    }, 2500);
   }
 
   function handleTileClick(e) {
@@ -228,43 +231,39 @@
     const tile = e.target;
     const index = parseInt(tile.dataset.index);
 
-    // Voorkom dubbel klikken op hetzelfde al gekozen vakje
-    if (clickedTiles.includes(index)) return;
+    if (userPattern.includes(index)) return;
 
-    if (activeTiles.includes(index)) {
-      // Goed geklikt!
+    if (targetPattern.includes(index)) {
       tile.classList.add('correct');
-      clickedTiles.push(index);
+      userPattern.push(index);
 
-      // Check of alle vakjes zijn gevonden
-      if (clickedTiles.length === activeTiles.length) {
+      if (userPattern.length === targetCount) {
         isClickable = false;
-        statusText.innerText = "Klaar!";
-        setTimeout(() => {
-          overlay.classList.add('show');
-        }, 500);
+        showEndScreen(true, "SYSTEM HACKED", "Alle vakjes correct gevonden!");
       }
     } else {
-      // Fout geklikt! Reset de game
       tile.classList.add('wrong');
       isClickable = false;
-      statusText.innerText = "Fout! Probeer opnieuw...";
 
-      // Toon alsnog alle juiste vakjes
-      activeTiles.forEach(i => {
-        const t = document.querySelector(`[data-index='${i}']`);
-        if (!t.classList.contains('correct')) {
-          t.classList.add('active');
-        }
+      targetPattern.forEach(idx => {
+        const t = document.querySelector(`[data-index='${idx}']`);
+        t.classList.add('active');
       });
 
-      setTimeout(() => {
-        startGame();
-      }, 2000);
+      showEndScreen(false, "ACCESS DENIED", "Verkeerd vakje aangeklikt.");
     }
   }
 
-  // Initialiseren
+  function showEndScreen(success, title, sub) {
+    statusIcon.innerText = success ? "✓" : "✕";
+    statusIcon.style.color = success ? "#22c55e" : "#ef4444";
+    overlayTitle.innerText = title;
+    overlayTitle.style.color = success ? "#22c55e" : "#ef4444";
+    overlaySub.innerText = sub;
+
+    setTimeout(() => overlay.classList.add('show'), 400);
+  }
+
   createGrid();
   startGame();
 </script>
