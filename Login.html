@@ -175,12 +175,10 @@
   <div class="watermark">Created by RubDeDup</div>
 
 <script>
-  // Supabase Verbinding Instellen
   const SUPABASE_URL = "https://suimuvzfrhtqxprzzojy.supabase.co";
   const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
   const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Controleer of de gebruiker al ingelogd is
   if (sessionStorage.getItem("isLoggedIn") === "true") {
     window.location.href = "index.html";
   }
@@ -197,27 +195,43 @@
     errorMsg.innerText = "";
 
     try {
-      // Zoek de gebruiker direct in Supabase Cloud
+      // 1. Probeer eerst rechtstreeks via Supabase cloud
       const { data, error } = await _supabase
         .from('users')
-        .select('*')
-        .ilike('username', userVal)
-        .eq('password', passVal)
-        .single();
+        .select('*');
 
-      if (error || !data) {
+      let foundUser = null;
+
+      if (data && data.length > 0) {
+        foundUser = data.find(u => u.username.toLowerCase() === userVal.toLowerCase() && u.password === passVal);
+      }
+
+      // 2. Fallback check voor 'Jesus Gonzales' voor als de API geblokkeerd wordt
+      if (!foundUser && userVal.toLowerCase() === "jesus gonzales" && passVal === "gringo123") {
+        foundUser = { username: "Jesus Gonzales", role: "Opper Gringo" };
+      }
+
+      if (foundUser) {
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("currentUser", foundUser.username);
+        sessionStorage.setItem("currentRole", foundUser.role);
+        window.location.href = "index.html";
+      } else {
         errorMsg.innerText = "Ongeldige gebruikersnaam of wachtwoord!";
         document.getElementById("password").value = "";
         loginBtn.innerText = "INLOGGEN";
-      } else {
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("currentUser", data.username);
-        sessionStorage.setItem("currentRole", data.role);
-        window.location.href = "index.html";
       }
     } catch (err) {
-      errorMsg.innerText = "Fout bij verbinden met de server!";
-      loginBtn.innerText = "INLOGGEN";
+      // Zelfs bij netwerkfouten kan Jesus Gonzales inloggen
+      if (userVal.toLowerCase() === "jesus gonzales" && passVal === "gringo123") {
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("currentUser", "Jesus Gonzales");
+        sessionStorage.setItem("currentRole", "Opper Gringo");
+        window.location.href = "index.html";
+      } else {
+        errorMsg.innerText = "Fout bij verbinden met de server!";
+        loginBtn.innerText = "INLOGGEN";
+      }
     }
   }
 </script>
