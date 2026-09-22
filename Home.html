@@ -17,7 +17,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       padding: 40px;
       min-height: 100vh;
-      overflow-y: auto; /* Zorgt voor een scrollbalk wanneer er meer dan 4 kaarten zijn */
+      overflow-y: auto;
       position: relative;
     }
 
@@ -52,7 +52,7 @@
       margin-bottom: 20px;
     }
 
-    /* Grid geforceerd op exact 4 kolommen */
+    /* Grid geforceerd op 4 kolommen per rij */
     .games-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -60,7 +60,6 @@
       margin-bottom: 50px;
     }
 
-    /* Responsieve weergave voor kleinere schermen */
     @media (max-width: 1200px) {
       .games-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -210,6 +209,19 @@
       <div class="card-footer">
         <span>Speel Nu &rarr;</span>
         <span class="tag">Toetsenbord / Muis</span>
+      </div>
+    </div>
+
+    <!-- GPS Hack -->
+    <div class="card" onclick="openGame('GPS_Hack.html')">
+      <div>
+        <div class="card-icon">📡</div>
+        <h3>GPS Hack</h3>
+        <p>Vind de juiste 4-delige code in de omgekeerde matrix.</p>
+      </div>
+      <div class="card-footer">
+        <span>Speel Nu &rarr;</span>
+        <span class="tag">Pijltoetsen + Enter</span>
       </div>
     </div>
 
