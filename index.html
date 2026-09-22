@@ -278,17 +278,9 @@
         <span class="brand-title">Fusilados Hub</span>
       </div>
 
-      <div class="nav-section-title">HOOFD NAVIGATIE</div>
-      <ul class="nav-list">
-        <li class="nav-item active" id="navHome" onclick="openHome()">
-          <span>🏠 Kruispunt</span>
-          <span class="arrow">&gt;</span>
-        </li>
-      </ul>
-
       <div class="nav-section-title">CATEGORIEËN</div>
       <ul class="nav-list">
-        <li class="nav-item" id="navMinigames" onclick="loadGame(this, 'MinigamesHome.html')">
+        <li class="nav-item active" id="navMinigames" onclick="loadGame(this, 'MinigamesHome.html')">
           <span>🎮 Minigames Hub</span>
           <span class="arrow">&gt;</span>
         </li>
@@ -322,7 +314,7 @@
 
   <!-- MAIN CONTENT -->
   <div class="content-area">
-    <iframe id="mainFrame" src="Home.html"></iframe>
+    <iframe id="mainFrame" src="MinigamesHome.html"></iframe>
   </div>
 
   <!-- WACHTWOORD MODAL -->
@@ -371,12 +363,6 @@
     }
     
     document.getElementById("mainFrame").src = url;
-  }
-
-  function openHome() {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-wiet', 'active-finance'));
-    document.getElementById("navHome").classList.add("active");
-    document.getElementById("mainFrame").src = "Home.html";
   }
 
   function openPasswordModal() {
