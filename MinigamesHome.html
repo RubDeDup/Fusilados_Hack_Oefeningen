@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusilados hub - Minigames Home</title>
+  <title>Fusilados hub - Minigames Hub</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="fusilados.png">
@@ -35,15 +35,16 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 30px;
     }
 
-    .section-title {
-      font-size: 0.85rem;
+    .page-title {
+      font-size: 1.4rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #fbbf24;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .back-btn {
@@ -63,50 +64,79 @@
       border-color: #fbbf24;
     }
 
-    /* GRID LAYOUT: Maximaal 4 kaarten per rij */
+    /* SECTIE STYLING PER CATEGORIE */
+    .category-section {
+      margin-bottom: 36px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #232730;
+      padding-bottom: 8px;
+    }
+
+    .category-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #fbbf24;
+    }
+
+    .category-badge {
+      font-size: 0.7rem;
+      color: #64748b;
+      background: #16181d;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #232730;
+    }
+
+    /* GRID LAYOUT FOR GAMES */
     .games-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      margin-bottom: 40px;
+      gap: 18px;
     }
 
     .game-card {
       background-color: #16181d;
       border: 1px solid #232730;
-      border-radius: 14px;
-      padding: 22px;
+      border-radius: 12px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       cursor: pointer;
       transition: all 0.2s ease;
-      position: relative;
     }
 
     .game-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: #fbbf24;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.4);
     }
 
     .game-icon {
-      font-size: 2rem;
-      margin-bottom: 12px;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
     }
 
     .game-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #ffffff;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .game-desc {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #94a3b8;
       line-height: 1.4;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .game-footer {
@@ -116,18 +146,31 @@
     }
 
     .play-link {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #38bdf8;
       font-weight: 600;
     }
 
     .controls-badge {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: #64748b;
       background: #0f1013;
-      padding: 3px 8px;
+      padding: 2px 6px;
       border-radius: 4px;
       border: 1px solid #232730;
+    }
+
+    .empty-card {
+      background-color: rgba(22, 24, 29, 0.4);
+      border: 1px dashed #232730;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      font-size: 0.85rem;
+      font-style: italic;
     }
 
     .watermark {
@@ -146,91 +189,211 @@
   <div class="container">
 
     <div class="header-bar">
-      <div class="section-title">BESCHIKBARE MINIGAMES</div>
+      <div class="page-title">🎮 MINIGAMES HUB</div>
       <button class="back-btn" onclick="goToKruispunt()">← Terug naar Kruispunt</button>
     </div>
 
-    <!-- 4 kaarten per rij grid -->
-    <div class="games-grid">
-
-      <!-- Memory Grid -->
-      <div class="game-card" onclick="openGame('Memory.html')">
-        <div>
-          <div class="game-icon">🧠</div>
-          <div class="game-title">Memory Grid</div>
-          <div class="game-desc">Onthoud de witte vakjes op het 6x6 raster en klik ze daarna uit het geheugen aan.</div>
-        </div>
-        <div class="game-footer">
-          <span class="play-link">Speel Nu →</span>
-          <span class="controls-badge">Muis</span>
+    <!-- 1. BOOSTING -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🚗 Boosting</span>
+        <span class="category-badge">1 Minigame</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" onclick="openGame('GPS_Hack.html')">
+          <div>
+            <div class="game-icon">📡</div>
+            <div class="game-title">GPS Hack</div>
+            <div class="game-desc">Vind de juiste 4-delige code in de omgekeerde matrix om het signaal te verstoren.</div>
+          </div>
+          <div class="game-footer">
+            <span class="play-link">Speel Nu →</span>
+            <span class="controls-badge">Pijltoetsen + Enter</span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Number Hack -->
-      <div class="game-card" onclick="openGame('NumberHack.html')">
-        <div>
-          <div class="game-icon">🔢</div>
-          <div class="game-title">Number Hack</div>
-          <div class="game-desc">Vind de getallenreeks in het schuifraster voor de tijd om is.</div>
-        </div>
-        <div class="game-footer">
-          <span class="play-link">Speel Nu →</span>
-          <span class="controls-badge">Pijlen + Enter</span>
+    <!-- 2. ATM -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🏧 ATM</span>
+        <span class="category-badge">1 Minigame</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" onclick="openGame('NumberHack.html')">
+          <div>
+            <div class="game-icon">🔢</div>
+            <div class="game-title">Number Hack</div>
+            <div class="game-desc">Vind de getallenreeks in het schuifraster voor de tijd om is.</div>
+          </div>
+          <div class="game-footer">
+            <span class="play-link">Speel Nu →</span>
+            <span class="controls-badge">Pijlen + Enter</span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- WT Hack -->
-      <div class="game-card" onclick="openGame('WT_Hack.html')">
-        <div>
-          <div class="game-icon">🎛️</div>
-          <div class="game-title">WT Hack</div>
-          <div class="game-desc">Zoek de twee constante codes in de ruis met WASD en Pijltoetsen.</div>
-        </div>
-        <div class="game-footer">
-          <span class="play-link">Speel Nu →</span>
-          <span class="controls-badge">WASD / Pijlen</span>
+    <!-- 3. WT -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🎛️ WT</span>
+        <span class="category-badge">1 Minigame</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" onclick="openGame('WT_Hack.html')">
+          <div>
+            <div class="game-icon">📻</div>
+            <div class="game-title">WT Hack</div>
+            <div class="game-desc">Zoek de twee constante codes in de ruis met WASD en Pijltoetsen.</div>
+          </div>
+          <div class="game-footer">
+            <span class="play-link">Speel Nu →</span>
+            <span class="controls-badge">WASD / Pijlen</span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Winkel DVD Hack -->
-      <div class="game-card" onclick="openGame('Winkel_DVD_Hack.html')">
-        <div>
-          <div class="game-icon">📀</div>
-          <div class="game-title">Winkel DVD Hack</div>
-          <div class="game-desc">Volg de stuiterende blokjes, onthoud hun nummering en klik ze in volgorde aan.</div>
-        </div>
-        <div class="game-footer">
-          <span class="play-link">Speel Nu →</span>
-          <span class="controls-badge">Muis</span>
+    <!-- 4. WINKEL -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🏪 Winkel</span>
+        <span class="category-badge">1 Minigame</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" onclick="openGame('Winkel_DVD_Hack.html')">
+          <div>
+            <div class="game-icon">📀</div>
+            <div class="game-title">Winkel DVD Hack</div>
+            <div class="game-desc">Volg de stuiterende blokjes, onthoud hun nummering en klik ze in volgorde aan.</div>
+          </div>
+          <div class="game-footer">
+            <span class="play-link">Speel Nu →</span>
+            <span class="controls-badge">Muis</span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Bobcat 1 -->
-      <div class="game-card" onclick="openGame('Bobcat_1.html')">
-        <div>
-          <div class="game-icon">🟩</div>
-          <div class="game-title">Bobcat 1</div>
-          <div class="game-desc">Raad de 5-cijferige geheime combinatie in maximaal 6 pogingen.</div>
-        </div>
-        <div class="game-footer">
-          <span class="play-link">Speel Nu →</span>
-          <span class="controls-badge">Toetsenbord / Muis</span>
+    <!-- 5. TELEFOON WINKEL -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">📱 Telefoon Winkel</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 6. KLEINE BANK -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🏦 Kleine Bank</span>
+        <span class="category-badge">1 Minigame</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" onclick="openGame('Memory.html')">
+          <div>
+            <div class="game-icon">🧠</div>
+            <div class="game-title">Memory Grid</div>
+            <div class="game-desc">Onthoud de witte vakjes op het 6x6 raster en klik ze uit het geheugen aan.</div>
+          </div>
+          <div class="game-footer">
+            <span class="play-link">Speel Nu →</span>
+            <span class="controls-badge">Muis</span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- GPS Hack -->
-      <div class="game-card" onclick="openGame('GPS_Hack.html')">
-        <div>
-          <div class="game-icon">📡</div>
-          <div class="game-title">GPS Hack</div>
-          <div class="game-desc">Vind de juiste 4-delige code in de omgekeerde matrix.</div>
-        </div>
-        <div class="game-footer">
-          <span class="play-link">Speel Nu →</span>
-          <span class="controls-badge">Pijltoetsen + Enter</span>
+    <!-- 7. JUWELIER -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">💎 Juwelier</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 8. WAREHOUSE -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">📦 Warehouse</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 9. GROTE BANK -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🏛️ Grote Bank</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 10. FIB -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🏢 FIB</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 11. JACHT -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🛥️ Jacht</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 12. OLIE-PLATFORM -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🛢️ Olie-platform</span>
+        <span class="category-badge">Binnenkort</span>
+      </div>
+      <div class="games-grid">
+        <div class="empty-card">Binnenkort beschikbaar...</div>
+      </div>
+    </div>
+
+    <!-- 13. BOBCAT -->
+    <div class="category-section">
+      <div class="category-header">
+        <span class="category-title">🟩 Bobcat</span>
+        <span class="category-badge">1 Minigame</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" onclick="openGame('Bobcat_1.html')">
+          <div>
+            <div class="game-icon">🟩</div>
+            <div class="game-title">Bobcat 1</div>
+            <div class="game-desc">Raad de 5-cijferige geheime combinatie in maximaal 6 pogingen.</div>
+          </div>
+          <div class="game-footer">
+            <span class="play-link">Speel Nu →</span>
+            <span class="controls-badge">Toetsenbord / Muis</span>
+          </div>
         </div>
       </div>
-
     </div>
 
   </div>
