@@ -15,188 +15,30 @@
   </script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: #121316;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* HEADER / TOPBAR */
-    header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #16181d;
-      border-bottom: 1px solid #232730;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 24px;
-      z-index: 10;
-    }
-
-    .brand-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-    }
-
-    .brand-logo {
-      height: 38px;
-      width: 38px;
-      object-fit: contain;
-      border-radius: 6px;
-    }
-
-    .brand {
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: #fff;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .user-badge {
-      background: #1e222b;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #232730;
-      font-size: 0.8rem;
-      color: #94a3b8;
-    }
-
-    .role-tag {
-      color: #fbbf24;
-      font-weight: bold;
-    }
-
-    .nav-btn {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      cursor: pointer;
-      background: #1e222b;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #232730;
-      transition: all 0.2s;
-    }
-
-    .nav-btn:hover {
-      color: #fbbf24;
-      border-color: #fbbf24;
-    }
-
-    .admin-btn {
-      color: #fbbf24;
-      border-color: #fbbf24;
-    }
-
-    .logout-btn {
-      color: #ef4444;
-    }
-
-    .logout-btn:hover {
-      background: #ef4444;
-      color: #ffffff;
-    }
-
-    /* SIDEBAR */
-    aside {
-      width: 260px;
-      height: 100vh;
-      background-color: #16181d;
-      border-right: 1px solid #232730;
-      padding-top: 80px;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .sidebar-section {
-      padding: 0 16px;
-      margin-bottom: 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #94a3b8;
-    }
-
-    .nav-list {
-      list-style: none;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 24px;
-      color: #94a3b8;
-      text-decoration: none;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .nav-item:hover {
-      color: #f8fafc;
-      background-color: #1e222b;
-    }
-
-    .nav-item.active {
-      color: #fbbf24;
-      background-color: #1e222b;
-      font-weight: 500;
-    }
-
-    .arrow {
-      font-size: 0.8rem;
-      opacity: 0.5;
-    }
-
-    /* MAIN CONTENT */
-    main {
-      flex-grow: 1;
-      padding-top: 60px;
-      height: 100vh;
-      background-color: #0f1013;
-      display: flex;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    /* WATERMARK */
-    .watermark {
-      position: absolute;
-      bottom: 15px;
-      left: 20px;
-      font-size: 0.75rem;
-      color: #475569;
-      letter-spacing: 1px;
-      pointer-events: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #121316; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
+    header { position: absolute; top: 0; left: 0; right: 0; height: 60px; background-color: #16181d; border-bottom: 1px solid #232730; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; z-index: 10; }
+    .brand-container { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .brand-logo { height: 38px; width: 38px; object-fit: contain; border-radius: 6px; }
+    .brand { font-weight: 600; font-size: 1.1rem; color: #fff; }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .user-badge { background: #1e222b; padding: 6px 12px; border-radius: 6px; border: 1px solid #232730; font-size: 0.8rem; color: #94a3b8; }
+    .role-tag { color: #fbbf24; font-weight: bold; }
+    .nav-btn { font-size: 0.85rem; color: #94a3b8; cursor: pointer; background: #1e222b; padding: 6px 12px; border-radius: 6px; border: 1px solid #232730; transition: all 0.2s; }
+    .nav-btn:hover { color: #fbbf24; border-color: #fbbf24; }
+    .admin-btn { color: #fbbf24; border-color: #fbbf24; }
+    .logout-btn { color: #ef4444; }
+    .logout-btn:hover { background: #ef4444; color: #ffffff; }
+    aside { width: 260px; height: 100vh; background-color: #16181d; border-right: 1px solid #232730; padding-top: 80px; display: flex; flex-direction: column; flex-shrink: 0; position: relative; }
+    .sidebar-section { padding: 0 16px; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+    .nav-list { list-style: none; }
+    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; color: #94a3b8; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+    .nav-item:hover { color: #f8fafc; background-color: #1e222b; }
+    .nav-item.active { color: #fbbf24; background-color: #1e222b; font-weight: 500; }
+    .arrow { font-size: 0.8rem; opacity: 0.5; }
+    main { flex-grow: 1; padding-top: 60px; height: 100vh; background-color: #0f1013; display: flex; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+    .watermark { position: absolute; bottom: 15px; left: 20px; font-size: 0.75rem; color: #475569; letter-spacing: 1px; pointer-events: none; }
   </style>
 </head>
 
@@ -260,9 +102,12 @@
     <iframe id="gameFrame" src="Home.html" title="Minigame Hub"></iframe>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const _trackerSupabase = supabase.createClient("https://suimuvzfrhtqxprzzojy.supabase.co", "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ");
     const currentUser = sessionStorage.getItem("currentUser") || "Jesus Gonzales";
     const currentRole = sessionStorage.getItem("currentRole") || "Opper Gringo";
+    let sessionStartTime = Date.now();
 
     document.getElementById("displayUser").innerText = currentUser;
     document.getElementById("displayRole").innerText = currentRole;
@@ -271,33 +116,28 @@
       document.getElementById("adminMenuBtn").style.display = "inline-block";
     }
 
+    _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Sessie gestart / Online" }]);
+
     function loadGame(element, url) {
       document.getElementById("gameFrame").src = url;
 
       const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) {
-        item.classList.remove("active");
-      });
+      items.forEach(function(item) { item.classList.remove("active"); });
+      if (element) element.classList.add("active");
 
-      if (element) {
-        element.classList.add("active");
-      }
+      _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Geopend: " + url }]);
     }
 
     function openHome() {
       document.getElementById("gameFrame").src = "Home.html";
       const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) {
-        item.classList.remove("active");
-      });
+      items.forEach(function(item) { item.classList.remove("active"); });
     }
 
     function openAdmin() {
       document.getElementById("gameFrame").src = "Admin.html";
       const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) {
-        item.classList.remove("active");
-      });
+      items.forEach(function(item) { item.classList.remove("active"); });
     }
 
     function loadGameFromHome(url) {
@@ -309,12 +149,18 @@
         }
       });
       document.getElementById("gameFrame").src = url;
+      _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Geopend via Home: " + url }]);
     }
 
     function logout() {
       sessionStorage.clear();
       window.location.href = "Login.html";
     }
+
+    window.addEventListener("beforeunload", () => {
+      const timeSpentSeconds = Math.round((Date.now() - sessionStartTime) / 1000);
+      _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Sessie beëindigd", duration_seconds: timeSpentSeconds }]);
+    });
   </script>
 
 </body>
