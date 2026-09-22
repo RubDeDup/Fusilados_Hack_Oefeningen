@@ -12,277 +12,63 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #0f1013; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; overflow: hidden; }
 
-    body {
-      background-color: #0f1013;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
+    .sidebar { width: 260px; background-color: #16181d; border-right: 1px solid #232730; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px; flex-shrink: 0; }
+    
+    .brand-section { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #232730; margin-bottom: 20px; cursor: pointer; border-radius: 8px; padding: 8px; transition: background-color 0.2s ease; }
+    .brand-section:hover { background-color: #232730; }
+    .brand-logo { width: 38px; height: 38px; object-fit: contain; border-radius: 8px; }
+    .brand-title { font-size: 1rem; font-weight: 700; color: #ffffff; letter-spacing: 0.03em; }
 
-    /* SIDEBAR STYLING */
-    .sidebar {
-      width: 260px;
-      background-color: #16181d;
-      border-right: 1px solid #232730;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 16px;
-      flex-shrink: 0;
-    }
+    .nav-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 10px; padding-left: 8px; }
+    .nav-list { list-style: none; margin-bottom: 24px; }
+    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; color: #94a3b8; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-bottom: 4px; }
+    .nav-item:hover { background-color: #232730; color: #ffffff; }
+    .nav-item.active { background-color: #232730; color: #fbbf24; font-weight: 600; }
+    .nav-item.active-wiet { background-color: #232730; color: #22c55e; font-weight: 600; }
+    .nav-item.active-finance { background-color: #232730; color: #38bdf8; font-weight: 600; }
+    .nav-item .arrow { font-size: 0.75rem; color: #475569; }
 
-    /* BRAND SECTION (KLIKBAAR MAKEN NAAR KRUISPUNT) */
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #232730;
-      margin-bottom: 20px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 8px;
-      transition: background-color 0.2s ease;
-    }
+    .user-section { padding-top: 16px; border-top: 1px solid #232730; }
+    .user-card { background-color: #0f1013; border: 1px solid #232730; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .user-name { font-size: 0.85rem; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+    .user-role { font-size: 0.75rem; color: #fbbf24; font-weight: 600; margin-bottom: 8px; }
 
-    .brand-section:hover {
-      background-color: #232730;
-    }
+    .btn-password { width: 100%; background: transparent; border: 1px solid #232730; color: #94a3b8; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-password:hover { border-color: #fbbf24; color: #fbbf24; }
 
-    .brand-logo {
-      width: 38px;
-      height: 38px;
-      object-fit: contain;
-      border-radius: 8px;
-    }
+    .admin-link { display: flex; align-items: center; gap: 8px; padding: 8px 12px; color: #fbbf24; font-size: 0.85rem; font-weight: 600; border-radius: 8px; cursor: pointer; margin-bottom: 8px; transition: background 0.2s; }
+    .admin-link:hover { background: rgba(251, 191, 36, 0.1); }
 
-    .brand-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 0.03em;
-    }
+    .btn-logout { width: 100%; background: #ef4444; color: #ffffff; border: none; padding: 8px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-logout:hover { background: #dc2626; }
 
-    .nav-section-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #64748b;
-      margin-bottom: 10px;
-      padding-left: 8px;
-    }
+    .content-area { flex: 1; height: 100vh; background-color: #0f1013; }
+    iframe { width: 100%; height: 100%; border: none; }
 
-    .nav-list {
-      list-style: none;
-      margin-bottom: 24px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 8px;
-      color: #94a3b8;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-bottom: 4px;
-    }
-
-    .nav-item:hover {
-      background-color: #232730;
-      color: #ffffff;
-    }
-
-    .nav-item.active {
-      background-color: #232730;
-      color: #fbbf24;
-      font-weight: 600;
-    }
-
-    .nav-item.active-wiet {
-      background-color: #232730;
-      color: #22c55e;
-      font-weight: 600;
-    }
-
-    .nav-item.active-finance {
-      background-color: #232730;
-      color: #38bdf8;
-      font-weight: 600;
-    }
-
-    .nav-item .arrow {
-      font-size: 0.75rem;
-      color: #475569;
-    }
-
-    /* USER PROFILE SECTION */
-    .user-section {
-      padding-top: 16px;
-      border-top: 1px solid #232730;
-    }
-
-    .user-card {
-      background-color: #0f1013;
-      border: 1px solid #232730;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    .user-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 2px;
-    }
-
-    .user-role {
-      font-size: 0.75rem;
-      color: #fbbf24;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .btn-password {
-      width: 100%;
-      background: transparent;
-      border: 1px solid #232730;
-      color: #94a3b8;
-      padding: 6px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-password:hover {
-      border-color: #fbbf24;
-      color: #fbbf24;
-    }
-
-    .admin-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      color: #fbbf24;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-bottom: 8px;
-      transition: background 0.2s;
-    }
-
-    .admin-link:hover {
-      background: rgba(251, 191, 36, 0.1);
-    }
-
-    .btn-logout {
-      width: 100%;
-      background: #ef4444;
-      color: #ffffff;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-logout:hover {
-      background: #dc2626;
-    }
-
-    /* MAIN CONTENT IFRAME */
-    .content-area {
-      flex: 1;
-      height: 100vh;
-      background-color: #0f1013;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* PASSWORD MODAL */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.75);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal {
-      background: #16181d;
-      border: 1px solid #232730;
-      border-radius: 12px;
-      padding: 24px;
-      width: 320px;
-    }
-
-    .modal h3 {
-      font-size: 1rem;
-      color: #fff;
-      margin-bottom: 16px;
-    }
-
-    .modal input {
-      width: 100%;
-      padding: 10px;
-      background: #0f1013;
-      border: 1px solid #232730;
-      border-radius: 6px;
-      color: #fff;
-      margin-bottom: 16px;
-      outline: none;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    .modal-btn {
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-    }
-
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: #16181d; border: 1px solid #232730; border-radius: 12px; padding: 24px; width: 320px; }
+    .modal h3 { font-size: 1rem; color: #fff; margin-bottom: 16px; }
+    .modal input { width: 100%; padding: 10px; background: #0f1013; border: 1px solid #232730; border-radius: 6px; color: #fff; margin-bottom: 16px; outline: none; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-btn { padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; }
     .btn-cancel { background: #232730; color: #94a3b8; }
     .btn-save { background: #fbbf24; color: #0f1013; }
   </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
+  <!-- Voorkom dat index.html IN een iframe geladen wordt -->
+  <script>
+    if (window.top !== window.self) {
+      window.top.location.href = window.location.href;
+    }
+  </script>
+
   <div class="sidebar">
     <div>
-      <!-- KLIKBAAR LOGO + TITEL TERUG NAAR KRUISPUNT -->
       <div class="brand-section" onclick="openHome()" title="Ga naar Kruispunt">
         <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
         <span class="brand-title">Fusilados Hub</span>
@@ -305,7 +91,6 @@
       </ul>
     </div>
 
-    <!-- GEBRUIKERSPROFIEL ONDERAAN -->
     <div class="user-section">
       <div class="user-card">
         <div class="user-name" id="displayUsername">Laden...</div>
@@ -313,7 +98,6 @@
         <button class="btn-password" onclick="openPasswordModal()">Wachtwoord Wijzigen</button>
       </div>
 
-      <!-- Alleen zichtbaar voor Opper Gringo -->
       <div class="admin-link" id="adminPanelLink" style="display: none;" onclick="loadGame(null, 'Admin.html')">
         ⚙️ Admin Beheer
       </div>
@@ -322,12 +106,10 @@
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
   <div class="content-area">
-    <iframe id="mainFrame" src="MinigamesHome.html"></iframe>
+    <iframe id="mainFrame" name="mainFrame" src="MinigamesHome.html"></iframe>
   </div>
 
-  <!-- WACHTWOORD MODAL -->
   <div class="modal-overlay" id="passwordModal">
     <div class="modal">
       <h3>Nieuw Wachtwoord Instellen</h3>
@@ -347,7 +129,6 @@
   const currentUser = sessionStorage.getItem("currentUser");
   const currentRole = sessionStorage.getItem("currentRole");
 
-  // Beveiliging: als er niet is ingelogd, stuur door naar Login.html
   if (!currentUser) {
     window.location.href = "Login.html";
   } else {
