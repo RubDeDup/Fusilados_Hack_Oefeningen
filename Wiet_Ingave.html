@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusilados hub - Wiet Ingave</title>
+  <title>Fusilados hub - Wiet Ingave v2</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="fusilados.png">
@@ -41,7 +41,8 @@
     .stat-box { background: #0f1013; border: 1px solid #232730; border-radius: 10px; padding: 18px; }
     .stat-user { font-size: 1rem; font-weight: bold; color: #fbbf24; margin-bottom: 12px; border-bottom: 1px solid #232730; padding-bottom: 6px; }
     .strain-summary { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #1e222b; }
-    .strain-name { font-size: 0.85rem; font-weight: bold; color: #4ade80; margin-bottom: 2px; }
+    .strain-summary:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .strain-name { font-size: 0.85rem; font-weight: bold; color: #4ade80; margin-bottom: 4px; }
     .stat-detail { font-size: 0.8rem; color: #cbd5e1; display: flex; justify-content: space-between; }
 
     /* TABEL OVERZICHT */
@@ -231,13 +232,13 @@
 
     tbody.innerHTML = "";
     
-    // Nested object: totals[username][strain][unit]
+    // Totalen groeperen: totals[username][strain][unit]
     const totals = {};
 
     data.forEach(item => {
       const date = new Date(item.created_at).toLocaleString('nl-NL');
       const unit = item.unit || 'Zakje';
-      const strain = item.strain || 'Onbekend';
+      const strain = item.strain || 'Marihuana';
       const amount = parseInt(item.amount || 0);
       const tr = document.createElement("tr");
 
@@ -251,7 +252,7 @@
       `;
       tbody.appendChild(tr);
 
-      // Totalen groeperen per gebruiker én per strain
+      // Groeperen
       if (!totals[item.username]) totals[item.username] = {};
       if (!totals[item.username][strain]) totals[item.username][strain] = { zakjes: 0, toppen: 0 };
 
@@ -262,7 +263,7 @@
       }
     });
 
-    // Vul statistieken grid per categorie
+    // Statistieken opbouwen per categorie per kweker
     grid.innerHTML = "";
     Object.keys(totals).forEach(user => {
       const box = document.createElement("div");
@@ -274,8 +275,8 @@
           <div class="strain-summary">
             <div class="strain-name">🌿 ${sName}</div>
             <div class="stat-detail">
-              <span>🛍️ Zakjes: <strong>${totals[user][sName].zakjes}</strong></span>
-              <span>✂️ Toppen: <strong>${totals[user][sName].toppen}</strong></span>
+              <span>🛍️ Zakjes: <strong>${totals[user][sName].zakjes} stuks</strong></span>
+              <span>✂️ Toppen: <strong>${totals[user][sName].toppen} stuks</strong></span>
             </div>
           </div>
         `;
@@ -308,6 +309,7 @@
     document.getElementById("amountInput").value = "";
     document.getElementById("notesInput").value = "";
     loadMyHistory();
+    if (canViewAll) loadAdminView();
   }
 
   async function deleteEntry(id) {
