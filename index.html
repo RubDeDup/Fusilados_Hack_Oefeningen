@@ -3,264 +3,404 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusilados hub</title>
-
-  <!-- Favicon / Tabblad Icoontje -->
+  <title>Fusilados Hub</title>
+  
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="fusilados.png">
 
-  <script>
-    if (sessionStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "Login.html";
-    }
-  </script>
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background-color: #121316; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-    
-    /* HEADER / TOPBAR */
-    header { position: absolute; top: 0; left: 0; right: 0; height: 60px; background-color: #16181d; border-bottom: 1px solid #232730; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; z-index: 10; }
-    .brand-container { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-    .brand-logo { height: 38px; width: 38px; object-fit: contain; border-radius: 6px; }
-    .brand { font-weight: 600; font-size: 1.1rem; color: #fff; }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .user-badge { background: #1e222b; padding: 6px 12px; border-radius: 6px; border: 1px solid #232730; font-size: 0.8rem; color: #94a3b8; }
-    .role-tag { color: #fbbf24; font-weight: bold; }
-    
-    .nav-btn { font-size: 0.85rem; color: #94a3b8; cursor: pointer; background: #1e222b; padding: 6px 12px; border-radius: 6px; border: 1px solid #232730; transition: all 0.2s; }
-    .nav-btn:hover { color: #fbbf24; border-color: #fbbf24; }
-    .admin-btn { color: #fbbf24; border-color: #fbbf24; }
-    .pwd-btn { color: #38bdf8; border-color: #0284c7; }
-    .pwd-btn:hover { color: #7dd3fc; border-color: #38bdf8; }
-    .logout-btn { color: #ef4444; }
-    .logout-btn:hover { background: #ef4444; color: #ffffff; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    /* SIDEBAR */
-    aside { width: 260px; height: 100vh; background-color: #16181d; border-right: 1px solid #232730; padding-top: 80px; display: flex; flex-direction: column; flex-shrink: 0; position: relative; }
-    .sidebar-section { padding: 0 16px; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
-    .nav-list { list-style: none; }
-    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; color: #94a3b8; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
-    .nav-item:hover { color: #f8fafc; background-color: #1e222b; }
-    .nav-item.active { color: #fbbf24; background-color: #1e222b; font-weight: 500; }
-    .arrow { font-size: 0.8rem; opacity: 0.5; }
+    body {
+      background-color: #0f1013;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
 
-    /* MAIN CONTENT */
-    main { flex-grow: 1; padding-top: 60px; height: 100vh; background-color: #0f1013; display: flex; }
-    iframe { width: 100%; height: 100%; border: none; display: block; }
-    .watermark { position: absolute; bottom: 15px; left: 20px; font-size: 0.75rem; color: #475569; letter-spacing: 1px; pointer-events: none; }
+    /* SIDEBAR STYLING */
+    .sidebar {
+      width: 260px;
+      background-color: #16181d;
+      border-right: 1px solid #232730;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px;
+      flex-shrink: 0;
+    }
 
-    /* MODAL POP-UP (Wachtwoord wijzigen) */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 100; }
-    .modal-card { background: #16181d; border: 1px solid #232730; border-radius: 12px; padding: 24px; width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
-    .modal-card h2 { font-size: 1.1rem; color: #fff; margin-bottom: 15px; }
-    .modal-group { margin-bottom: 12px; }
-    .modal-group label { display: block; font-size: 0.75rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
-    .modal-group input { width: 100%; padding: 8px 10px; background: #0f1013; border: 1px solid #232730; border-radius: 6px; color: #fff; outline: none; }
-    .modal-group input:focus { border-color: #38bdf8; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; }
-    .modal-btn { padding: 8px 14px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-    .modal-btn-cancel { background: #232730; color: #94a3b8; }
-    .modal-btn-save { background: #0284c7; color: #fff; }
-    .modal-btn-save:hover { background: #0369a1; }
-    .modal-msg { font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #232730;
+      margin-bottom: 20px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.03em;
+    }
+
+    .nav-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      margin-bottom: 10px;
+      padding-left: 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+    }
+
+    .nav-item:hover {
+      background-color: #232730;
+      color: #ffffff;
+    }
+
+    .nav-item.active {
+      background-color: #232730;
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .nav-item.active-wiet {
+      background-color: #232730;
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .nav-item .arrow {
+      font-size: 0.75rem;
+      color: #475569;
+    }
+
+    /* USER PROFILE SECTION */
+    .user-section {
+      padding-top: 16px;
+      border-top: 1px solid #232730;
+    }
+
+    .user-card {
+      background-color: #0f1013;
+      border: 1px solid #232730;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .user-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: #fbbf24;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .btn-password {
+      width: 100%;
+      background: transparent;
+      border: 1px solid #232730;
+      color: #94a3b8;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-password:hover {
+      border-color: #fbbf24;
+      color: #fbbf24;
+    }
+
+    .admin-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      color: #fbbf24;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+
+    .admin-link:hover {
+      background: rgba(251, 191, 36, 0.1);
+    }
+
+    .btn-logout {
+      width: 100%;
+      background: #ef4444;
+      color: #ffffff;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+
+    /* MAIN CONTENT IFRAME */
+    .content-area {
+      flex: 1;
+      height: 100vh;
+      background-color: #0f1013;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* PASSWORD MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: #16181d;
+      border: 1px solid #232730;
+      border-radius: 12px;
+      padding: 24px;
+      width: 320px;
+    }
+
+    .modal h3 {
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 10px;
+      background: #0f1013;
+      border: 1px solid #232730;
+      border-radius: 6px;
+      color: #fff;
+      margin-bottom: 16px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-cancel { background: #232730; color: #94a3b8; }
+    .btn-save { background: #fbbf24; color: #0f1013; }
   </style>
 </head>
-
 <body>
 
-  <header>
-    <div class="brand-container" onclick="openHome()">
-      <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
-      <div class="brand">Fusilados hub</div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div>
+      <div class="brand-section">
+        <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
+        <span class="brand-title">Fusilados Hub</span>
+      </div>
+
+      <div class="nav-section-title">HOOFD NAVIGATIE</div>
+      <ul class="nav-list">
+        <li class="nav-item active" id="navHome" onclick="openHome()">
+          <span>🏠 Kruispunt</span>
+          <span class="arrow">&gt;</span>
+        </li>
+      </ul>
+
+      <div class="nav-section-title">CATEGORIEËN</div>
+      <ul class="nav-list">
+        <li class="nav-item" id="navMinigames" onclick="loadGame(this, 'MinigamesHome.html')">
+          <span>🎮 Minigames Hub</span>
+          <span class="arrow">&gt;</span>
+        </li>
+        <li class="nav-item" id="navWiet" onclick="loadGame(this, 'Wiet_Ingave.html?v=2')">
+          <span>🌿 Wiet Ingave Systeem</span>
+          <span class="arrow">&gt;</span>
+        </li>
+      </ul>
     </div>
 
-    <div class="header-actions">
-      <div class="user-badge">
-        <span id="displayUser">...</span> [<span class="role-tag" id="displayRole">...</span>]
+    <!-- GEBRUIKERSPROFIEL ONDERAAN -->
+    <div class="user-section">
+      <div class="user-card">
+        <div class="user-name" id="displayUsername">Laden...</div>
+        <div class="user-role" id="displayRole">...</div>
+        <button class="btn-password" onclick="openPasswordModal()">Wachtwoord Wijzigen</button>
       </div>
-      <div class="nav-btn" onclick="openHome()">Home</div>
-      <div class="nav-btn pwd-btn" onclick="openPwdModal()">🔑 Wachtwoord</div>
-      <div class="nav-btn admin-btn" id="adminMenuBtn" onclick="openAdmin()" style="display: none;">⚙️ Beheer</div>
-      <div class="nav-btn logout-btn" onclick="logout()">Uitloggen</div>
+
+      <!-- Alleen zichtbaar voor Opper Gringo -->
+      <div class="admin-link" id="adminPanelLink" style="display: none;" onclick="loadGame(null, 'Admin.html')">
+        ⚙️ Admin Beheer
+      </div>
+
+      <button class="btn-logout" onclick="logout()">Uitloggen</button>
     </div>
-  </header>
+  </div>
 
-  <aside>
-    <div class="sidebar-section">Minigames</div>
+  <!-- MAIN CONTENT -->
+  <div class="content-area">
+    <iframe id="mainFrame" src="Home.html"></iframe>
+  </div>
 
-    <ul class="nav-list">
-      <li class="nav-item" onclick="loadGame(this, 'Memory.html')">
-        <span>Memory Grid</span>
-        <span class="arrow">&gt;</span>
-      </li>
-
-      <li class="nav-item" onclick="loadGame(this, 'NumberHack.html')">
-        <span>Number Hack</span>
-        <span class="arrow">&gt;</span>
-      </li>
-
-      <li class="nav-item" onclick="loadGame(this, 'WT_Hack.html')">
-        <span>WT Hack</span>
-        <span class="arrow">&gt;</span>
-      </li>
-
-      <li class="nav-item" onclick="loadGame(this, 'Winkel_DVD_Hack.html')">
-        <span>Winkel DVD Hack</span>
-        <span class="arrow">&gt;</span>
-      </li>
-
-      <li class="nav-item" onclick="loadGame(this, 'Bobcat_1.html')">
-        <span>Bobcat 1</span>
-        <span class="arrow">&gt;</span>
-      </li>
-
-      <li class="nav-item" onclick="loadGame(this, 'GPS_Hack.html')">
-        <span>GPS Hack</span>
-        <span class="arrow">&gt;</span>
-      </li>
-    </ul>
-
-    <div class="watermark">Created by RubDeDup</div>
-  </aside>
-
-  <main>
-    <iframe id="gameFrame" src="Home.html" title="Minigame Hub"></iframe>
-  </main>
-
-  <!-- WACHTWOORD WIJZIGEN MODAL POP-UP -->
-  <div class="modal-overlay" id="pwdModal">
-    <div class="modal-card">
-      <h2>🔑 Wachtwoord Wijzigen</h2>
-      <div class="modal-group">
-        <label>Huidig Wachtwoord</label>
-        <input type="password" id="oldPwd" placeholder="••••••••">
-      </div>
-      <div class="modal-group">
-        <label>Nieuw Wachtwoord</label>
-        <input type="password" id="newPwd" placeholder="••••••••">
-      </div>
-      <div class="modal-msg" id="pwdMsg"></div>
+  <!-- WACHTWOORD MODAL -->
+  <div class="modal-overlay" id="passwordModal">
+    <div class="modal">
+      <h3>Nieuw Wachtwoord Instellen</h3>
+      <input type="password" id="newPasswordInput" placeholder="Voer nieuw wachtwoord in">
       <div class="modal-actions">
-        <button class="modal-btn modal-btn-cancel" onclick="closePwdModal()">Annuleren</button>
-        <button class="modal-btn modal-btn-save" onclick="changePassword()">Opslaan</button>
+        <button class="modal-btn btn-cancel" onclick="closePasswordModal()">Annuleren</button>
+        <button class="modal-btn btn-save" onclick="saveNewPassword()">Opslaan</button>
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const _trackerSupabase = supabase.createClient("https://suimuvzfrhtqxprzzojy.supabase.co", "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ");
-    const currentUser = sessionStorage.getItem("currentUser") || "Jesus Gonzales";
-    const currentRole = sessionStorage.getItem("currentRole") || "Opper Gringo";
-    let sessionStartTime = Date.now();
+<script>
+  const SUPABASE_URL = "https://suimuvzfrhtqxprzzojy.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    document.getElementById("displayUser").innerText = currentUser;
-    document.getElementById("displayRole").innerText = currentRole;
+  const currentUser = sessionStorage.getItem("currentUser");
+  const currentRole = sessionStorage.getItem("currentRole");
+
+  // Beveiliging: als er niet is ingelogd, stuur door naar Login.html
+  if (!currentUser) {
+    window.location.href = "Login.html";
+  } else {
+    document.getElementById("displayUsername").innerText = currentUser;
+    document.getElementById("displayRole").innerText = currentRole || "Gringo";
 
     if (currentRole === "Opper Gringo") {
-      document.getElementById("adminMenuBtn").style.display = "inline-block";
+      document.getElementById("adminPanelLink").style.display = "flex";
     }
+  }
 
-    _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Sessie gestart / Online" }]);
-
-    function loadGame(element, url) {
-      document.getElementById("gameFrame").src = url;
-      const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) { item.classList.remove("active"); });
-      if (element) element.classList.add("active");
-      _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Geopend: " + url }]);
-    }
-
-    function openHome() {
-      document.getElementById("gameFrame").src = "Home.html";
-      const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) { item.classList.remove("active"); });
-    }
-
-    function openAdmin() {
-      document.getElementById("gameFrame").src = "Admin.html";
-      const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) { item.classList.remove("active"); });
-    }
-
-    function loadGameFromHome(url) {
-      const items = document.querySelectorAll(".nav-item");
-      items.forEach(function(item) {
-        item.classList.remove("active");
-        if (item.getAttribute("onclick") && item.getAttribute("onclick").includes(url)) {
-          item.classList.add("active");
-        }
-      });
-      document.getElementById("gameFrame").src = url;
-      _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Geopend via Home: " + url }]);
-    }
-
-    /* Modal logica */
-    function openPwdModal() {
-      document.getElementById("pwdModal").style.display = "flex";
-      document.getElementById("oldPwd").value = "";
-      document.getElementById("newPwd").value = "";
-      document.getElementById("pwdMsg").innerText = "";
-    }
-
-    function closePwdModal() {
-      document.getElementById("pwdModal").style.display = "none";
-    }
-
-    async function changePassword() {
-      const oldPwd = document.getElementById("oldPwd").value;
-      const newPwd = document.getElementById("newPwd").value;
-      const msg = document.getElementById("pwdMsg");
-
-      if (!oldPwd || !newPwd) {
-        msg.style.color = "#ef4444";
-        msg.innerText = "Vul alle velden in!";
-        return;
-      }
-
-      msg.style.color = "#94a3b8";
-      msg.innerText = "Verifiëren...";
-
-      // Controleer oud wachtwoord
-      const { data, error } = await _trackerSupabase
-        .from('users')
-        .select('*')
-        .ilike('username', currentUser)
-        .single();
-
-      if (error || !data || data.password !== oldPwd) {
-        msg.style.color = "#ef4444";
-        msg.innerText = "Huidig wachtwoord is onjuist!";
-        return;
-      }
-
-      // Update naar nieuw wachtwoord
-      const { error: updateErr } = await _trackerSupabase
-        .from('users')
-        .update({ password: newPwd })
-        .eq('id', data.id);
-
-      if (updateErr) {
-        msg.style.color = "#ef4444";
-        msg.innerText = "Fout bij opslaan van nieuw wachtwoord!";
+  function loadGame(element, url) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-wiet'));
+    
+    if (element) {
+      if (url.includes('Wiet_Ingave')) {
+        element.classList.add('active-wiet');
       } else {
-        msg.style.color = "#22c55e";
-        msg.innerText = "Wachtwoord succesvol gewijzigd!";
-        _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Wachtwoord gewijzigd" }]);
-        setTimeout(() => closePwdModal(), 1500);
+        element.classList.add('active');
       }
     }
+    
+    document.getElementById("mainFrame").src = url;
+  }
 
-    function logout() {
-      sessionStorage.clear();
-      window.location.href = "Login.html";
+  function openHome() {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-wiet'));
+    document.getElementById("navHome").classList.add("active");
+    document.getElementById("mainFrame").src = "Home.html";
+  }
+
+  function openPasswordModal() {
+    document.getElementById("passwordModal").style.display = "flex";
+  }
+
+  function closePasswordModal() {
+    document.getElementById("passwordModal").style.display = "none";
+    document.getElementById("newPasswordInput").value = "";
+  }
+
+  async function saveNewPassword() {
+    const newPassword = document.getElementById("newPasswordInput").value.trim();
+    if (!newPassword) {
+      alert("Voer een geldig wachtwoord in!");
+      return;
     }
 
-    window.addEventListener("beforeunload", () => {
-      const timeSpentSeconds = Math.round((Date.now() - sessionStartTime) / 1000);
-      _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Sessie beëindigd", duration_seconds: timeSpentSeconds }]);
-    });
-  </script>
+    const { error } = await _supabase
+      .from('users')
+      .update({ password: newPassword })
+      .eq('username', currentUser);
+
+    if (error) {
+      alert("Fout bij wijzigen wachtwoord: " + error.message);
+    } else {
+      alert("Wachtwoord succesvol gewijzigd!");
+      closePasswordModal();
+    }
+  }
+
+  function logout() {
+    sessionStorage.clear();
+    window.location.href = "Login.html";
+  }
+</script>
 
 </body>
 </html>
