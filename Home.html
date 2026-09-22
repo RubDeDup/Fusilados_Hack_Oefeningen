@@ -250,16 +250,14 @@
 
 <script>
   function goToMinigames() {
-    // Opent de Memory Grid minigame of het minigame overzicht in het hoofdscherm
     if (window.parent && window.parent.loadGame) {
-      window.parent.loadGame(null, 'Memory.html');
+      window.parent.loadGame(null, 'MinigamesHome.html');
     } else {
-      window.location.href = 'Memory.html';
+      window.location.href = 'MinigamesHome.html';
     }
   }
 
   function goToWiet() {
-    // Navigeert naar het wiet ingave bestand
     if (window.parent && window.parent.loadGame) {
       window.parent.loadGame(null, 'Wiet_Ingave.html');
     } else {
