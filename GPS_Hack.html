@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPS Hack</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0d0e12;
+      color: #ffffff;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      background: #14171f;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid #232836;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      width: 460px;
+      position: relative;
+    }
+
+    .logo {
+      font-size: 2.2rem;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .status-title {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+
+    .target-code {
+      font-size: 1.4rem;
+      font-weight: bold;
+      letter-spacing: 6px;
+      color: #ffffff;
+      margin-bottom: 20px;
+      min-height: 32px;
+    }
+
+    /* Grid met omgekeerde (upside down) tekens */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      background: #090a0f;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #1e2330;
+    }
+
+    .cell {
+      padding: 6px 0;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #e2e8f0;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      /* 180 graden draaien voor de 'upside down' look uit de video */
+      transform: rotate(180deg);
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .cell.highlight {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .instructions {
+      margin-top: 15px;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    kbd {
+      background: #1e2330;
+      padding: 2px 5px;
+      border-radius: 3px;
+      color: #38bdf8;
+    }
+
+    /* Overlay scherm */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(20, 23, 31, 0.98);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .overlay-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      margin-top: 18px;
+      padding: 10px 22px;
+      background: #22c55e;
+      color: #000000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .btn:hover {
+      background: #16a34a;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body onclick="window.focus()">
+
+  <div class="container">
+    <div class="logo">A</div>
+    <div class="status-title" id="statusTitle">PREPARING THE SYSTEM...</div>
+
+    <div class="target-code" id="targetDisplay"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="instructions">
+      Gebruik <kbd>Pijltoetsen</kbd> of <kbd>Muis</kbd> + <kbd>ENTER</kbd>
+    </div>
+
+    <div class="overlay show" id="overlay">
+      <div class="overlay-icon" id="overlayIcon">A</div>
+      <h2 id="overlayTitle" style="color: #ffffff; font-size: 1.2rem;">PREPARING THE SYSTEM...</h2>
+      <p id="overlaySub" style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">Systeem initialiseren...</p>
+      <button class="btn" id="startBtn" onclick="startGame()" style="display: none;">START HACK</button>
+    </div>
+  </div>
+
+  <div class="watermark">Created by RubDeDup</div>
+
+<script>
+  const grid = document.getElementById('grid');
+  const targetDisplay = document.getElementById('targetDisplay');
+  const statusTitle = document.getElementById('statusTitle');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlaySub = document.getElementById('overlaySub');
+  const overlayIcon = document.getElementById('overlayIcon');
+  const startBtn = document.getElementById('startBtn');
+
+  const rows = 8;
+  const cols = 8;
+  const targetLength = 4;
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+  let targetSeq = [];
+  let gridData = [];
+  let hoveredIndex = 0;
+  let targetIndex = -1;
+
+  let isGameActive = false;
+  let moveInterval = null;
+
+  function randomPair() {
+    return chars[Math.floor(Math.random() * chars.length)] + chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  function initLoading() {
+    overlay.classList.add('show');
+    overlayIcon.innerText = "A";
+    overlayIcon.style.color = "#ffffff";
+    overlayTitle.innerText = "PREPARING THE SYSTEM...";
+    overlaySub.innerText = "Verbinding opbouwen...";
+    startBtn.style.display = "none";
+
+    setTimeout(() => {
+      startBtn.style.display = "inline-block";
+      startBtn.innerText = "START HACK";
+    }, 1200);
+  }
+
+  function startGame() {
+    window.focus();
+    overlay.classList.remove('show');
+    clearInterval(moveInterval);
+
+    isGameActive = true;
+    statusTitle.innerText = "CONNECTING TO THE SYSTEM...";
+
+    // Genereer 4 doelparen
+    targetSeq = [];
+    for (let i = 0; i < targetLength; i++) {
+      targetSeq.push(randomPair());
+    }
+    targetDisplay.innerText = targetSeq.join(' ');
+
+    const totalCells = rows * cols;
+    gridData = [];
+    for (let i = 0; i < totalCells; i++) {
+      gridData.push(randomPair());
+    }
+
+    // Plaats het juiste antwoord ergens in de matrix
+    targetIndex = Math.floor(Math.random() * (totalCells - targetLength));
+    for (let i = 0; i < targetLength; i++) {
+      gridData[targetIndex + i] = targetSeq[i];
+    }
+
+    hoveredIndex = 0;
+    renderGrid();
+
+    // Verschuif de matrix periodiek
+    moveInterval = setInterval(() => {
+      if (!isGameActive) return;
+      const first = gridData.shift();
+      gridData.push(first);
+      
+      targetIndex = (targetIndex - 1 + totalCells) % totalCells;
+      renderGrid();
+    }, 1800);
+  }
+
+  function renderGrid() {
+    grid.innerHTML = '';
+    const maxIdx = gridData.length - targetLength;
+
+    gridData.forEach((pair, idx) => {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.innerText = pair;
+
+      if (idx >= hoveredIndex && idx < hoveredIndex + targetLength) {
+        cell.classList.add('highlight');
+      }
+
+      cell.addEventListener('mouseenter', () => {
+        if (!isGameActive) return;
+        hoveredIndex = Math.min(idx, maxIdx);
+        renderGrid();
+      });
+
+      cell.addEventListener('click', () => {
+        if (!isGameActive) return;
+        hoveredIndex = Math.min(idx, maxIdx);
+        checkSelection(hoveredIndex);
+      });
+
+      grid.appendChild(cell);
+    });
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (!isGameActive) return;
+
+    const maxIdx = gridData.length - targetLength;
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      hoveredIndex = Math.min(hoveredIndex + 1, maxIdx);
+      renderGrid();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      hoveredIndex = Math.max(hoveredIndex - 1, 0);
+      renderGrid();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      hoveredIndex = Math.min(hoveredIndex + cols, maxIdx);
+      renderGrid();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      hoveredIndex = Math.max(hoveredIndex - cols, 0);
+      renderGrid();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      checkSelection(hoveredIndex);
+    }
+  });
+
+  function checkSelection(index) {
+    if (!isGameActive) return;
+
+    const selectedSeq = gridData.slice(index, index + targetLength);
+    const isCorrect = selectedSeq.join(' ') === targetSeq.join(' ');
+
+    isGameActive = false;
+    clearInterval(moveInterval);
+
+    if (isCorrect) {
+      overlayIcon.innerText = "✓";
+      overlayIcon.style.color = "#22c55e";
+      overlayTitle.innerText = "ACCESS GRANTED";
+      overlayTitle.style.color = "#22c55e";
+      overlaySub.innerText = "GPS signaal succesvol gehackt!";
+    } else {
+      overlayIcon.innerText = "✕";
+      overlayIcon.style.color = "#ef4444";
+      overlayTitle.innerText = "ACCESS DENIED";
+      overlayTitle.style.color = "#ef4444";
+      overlaySub.innerText = "Verkeerde sequentie gekozen.";
+    }
+
+    startBtn.innerText = "OPNIEUW PROBEREN";
+    startBtn.style.display = "inline-block";
+    overlay.classList.add('show');
+  }
+
+  initLoading();
+</script>
+
+</body>
+</html>
