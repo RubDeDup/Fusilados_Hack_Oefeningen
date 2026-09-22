@@ -36,11 +36,13 @@
     .form-group input:focus, .form-group select:focus { border-color: #22c55e; }
     .btn-submit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
 
-    /* STATISTIEKEN OVERZICHT */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    /* CATEGORIE OVERZICHT GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .stat-box { background: #0f1013; border: 1px solid #232730; border-radius: 10px; padding: 18px; }
-    .stat-user { font-size: 1rem; font-weight: bold; color: #fbbf24; margin-bottom: 10px; border-bottom: 1px solid #232730; padding-bottom: 6px; }
-    .stat-detail { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 4px; }
+    .stat-user { font-size: 1rem; font-weight: bold; color: #fbbf24; margin-bottom: 12px; border-bottom: 1px solid #232730; padding-bottom: 6px; }
+    .strain-summary { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #1e222b; }
+    .strain-name { font-size: 0.85rem; font-weight: bold; color: #4ade80; margin-bottom: 2px; }
+    .stat-detail { font-size: 0.8rem; color: #cbd5e1; display: flex; justify-content: space-between; }
 
     /* TABEL OVERZICHT */
     table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -65,7 +67,7 @@
     <!-- TABBLADEN NAVIGATIE -->
     <div class="nav-tabs">
       <button class="tab-btn active" id="tabInputBtn" onclick="switchTab('input')">📝 Invoeren & Mijn Historie</button>
-      <button class="tab-btn" id="tabAdminBtn" onclick="switchTab('admin')" style="display: none;">📊 Totaaloverzicht Per Kweker</button>
+      <button class="tab-btn" id="tabAdminBtn" onclick="switchTab('admin')" style="display: none;">📊 Totaaloverzicht Per Categorie</button>
     </div>
 
     <!-- TAB 1: INVOEREN & EIGEN HISTORIE -->
@@ -127,7 +129,7 @@
     <!-- TAB 2: BEHEERDERS OVERZICHT (Alleen voor Opper Gringo & Higher Gringo) -->
     <div id="tabAdminView" style="display: none;">
       <div class="card">
-        <h2>👑 Totale Voorraad Per Kweker</h2>
+        <h2>👑 Totale Voorraad Per Categorie & Kweker</h2>
         <div class="stats-grid" id="adminStatsGrid">
           <div style="color: #94a3b8;">Berekenen...</div>
         </div>
@@ -166,7 +168,6 @@
   const currentRole = sessionStorage.getItem("currentRole") || "Gringo";
   const canViewAll = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
 
-  // Toon het beheerderstabblad als de gebruiker Opper of Higher Gringo is
   if (canViewAll) {
     document.getElementById("tabAdminBtn").style.display = "inline-block";
   }
@@ -228,45 +229,61 @@
       return;
     }
 
-    // Vul alle ingaves tabel
     tbody.innerHTML = "";
+    
+    // Nested object: totals[username][strain][unit]
     const totals = {};
 
     data.forEach(item => {
       const date = new Date(item.created_at).toLocaleString('nl-NL');
       const unit = item.unit || 'Zakje';
+      const strain = item.strain || 'Onbekend';
+      const amount = parseInt(item.amount || 0);
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
         <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
         <td><strong>${item.username}</strong></td>
-        <td><span class="strain-badge">${item.strain}</span></td>
-        <td><span class="amount-badge">${item.amount} ${unit}</span></td>
+        <td><span class="strain-badge">${strain}</span></td>
+        <td><span class="amount-badge">${amount} ${unit}</span></td>
         <td style="color:#94a3b8;">${item.notes || '-'}</td>
         <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
       `;
       tbody.appendChild(tr);
 
-      // Bereken totalen per gebruiker
-      if (!totals[item.username]) {
-        totals[item.username] = { zakjes: 0, toppen: 0 };
-      }
+      // Totalen groeperen per gebruiker én per strain
+      if (!totals[item.username]) totals[item.username] = {};
+      if (!totals[item.username][strain]) totals[item.username][strain] = { zakjes: 0, toppen: 0 };
+
       if (unit === 'Toppen') {
-        totals[item.username].toppen += parseInt(item.amount || 0);
+        totals[item.username][strain].toppen += amount;
       } else {
-        totals[item.username].zakjes += parseInt(item.amount || 0);
+        totals[item.username][strain].zakjes += amount;
       }
     });
 
-    // Vul statistieken grid
+    // Vul statistieken grid per categorie
     grid.innerHTML = "";
     Object.keys(totals).forEach(user => {
       const box = document.createElement("div");
       box.className = "stat-box";
+
+      let strainsHtml = '';
+      Object.keys(totals[user]).forEach(sName => {
+        strainsHtml += `
+          <div class="strain-summary">
+            <div class="strain-name">🌿 ${sName}</div>
+            <div class="stat-detail">
+              <span>🛍️ Zakjes: <strong>${totals[user][sName].zakjes}</strong></span>
+              <span>✂️ Toppen: <strong>${totals[user][sName].toppen}</strong></span>
+            </div>
+          </div>
+        `;
+      });
+
       box.innerHTML = `
         <div class="stat-user">👤 ${user}</div>
-        <div class="stat-detail">🛍️ Zakjes: <strong>${totals[user].zakjes} stuks</strong></div>
-        <div class="stat-detail">✂️ Toppen: <strong>${totals[user].toppen} stuks</strong></div>
+        ${strainsHtml}
       `;
       grid.appendChild(box);
     });
