@@ -39,6 +39,7 @@
       flex-shrink: 0;
     }
 
+    /* BRAND SECTION (KLIKBAAR MAKEN NAAR KRUISPUNT) */
     .brand-section {
       display: flex;
       align-items: center;
@@ -46,6 +47,14 @@
       padding-bottom: 20px;
       border-bottom: 1px solid #232730;
       margin-bottom: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .brand-section:hover {
+      background-color: #232730;
     }
 
     .brand-logo {
@@ -273,7 +282,8 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div>
-      <div class="brand-section">
+      <!-- KLIKBAAR LOGO + TITEL -->
+      <div class="brand-section" onclick="openHome()" title="Ga naar Kruispunt">
         <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
         <span class="brand-title">Fusilados Hub</span>
       </div>
@@ -314,7 +324,7 @@
 
   <!-- MAIN CONTENT -->
   <div class="content-area">
-    <iframe id="mainFrame" src="MinigamesHome.html"></iframe>
+    <iframe id="mainFrame" src="Home.html"></iframe>
   </div>
 
   <!-- WACHTWOORD MODAL -->
@@ -363,6 +373,11 @@
     }
     
     document.getElementById("mainFrame").src = url;
+  }
+
+  function openHome() {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-wiet', 'active-finance'));
+    document.getElementById("mainFrame").src = "Home.html";
   }
 
   function openPasswordModal() {
