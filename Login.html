@@ -12,140 +12,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: #0f1013;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, rgba(0,0,0,0) 70%);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    .login-card {
-      background: #16181d;
-      border: 1px solid #232730;
-      border-radius: 16px;
-      padding: 40px 35px;
-      width: 380px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-      text-align: center;
-      position: relative;
-      z-index: 10;
-    }
-
-    .logo {
-      width: 110px;
-      height: 110px;
-      object-fit: contain;
-      margin: 0 auto 15px auto;
-      display: block;
-      border-radius: 12px;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      color: #ffffff;
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }
-
-    p.subtitle {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      margin-bottom: 25px;
-    }
-
-    .input-group {
-      margin-bottom: 18px;
-      text-align: left;
-    }
-
-    .input-group label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px 14px;
-      background-color: #0f1013;
-      border: 1px solid #232730;
-      border-radius: 8px;
-      color: #ffffff;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .input-group input:focus {
-      border-color: #fbbf24;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #fbbf24;
-      color: #0f1013;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background-color 0.2s, transform 0.1s;
-    }
-
-    .login-btn:hover {
-      background-color: #f59e0b;
-    }
-
-    .login-btn:active {
-      transform: scale(0.98);
-    }
-
-    .error-msg {
-      color: #ef4444;
-      font-size: 0.8rem;
-      margin-top: 15px;
-      min-height: 18px;
-    }
-
-    .watermark {
-      position: absolute;
-      bottom: 15px;
-      right: 20px;
-      font-size: 0.75rem;
-      color: #475569;
-      letter-spacing: 1px;
-      pointer-events: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #0f1013; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; position: relative; }
+    body::before { content: ''; position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, rgba(0,0,0,0) 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    .login-card { background: #16181d; border: 1px solid #232730; border-radius: 16px; padding: 40px 35px; width: 380px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); text-align: center; position: relative; z-index: 10; }
+    .logo { width: 110px; height: 110px; object-fit: contain; margin: 0 auto 15px auto; display: block; border-radius: 12px; }
+    h1 { font-size: 1.4rem; color: #ffffff; margin-bottom: 6px; letter-spacing: 1px; }
+    p.subtitle { font-size: 0.85rem; color: #94a3b8; margin-bottom: 25px; }
+    .input-group { margin-bottom: 18px; text-align: left; }
+    .input-group label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 6px; }
+    .input-group input { width: 100%; padding: 12px 14px; background-color: #0f1013; border: 1px solid #232730; border-radius: 8px; color: #ffffff; font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .input-group input:focus { border-color: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.2); }
+    .login-btn { width: 100%; padding: 12px; background-color: #fbbf24; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-top: 10px; transition: background-color 0.2s, transform 0.1s; }
+    .login-btn:hover { background-color: #f59e0b; }
+    .login-btn:active { transform: scale(0.98); }
+    .error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 15px; min-height: 18px; }
+    .watermark { position: absolute; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; letter-spacing: 1px; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -195,7 +77,6 @@
     errorMsg.innerText = "";
 
     try {
-      // 1. Probeer eerst rechtstreeks via Supabase cloud
       const { data, error } = await _supabase
         .from('users')
         .select('*');
@@ -206,7 +87,6 @@
         foundUser = data.find(u => u.username.toLowerCase() === userVal.toLowerCase() && u.password === passVal);
       }
 
-      // 2. Fallback check voor 'Jesus Gonzales' voor als de API geblokkeerd wordt
       if (!foundUser && userVal.toLowerCase() === "jesus gonzales" && passVal === "gringo123") {
         foundUser = { username: "Jesus Gonzales", role: "Opper Gringo" };
       }
@@ -222,7 +102,6 @@
         loginBtn.innerText = "INLOGGEN";
       }
     } catch (err) {
-      // Zelfs bij netwerkfouten kan Jesus Gonzales inloggen
       if (userVal.toLowerCase() === "jesus gonzales" && passVal === "gringo123") {
         sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("currentUser", "Jesus Gonzales");
