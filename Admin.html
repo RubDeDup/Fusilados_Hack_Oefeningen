@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fusilados hub - Beheerderspaneel</title>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0f1013;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 40px;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .admin-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #fbbf24;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background-color: #16181d;
+      border: 1px solid #232730;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0f1013;
+      border: 1px solid #232730;
+      border-radius: 6px;
+      color: #ffffff;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: #fbbf24;
+    }
+
+    .btn-add {
+      padding: 10px 20px;
+      background: #fbbf24;
+      color: #0f1013;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-add:hover {
+      background: #f59e0b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #232730;
+      font-size: 0.9rem;
+    }
+
+    th {
+      color: #94a3b8;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .role-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .role-opper {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      border: 1px solid #fbbf24;
+    }
+
+    .role-gringo {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+      border: 1px solid #232730;
+    }
+
+    .action-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 6px;
+    }
+
+    .btn-promote {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .btn-delete {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .watermark {
+      position: fixed;
+      bottom: 15px;
+      right: 20px;
+      font-size: 0.75rem;
+      color: #475569;
+      letter-spacing: 1px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <h1>⚙️ Opper Gringo Beheerderspaneel</h1>
+    <p class="subtitle">Beheer leden, maak nieuwe accounts aan en ken rollen toe in de Cloud Database.</p>
+
+    <!-- Nieuw Account Aanmaken -->
+    <div class="card">
+      <h2>Nieuwe Gringo Toevoegen</h2>
+      <form onsubmit="addUser(event)" class="form-grid">
+        <div class="form-group">
+          <label>Gebruikersnaam</label>
+          <input type="text" id="newUsername" required placeholder="Naam...">
+        </div>
+        <div class="form-group">
+          <label>Wachtwoord</label>
+          <input type="password" id="newPassword" required placeholder="Wachtwoord...">
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="newRole">
+            <option value="Gringo">Gringo (Lid)</option>
+            <option value="Opper Gringo">Opper Gringo (Admin)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-add">+ Toevoegen</button>
+      </form>
+    </div>
+
+    <!-- Gebruikerslijst -->
+    <div class="card">
+      <h2>Ledenoverzicht</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Gebruikersnaam</th>
+            <th>Rol</th>
+            <th>Acties</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <tr><td colspan="3" style="color: #94a3b8;">Laden uit cloud...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="watermark">Created by RubDeDup</div>
+
+<script>
+  // Supabase Verbinding Instellen
+  const SUPABASE_URL = "https://suimuvzfrhtqxprzzojy.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Beveiliging: Alleen "Opper Gringo" mag op deze pagina kijken
+  if (sessionStorage.getItem("currentRole") !== "Opper Gringo") {
+    document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>Toegang geweigerd! Alleen Opper Gringos hebben toegang.</h2>";
+  }
+
+  async function loadUsers() {
+    const tbody = document.getElementById("userTableBody");
+    
+    const { data: users, error } = await _supabase
+      .from('users')
+      .select('*')
+      .order('id', { ascending: true });
+
+    if (error) {
+      tbody.innerHTML = "<tr><td colspan='3' style='color:red;'>Fout bij laden van gebruikers!</td></tr>";
+      return;
+    }
+
+    tbody.innerHTML = "";
+
+    users.forEach((user) => {
+      const tr = document.createElement("tr");
+      const isOpper = user.role === "Opper Gringo";
+
+      tr.innerHTML = `
+        <td><strong>${user.username}</strong></td>
+        <td><span class="role-badge ${isOpper ? 'role-opper' : 'role-gringo'}">${user.role}</span></td>
+        <td>
+          <button class="action-btn btn-promote" onclick="toggleRole(${user.id}, '${user.role}')">
+            ${isOpper ? 'Degradeer naar Gringo' : 'Promoveer naar Opper Gringo'}
+          </button>
+          ${user.username !== "Jesus Gonzales" ? `<button class="action-btn btn-delete" onclick="deleteUser(${user.id})">Verwijderen</button>` : ''}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function addUser(e) {
+    e.preventDefault();
+    const username = document.getElementById("newUsername").value.trim();
+    const password = document.getElementById("newPassword").value;
+    const role = document.getElementById("newRole").value;
+
+    const { error } = await _supabase
+      .from('users')
+      .insert([{ username, password, role }]);
+
+    if (error) {
+      alert("Fout bij toevoegen. Mogelijk bestaat deze gebruikersnaam al!");
+      return;
+    }
+
+    document.getElementById("newUsername").value = "";
+    document.getElementById("newPassword").value = "";
+    loadUsers();
+  }
+
+  async function toggleRole(id, currentRole) {
+    const newRole = currentRole === "Opper Gringo" ? "Gringo" : "Opper Gringo";
+    
+    await _supabase
+      .from('users')
+      .update({ role: newRole })
+      .eq('id', id);
+
+    loadUsers();
+  }
+
+  async function deleteUser(id) {
+    if (confirm("Weet je zeker dat je dit account wilt verwijderen uit de Cloud Database?")) {
+      await _supabase
+        .from('users')
+        .delete()
+        .eq('id', id);
+
+      loadUsers();
+    }
+  }
+
+  loadUsers();
+</script>
+
+</body>
+</html>
