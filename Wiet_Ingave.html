@@ -87,8 +87,8 @@
     /* INVOERFORMULIER GRID */
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1.5fr auto;
-      gap: 16px;
+      grid-template-columns: 1.2fr 1fr 1fr 1.5fr auto;
+      gap: 14px;
       align-items: end;
     }
 
@@ -138,6 +138,33 @@
       background: #16a34a;
     }
 
+    /* ADMIN / HIGHER GRINGO TOTAAL STATISTIEKEN */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: #0f1013;
+      border: 1px solid #232730;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .stat-user {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #fbbf24;
+      margin-bottom: 6px;
+    }
+
+    .stat-detail {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
     /* TABEL OVERZICHT */
     table {
       width: 100%;
@@ -168,7 +195,7 @@
       border: 1px solid #22c55e;
     }
 
-    .gram-badge {
+    .amount-badge {
       font-weight: bold;
       color: #fbbf24;
     }
@@ -204,33 +231,45 @@
       <button class="back-btn" onclick="goToKruispunt()">← Terug naar Kruispunt</button>
     </div>
 
+    <!-- Totaaloverzicht Card (Zichtbaar voor Opper Gringo & Higher Gringo) -->
+    <div class="card" id="adminSummaryCard" style="display: none;">
+      <h2>👑 Totale Voorraad Per Kweker</h2>
+      <div class="admin-stats-grid" id="adminStatsGrid">
+        <div style="color: #94a3b8;">Berekenen...</div>
+      </div>
+    </div>
+
     <!-- Invoer Formulier Card -->
     <div class="card">
-      <h2>📝 Nieuwe Oogst / Ingave Registreren</h2>
+      <h2>📝 Nieuwe Ingave Registreren</h2>
       <form onsubmit="submitEntry(event)" class="form-grid">
         
         <div class="form-group">
-          <label>Soort Wiet (Strain)</label>
+          <label>Soort Wiet</label>
           <select id="strainSelect" required>
-            <option value="Amnesia Haze">Amnesia Haze</option>
-            <option value="Northern Lights">Northern Lights</option>
-            <option value="Gelato #33">Gelato #33</option>
-            <option value="OG Kush">OG Kush</option>
-            <option value="Super Silver Haze">Super Silver Haze</option>
-            <option value="White Widow">White Widow</option>
-            <option value="Gorilla Glue">Gorilla Glue</option>
-            <option value="Overig">Overig</option>
+            <option value="Marihuana">Marihuana</option>
+            <option value="Royal Domina">Royal Domina</option>
+            <option value="Familie">Familie</option>
+            <option value="Lemon Haze">Lemon Haze</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Aantal Gram</label>
-          <input type="number" id="gramInput" min="1" required placeholder="bijv. 50">
+          <label>Aantal</label>
+          <input type="number" id="amountInput" min="1" required placeholder="bijv. 50">
+        </div>
+
+        <div class="form-group">
+          <label>Eenheid</label>
+          <select id="unitSelect" required>
+            <option value="Gram">Gram</option>
+            <option value="Toppen">Toppen</option>
+          </select>
         </div>
 
         <div class="form-group">
           <label>Opmerking / Locatie (Optioneel)</label>
-          <input type="text" id="notesInput" placeholder="bijv. Oogst Loods A">
+          <input type="text" id="notesInput" placeholder="bijv. Loods A">
         </div>
 
         <button type="submit" class="btn-submit">+ Opslaan</button>
@@ -239,14 +278,14 @@
 
     <!-- Live Voorraad Tabel Card -->
     <div class="card">
-      <h2>📊 Live Oogst & Voorraad Overzicht</h2>
+      <h2 id="tableTitle">📊 Mijn Invoer Historie</h2>
       <table>
         <thead>
           <tr>
             <th>Datum / Tijd</th>
             <th>Kweker / Lid</th>
             <th>Soort Wiet</th>
-            <th>Gewicht</th>
+            <th>Aantal & Eenheid</th>
             <th>Opmerking</th>
             <th>Acties</th>
           </tr>
@@ -268,13 +307,27 @@
 
   const currentUser = sessionStorage.getItem("currentUser") || "Onbekend";
   const currentRole = sessionStorage.getItem("currentRole") || "Gringo";
+  
+  // Zowel Opper Gringo als Higher Gringo hebben inzagerechten!
+  const canViewAll = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
+
+  if (canViewAll) {
+    document.getElementById("adminSummaryCard").style.display = "block";
+    document.getElementById("tableTitle").innerText = "📊 Alle Ingaves (Totaal Overzicht)";
+  }
 
   async function loadInventory() {
     const tbody = document.getElementById("inventoryTableBody");
-    const { data, error } = await _supabase
-      .from('wiet_inventory')
-      .select('*')
-      .order('created_at', { ascending: false });
+    
+    // Haal gegevens op uit Supabase
+    let query = _supabase.from('wiet_inventory').select('*').order('created_at', { ascending: false });
+    
+    // Als de gebruiker géén Opper/Higher Gringo is, filter alleen zijn eigen ingaves!
+    if (!canViewAll) {
+      query = query.eq('username', currentUser);
+    }
+
+    const { data, error } = await query;
 
     if (error || !data) {
       tbody.innerHTML = "<tr><td colspan='6' style='color:#ef4444;'>Fout bij laden van de gegevens!</td></tr>";
@@ -282,7 +335,7 @@
     }
 
     if (data.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='6' style='color:#64748b;'>Nog geen ingaves geregistreerd.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='6' style='color:#64748b;'>Geen ingaves gevonden.</td></tr>";
       return;
     }
 
@@ -291,38 +344,79 @@
       const date = new Date(item.created_at).toLocaleString('nl-NL');
       const tr = document.createElement("tr");
 
-      const isOwnerOrAdmin = (item.username === currentUser) || (currentRole === "Opper Gringo");
+      const unitDisplay = item.unit || 'Gram';
 
       tr.innerHTML = `
         <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
         <td><strong>${item.username}</strong></td>
         <td><span class="strain-badge">${item.strain}</span></td>
-        <td><span class="gram-badge">${item.amount_grams}g</span></td>
+        <td><span class="amount-badge">${item.amount} ${unitDisplay}</span></td>
         <td style="color:#94a3b8;">${item.notes || '-'}</td>
         <td>
-          ${isOwnerOrAdmin ? `<button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button>` : '-'}
+          <button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button>
         </td>
       `;
       tbody.appendChild(tr);
+    });
+
+    if (canViewAll) {
+      loadAdminTotals();
+    }
+  }
+
+  async function loadAdminTotals() {
+    const grid = document.getElementById("adminStatsGrid");
+    const { data, error } = await _supabase.from('wiet_inventory').select('*');
+
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = "<div style='color:#94a3b8;'>Nog geen ingaves aanwezig.</div>";
+      return;
+    }
+
+    // Groepeer en optellen per gebruiker
+    const totals = {};
+    data.forEach(item => {
+      if (!totals[item.username]) {
+        totals[item.username] = { grams: 0, toppen: 0 };
+      }
+      const unit = item.unit || 'Gram';
+      if (unit === 'Toppen') {
+        totals[item.username].toppen += parseInt(item.amount || item.amount_grams || 0);
+      } else {
+        totals[item.username].grams += parseInt(item.amount || item.amount_grams || 0);
+      }
+    });
+
+    grid.innerHTML = "";
+    Object.keys(totals).forEach(user => {
+      const box = document.createElement("div");
+      box.className = "stat-box";
+      box.innerHTML = `
+        <div class="stat-user">👤 ${user}</div>
+        <div class="stat-detail">🌱 Grammen: <strong>${totals[user].grams}g</strong></div>
+        <div class="stat-detail">✂️ Toppen: <strong>${totals[user].toppen} stuks</strong></div>
+      `;
+      grid.appendChild(box);
     });
   }
 
   async function submitEntry(e) {
     e.preventDefault();
     const strain = document.getElementById("strainSelect").value;
-    const amount_grams = parseInt(document.getElementById("gramInput").value);
+    const amount = parseInt(document.getElementById("amountInput").value);
+    const unit = document.getElementById("unitSelect").value;
     const notes = document.getElementById("notesInput").value.trim();
 
     const { error } = await _supabase
       .from('wiet_inventory')
-      .insert([{ username: currentUser, strain, amount_grams, notes }]);
+      .insert([{ username: currentUser, strain, amount, unit, amount_grams: amount, notes }]);
 
     if (error) {
       alert("Fout bij opslaan: " + error.message);
       return;
     }
 
-    document.getElementById("gramInput").value = "";
+    document.getElementById("amountInput").value = "";
     document.getElementById("notesInput").value = "";
     loadInventory();
   }
