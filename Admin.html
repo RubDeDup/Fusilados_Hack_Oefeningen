@@ -19,16 +19,24 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
     .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
     .form-group input, .form-group select { width: 100%; padding: 10px 12px; background: #0f1013; border: 1px solid #232730; border-radius: 6px; color: #ffffff; outline: none; }
+    .form-group select option { background: #16181d; color: #fff; }
     .btn-add { padding: 10px 20px; background: #fbbf24; color: #0f1013; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn-add:hover { background: #f59e0b; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th, td { padding: 12px 16px; border-bottom: 1px solid #232730; font-size: 0.9rem; }
     th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
-    .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+    
+    /* Badges per Rol */
+    .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
     .role-opper { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #fbbf24; }
-    .role-gringo { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #232730; }
+    .role-higher { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; }
+    .role-gringo { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #475569; }
+    .role-lesser { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #c084fc; }
+    .role-pasto { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #4ade80; }
+
+    .role-select-inline { background: #0f1013; color: #fff; border: 1px solid #232730; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; outline: none; }
+
     .action-btn { padding: 6px 10px; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-right: 6px; }
-    .btn-promote { background: #0284c7; color: #ffffff; }
     .btn-delete { background: #ef4444; color: #ffffff; }
     .watermark { position: fixed; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; letter-spacing: 1px; pointer-events: none; }
   </style>
@@ -37,7 +45,7 @@
 
   <div class="admin-container">
     <h1>⚙️ Opper Gringo Beheerderspaneel</h1>
-    <p class="subtitle">Beheer leden, maak nieuwe accounts aan en bekijk live de gebruikersactiviteit.</p>
+    <p class="subtitle">Beheer leden, ken esthetische rollen toe en bekijk live de gebruikersactiviteit.</p>
 
     <!-- Nieuw Account Aanmaken -->
     <div class="card">
@@ -54,8 +62,11 @@
         <div class="form-group">
           <label>Rol</label>
           <select id="newRole">
-            <option value="Gringo">Gringo (Lid)</option>
-            <option value="Opper Gringo">Opper Gringo (Admin)</option>
+            <option value="Opper Gringo">👑 Opper Gringo (Admin)</option>
+            <option value="Higher Gringo">Higher Gringo</option>
+            <option value="Gringo" selected>Gringo</option>
+            <option value="Lesser Gringo">Lesser Gringo</option>
+            <option value="Pasto Kweker">🌿 Pasto Kweker</option>
           </select>
         </div>
         <button type="submit" class="btn-add">+ Toevoegen</button>
@@ -69,12 +80,13 @@
         <thead>
           <tr>
             <th>Gebruikersnaam</th>
-            <th>Rol</th>
+            <th>Rol / Rang</th>
+            <th>Rol Wijzigen</th>
             <th>Acties</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
-          <tr><td colspan="3" style="color: #94a3b8;">Laden uit cloud...</td></tr>
+          <tr><td colspan="4" style="color: #94a3b8;">Laden uit cloud...</td></tr>
         </tbody>
       </table>
     </div>
@@ -109,28 +121,44 @@
     document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>Toegang geweigerd! Alleen Opper Gringos hebben toegang.</h2>";
   }
 
+  function getRoleBadgeClass(role) {
+    switch(role) {
+      case 'Opper Gringo': return 'role-opper';
+      case 'Higher Gringo': return 'role-higher';
+      case 'Lesser Gringo': return 'role-lesser';
+      case 'Pasto Kweker': return 'role-pasto';
+      default: return 'role-gringo';
+    }
+  }
+
   async function loadUsers() {
     const tbody = document.getElementById("userTableBody");
     const { data: users, error } = await _supabase.from('users').select('*').order('id', { ascending: true });
 
     if (error) {
-      tbody.innerHTML = "<tr><td colspan='3' style='color:red;'>Fout bij laden van gebruikers!</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='4' style='color:red;'>Fout bij laden van gebruikers!</td></tr>";
       return;
     }
 
     tbody.innerHTML = "";
     users.forEach((user) => {
       const tr = document.createElement("tr");
-      const isOpper = user.role === "Opper Gringo";
+      const badgeClass = getRoleBadgeClass(user.role);
 
       tr.innerHTML = `
         <td><strong>${user.username}</strong></td>
-        <td><span class="role-badge ${isOpper ? 'role-opper' : 'role-gringo'}">${user.role}</span></td>
+        <td><span class="role-badge ${badgeClass}">${user.role}</span></td>
         <td>
-          <button class="action-btn btn-promote" onclick="toggleRole(${user.id}, '${user.role}')">
-            ${isOpper ? 'Degradeer' : 'Promoveer naar Opper Gringo'}
-          </button>
-          ${user.username !== "Jesus Gonzales" ? `<button class="action-btn btn-delete" onclick="deleteUser(${user.id})">Verwijderen</button>` : ''}
+          <select class="role-select-inline" onchange="updateRole(${user.id}, this.value)">
+            <option value="Opper Gringo" ${user.role === 'Opper Gringo' ? 'selected' : ''}>Opper Gringo</option>
+            <option value="Higher Gringo" ${user.role === 'Higher Gringo' ? 'selected' : ''}>Higher Gringo</option>
+            <option value="Gringo" ${user.role === 'Gringo' ? 'selected' : ''}>Gringo</option>
+            <option value="Lesser Gringo" ${user.role === 'Lesser Gringo' ? 'selected' : ''}>Lesser Gringo</option>
+            <option value="Pasto Kweker" ${user.role === 'Pasto Kweker' ? 'selected' : ''}>Pasto Kweker</option>
+          </select>
+        </td>
+        <td>
+          ${user.username !== "Jesus Gonzales" ? `<button class="action-btn btn-delete" onclick="deleteUser(${user.id})">Verwijderen</button>` : '<span style="color:#64748b; font-size:0.75rem;">Eigenaar</span>'}
         </td>
       `;
       tbody.appendChild(tr);
@@ -181,8 +209,7 @@
     loadUsers();
   }
 
-  async function toggleRole(id, currentRole) {
-    const newRole = currentRole === "Opper Gringo" ? "Gringo" : "Opper Gringo";
+  async function updateRole(id, newRole) {
     await _supabase.from('users').update({ role: newRole }).eq('id', id);
     loadUsers();
   }
