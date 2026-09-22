@@ -9,169 +9,35 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: #0f1013;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 40px;
-      min-height: 100vh;
-      position: relative;
-    }
-
-    .admin-container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: #fbbf24;
-      margin-bottom: 8px;
-    }
-
-    p.subtitle {
-      color: #94a3b8;
-      font-size: 0.9rem;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background-color: #16181d;
-      border: 1px solid #232730;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 30px;
-    }
-
-    .card h2 {
-      font-size: 1.1rem;
-      color: #ffffff;
-      margin-bottom: 16px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 12px;
-      align-items: end;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 10px 12px;
-      background: #0f1013;
-      border: 1px solid #232730;
-      border-radius: 6px;
-      color: #ffffff;
-      outline: none;
-    }
-
-    .form-group input:focus, .form-group select:focus {
-      border-color: #fbbf24;
-    }
-
-    .btn-add {
-      padding: 10px 20px;
-      background: #fbbf24;
-      color: #0f1013;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-add:hover {
-      background: #f59e0b;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    th, td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #232730;
-      font-size: 0.9rem;
-    }
-
-    th {
-      color: #94a3b8;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-    }
-
-    .role-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: bold;
-    }
-
-    .role-opper {
-      background: rgba(251, 191, 36, 0.15);
-      color: #fbbf24;
-      border: 1px solid #fbbf24;
-    }
-
-    .role-gringo {
-      background: rgba(148, 163, 184, 0.15);
-      color: #94a3b8;
-      border: 1px solid #232730;
-    }
-
-    .action-btn {
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-right: 6px;
-    }
-
-    .btn-promote {
-      background: #0284c7;
-      color: #ffffff;
-    }
-
-    .btn-delete {
-      background: #ef4444;
-      color: #ffffff;
-    }
-
-    .watermark {
-      position: fixed;
-      bottom: 15px;
-      right: 20px;
-      font-size: 0.75rem;
-      color: #475569;
-      letter-spacing: 1px;
-      pointer-events: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #0f1013; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; min-height: 100vh; }
+    .admin-container { max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; color: #fbbf24; margin-bottom: 8px; }
+    p.subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; }
+    .card { background-color: #16181d; border: 1px solid #232730; border-radius: 12px; padding: 24px; margin-bottom: 30px; }
+    .card h2 { font-size: 1.1rem; color: #ffffff; margin-bottom: 16px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 12px; background: #0f1013; border: 1px solid #232730; border-radius: 6px; color: #ffffff; outline: none; }
+    .btn-add { padding: 10px 20px; background: #fbbf24; color: #0f1013; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-add:hover { background: #f59e0b; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid #232730; font-size: 0.9rem; }
+    th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
+    .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+    .role-opper { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #fbbf24; }
+    .role-gringo { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #232730; }
+    .action-btn { padding: 6px 10px; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin-right: 6px; }
+    .btn-promote { background: #0284c7; color: #ffffff; }
+    .btn-delete { background: #ef4444; color: #ffffff; }
+    .watermark { position: fixed; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; letter-spacing: 1px; pointer-events: none; }
   </style>
 </head>
 <body>
 
   <div class="admin-container">
     <h1>⚙️ Opper Gringo Beheerderspaneel</h1>
-    <p class="subtitle">Beheer leden, maak nieuwe accounts aan en ken rollen toe in de Cloud Database.</p>
+    <p class="subtitle">Beheer leden, maak nieuwe accounts aan en bekijk live de gebruikersactiviteit.</p>
 
     <!-- Nieuw Account Aanmaken -->
     <div class="card">
@@ -196,7 +62,7 @@
       </form>
     </div>
 
-    <!-- Gebruikerslijst -->
+    <!-- Ledenoverzicht -->
     <div class="card">
       <h2>Ledenoverzicht</h2>
       <table>
@@ -212,28 +78,40 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Activiteiten & Sessie Logboek -->
+    <div class="card">
+      <h2>📊 Live Gebruikersactiviteit & Sessies</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tijdstip</th>
+            <th>Gebruiker</th>
+            <th>Actie / Pagina</th>
+            <th>Tijdsduur</th>
+          </tr>
+        </thead>
+        <tbody id="logsTableBody">
+          <tr><td colspan="4" style="color: #94a3b8;">Laden van activiteit...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="watermark">Created by RubDeDup</div>
 
 <script>
-  // Supabase Verbinding Instellen
   const SUPABASE_URL = "https://suimuvzfrhtqxprzzojy.supabase.co";
   const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
   const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Beveiliging: Alleen "Opper Gringo" mag op deze pagina kijken
   if (sessionStorage.getItem("currentRole") !== "Opper Gringo") {
     document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>Toegang geweigerd! Alleen Opper Gringos hebben toegang.</h2>";
   }
 
   async function loadUsers() {
     const tbody = document.getElementById("userTableBody");
-    
-    const { data: users, error } = await _supabase
-      .from('users')
-      .select('*')
-      .order('id', { ascending: true });
+    const { data: users, error } = await _supabase.from('users').select('*').order('id', { ascending: true });
 
     if (error) {
       tbody.innerHTML = "<tr><td colspan='3' style='color:red;'>Fout bij laden van gebruikers!</td></tr>";
@@ -241,7 +119,6 @@
     }
 
     tbody.innerHTML = "";
-
     users.forEach((user) => {
       const tr = document.createElement("tr");
       const isOpper = user.role === "Opper Gringo";
@@ -251,10 +128,35 @@
         <td><span class="role-badge ${isOpper ? 'role-opper' : 'role-gringo'}">${user.role}</span></td>
         <td>
           <button class="action-btn btn-promote" onclick="toggleRole(${user.id}, '${user.role}')">
-            ${isOpper ? 'Degradeer naar Gringo' : 'Promoveer naar Opper Gringo'}
+            ${isOpper ? 'Degradeer' : 'Promoveer naar Opper Gringo'}
           </button>
           ${user.username !== "Jesus Gonzales" ? `<button class="action-btn btn-delete" onclick="deleteUser(${user.id})">Verwijderen</button>` : ''}
         </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function loadLogs() {
+    const tbody = document.getElementById("logsTableBody");
+    const { data: logs, error } = await _supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(20);
+
+    if (error || !logs) {
+      tbody.innerHTML = "<tr><td colspan='4' style='color:#64748b;'>Nog geen activiteit geregistreerd.</td></tr>";
+      return;
+    }
+
+    tbody.innerHTML = "";
+    logs.forEach(log => {
+      const date = new Date(log.created_at).toLocaleString('nl-NL');
+      const duration = log.duration_seconds > 0 ? `${Math.floor(log.duration_seconds / 60)}m ${log.duration_seconds % 60}s` : '-';
+      
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
+        <td><strong>${log.username}</strong></td>
+        <td>${log.action}</td>
+        <td><span style="color:#38bdf8;">${duration}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -266,15 +168,14 @@
     const password = document.getElementById("newPassword").value;
     const role = document.getElementById("newRole").value;
 
-    const { error } = await _supabase
-      .from('users')
-      .insert([{ username, password, role }]);
+    const { error } = await _supabase.from('users').insert([{ username, password, role }]);
 
     if (error) {
-      alert("Fout bij toevoegen. Mogelijk bestaat deze gebruikersnaam al!");
+      alert("Fout bij toevoegen: " + error.message);
       return;
     }
 
+    alert("Gebruiker succesvol aangemaakt!");
     document.getElementById("newUsername").value = "";
     document.getElementById("newPassword").value = "";
     loadUsers();
@@ -282,27 +183,19 @@
 
   async function toggleRole(id, currentRole) {
     const newRole = currentRole === "Opper Gringo" ? "Gringo" : "Opper Gringo";
-    
-    await _supabase
-      .from('users')
-      .update({ role: newRole })
-      .eq('id', id);
-
+    await _supabase.from('users').update({ role: newRole }).eq('id', id);
     loadUsers();
   }
 
   async function deleteUser(id) {
-    if (confirm("Weet je zeker dat je dit account wilt verwijderen uit de Cloud Database?")) {
-      await _supabase
-        .from('users')
-        .delete()
-        .eq('id', id);
-
+    if (confirm("Weet je zeker dat je dit account wilt verwijderen?")) {
+      await _supabase.from('users').delete().eq('id', id);
       loadUsers();
     }
   }
 
   loadUsers();
+  loadLogs();
 </script>
 
 </body>
