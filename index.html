@@ -8,6 +8,13 @@
   <!-- Favicon / Tabblad Icoontje -->
   <link rel="icon" type="image/png" href="fusilados.png">
 
+  <script>
+    // Controleer of de gebruiker ingelogd is, zo niet -> stuur door naar Login.html
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "Login.html";
+    }
+  </script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -60,6 +67,12 @@
       color: #fff;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
     .home-btn {
       font-size: 0.9rem;
       color: #94a3b8;
@@ -69,6 +82,22 @@
 
     .home-btn:hover {
       color: #fbbf24;
+    }
+
+    .logout-btn {
+      font-size: 0.85rem;
+      color: #ef4444;
+      cursor: pointer;
+      background: #1e222b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #232730;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #ef4444;
+      color: #ffffff;
     }
 
     /* SIDEBAR */
@@ -162,7 +191,11 @@
       <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
       <div class="brand">Fusilados hub</div>
     </div>
-    <div class="home-btn" onclick="openHome()">Home</div>
+
+    <div class="header-actions">
+      <div class="home-btn" onclick="openHome()">Home</div>
+      <div class="logout-btn" onclick="logout()">Uitloggen</div>
+    </div>
   </header>
 
   <aside>
@@ -238,6 +271,11 @@
         }
       });
       document.getElementById("gameFrame").src = url;
+    }
+
+    function logout() {
+      sessionStorage.removeItem("isLoggedIn");
+      window.location.href = "Login.html";
     }
   </script>
 
