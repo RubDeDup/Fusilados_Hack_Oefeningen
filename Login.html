@@ -8,6 +8,9 @@
   <!-- Favicon / Tabblad Icoontje -->
   <link rel="icon" type="image/png" href="fusilados.png">
 
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -27,7 +30,6 @@
       position: relative;
     }
 
-    /* Subtiele geanimeerde achtergrond gloed */
     body::before {
       content: '';
       position: absolute;
@@ -160,11 +162,11 @@
       </div>
 
       <div class="input-group">
-        <label for="password">Wachtwoord / Toegangscode</label>
+        <label for="password">Wachtwoord</label>
         <input type="password" id="password" placeholder="••••••••" required>
       </div>
 
-      <button type="submit" class="login-btn">INLOGGEN</button>
+      <button type="submit" class="login-btn" id="loginBtn">INLOGGEN</button>
     </form>
 
     <div class="error-msg" id="errorMsg"></div>
@@ -173,29 +175,49 @@
   <div class="watermark">Created by RubDeDup</div>
 
 <script>
-  // Instellingen voor inloggegevens (Pas deze aan naar wens!)
-  const CORRECT_USER = "fusilados";
-  const CORRECT_PASS = "1234";
+  // Supabase Verbinding Instellen
+  const SUPABASE_URL = "https://suimuvzfrhtqxprzzojy.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
+  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Controleer of de gebruiker al ingelogd is
   if (sessionStorage.getItem("isLoggedIn") === "true") {
     window.location.href = "index.html";
   }
 
-  function handleLogin(event) {
+  async function handleLogin(event) {
     event.preventDefault();
 
     const userVal = document.getElementById("username").value.trim();
     const passVal = document.getElementById("password").value;
     const errorMsg = document.getElementById("errorMsg");
+    const loginBtn = document.getElementById("loginBtn");
 
-    // Simpele check (je kunt 'CORRECT_USER' en 'CORRECT_PASS' hierboven aanpassen)
-    if (userVal.toLowerCase() === CORRECT_USER.toLowerCase() && passVal === CORRECT_PASS) {
-      sessionStorage.setItem("isLoggedIn", "true");
-      window.location.href = "index.html";
-    } else {
-      errorMsg.innerText = "Ongeldige gebruikersnaam of wachtwoord!";
-      document.getElementById("password").value = "";
+    loginBtn.innerText = "VERIFIËREN...";
+    errorMsg.innerText = "";
+
+    try {
+      // Zoek de gebruiker direct in Supabase Cloud
+      const { data, error } = await _supabase
+        .from('users')
+        .select('*')
+        .ilike('username', userVal)
+        .eq('password', passVal)
+        .single();
+
+      if (error || !data) {
+        errorMsg.innerText = "Ongeldige gebruikersnaam of wachtwoord!";
+        document.getElementById("password").value = "";
+        loginBtn.innerText = "INLOGGEN";
+      } else {
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("currentUser", data.username);
+        sessionStorage.setItem("currentRole", data.role);
+        window.location.href = "index.html";
+      }
+    } catch (err) {
+      errorMsg.innerText = "Fout bij verbinden met de server!";
+      loginBtn.innerText = "INLOGGEN";
     }
   }
 </script>
