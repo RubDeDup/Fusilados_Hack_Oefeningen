@@ -36,12 +36,13 @@
     .form-group input:focus, .form-group select:focus { border-color: #22c55e; }
     .btn-submit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
 
-    /* EENHEID STATS GRID */
-    .grand-totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 30px; }
+    /* BENDE TOTAAL GRID */
+    .grand-totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
     .grand-box { background: rgba(34, 197, 94, 0.08); border: 1px solid #22c55e; border-radius: 10px; padding: 18px; }
     .grand-strain { font-size: 1rem; font-weight: bold; color: #4ade80; margin-bottom: 8px; }
     .grand-detail { font-size: 0.85rem; color: #cbd5e1; display: flex; justify-content: space-between; margin-bottom: 4px; }
 
+    /* KWEKER GRID */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .stat-box { background: #0f1013; border: 1px solid #232730; border-radius: 10px; padding: 18px; }
     .stat-user { font-size: 1rem; font-weight: bold; color: #fbbf24; margin-bottom: 12px; border-bottom: 1px solid #232730; padding-bottom: 6px; }
@@ -135,7 +136,7 @@
     <!-- TAB 2: BEHEERDERS OVERZICHT (Alleen voor Opper Gringo & Higher Gringo) -->
     <div id="tabAdminView" style="display: none;">
       
-      <!-- GROTE TOTAALSOM ALLE GEBRUIKERS SAMEN -->
+      <!-- 1. GROTE TOTAALSOM ALLE GEBRUIKERS SAMEN -->
       <div class="card">
         <h2>🏆 Totale Bende-Voorraad Per Categorie (Alle Leden Samen)</h2>
         <div class="grand-totals-grid" id="grandTotalsGrid">
@@ -143,14 +144,15 @@
         </div>
       </div>
 
-      <!-- PER KWEKER SPECIFIEK -->
+      <!-- 2. PER KWEKER SPECIFIEK -->
       <div class="card">
-        <h2>👤 Voorraad Verdeling Per Kweker</h2>
+        <h2>👑 Totale Voorraad Per Categorie & Kweker</h2>
         <div class="stats-grid" id="adminStatsGrid">
           <div style="color: #94a3b8;">Berekenen...</div>
         </div>
       </div>
 
+      <!-- 3. ALLE INGAVES TABEL -->
       <div class="card">
         <h2>📂 Alle Ingaves Van Iedereen</h2>
         <table>
@@ -292,7 +294,7 @@
       }
     });
 
-    // 1. Vul Grote Bende Totals
+    // 1. Vul Grote Bende Totals (Bovenaan)
     grandGrid.innerHTML = "";
     Object.keys(grandTotals).forEach(sName => {
       const gBox = document.createElement("div");
