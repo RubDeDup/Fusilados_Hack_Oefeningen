@@ -17,18 +17,25 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background-color: #121316; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; height: 100vh; overflow: hidden; }
+    
+    /* HEADER / TOPBAR */
     header { position: absolute; top: 0; left: 0; right: 0; height: 60px; background-color: #16181d; border-bottom: 1px solid #232730; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; z-index: 10; }
     .brand-container { display: flex; align-items: center; gap: 12px; cursor: pointer; }
     .brand-logo { height: 38px; width: 38px; object-fit: contain; border-radius: 6px; }
     .brand { font-weight: 600; font-size: 1.1rem; color: #fff; }
-    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
     .user-badge { background: #1e222b; padding: 6px 12px; border-radius: 6px; border: 1px solid #232730; font-size: 0.8rem; color: #94a3b8; }
     .role-tag { color: #fbbf24; font-weight: bold; }
+    
     .nav-btn { font-size: 0.85rem; color: #94a3b8; cursor: pointer; background: #1e222b; padding: 6px 12px; border-radius: 6px; border: 1px solid #232730; transition: all 0.2s; }
     .nav-btn:hover { color: #fbbf24; border-color: #fbbf24; }
     .admin-btn { color: #fbbf24; border-color: #fbbf24; }
+    .pwd-btn { color: #38bdf8; border-color: #0284c7; }
+    .pwd-btn:hover { color: #7dd3fc; border-color: #38bdf8; }
     .logout-btn { color: #ef4444; }
     .logout-btn:hover { background: #ef4444; color: #ffffff; }
+
+    /* SIDEBAR */
     aside { width: 260px; height: 100vh; background-color: #16181d; border-right: 1px solid #232730; padding-top: 80px; display: flex; flex-direction: column; flex-shrink: 0; position: relative; }
     .sidebar-section { padding: 0 16px; margin-bottom: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
     .nav-list { list-style: none; }
@@ -36,9 +43,26 @@
     .nav-item:hover { color: #f8fafc; background-color: #1e222b; }
     .nav-item.active { color: #fbbf24; background-color: #1e222b; font-weight: 500; }
     .arrow { font-size: 0.8rem; opacity: 0.5; }
+
+    /* MAIN CONTENT */
     main { flex-grow: 1; padding-top: 60px; height: 100vh; background-color: #0f1013; display: flex; }
     iframe { width: 100%; height: 100%; border: none; display: block; }
     .watermark { position: absolute; bottom: 15px; left: 20px; font-size: 0.75rem; color: #475569; letter-spacing: 1px; pointer-events: none; }
+
+    /* MODAL POP-UP (Wachtwoord wijzigen) */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .modal-card { background: #16181d; border: 1px solid #232730; border-radius: 12px; padding: 24px; width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
+    .modal-card h2 { font-size: 1.1rem; color: #fff; margin-bottom: 15px; }
+    .modal-group { margin-bottom: 12px; }
+    .modal-group label { display: block; font-size: 0.75rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; }
+    .modal-group input { width: 100%; padding: 8px 10px; background: #0f1013; border: 1px solid #232730; border-radius: 6px; color: #fff; outline: none; }
+    .modal-group input:focus { border-color: #38bdf8; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; }
+    .modal-btn { padding: 8px 14px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+    .modal-btn-cancel { background: #232730; color: #94a3b8; }
+    .modal-btn-save { background: #0284c7; color: #fff; }
+    .modal-btn-save:hover { background: #0369a1; }
+    .modal-msg { font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
   </style>
 </head>
 
@@ -55,6 +79,7 @@
         <span id="displayUser">...</span> [<span class="role-tag" id="displayRole">...</span>]
       </div>
       <div class="nav-btn" onclick="openHome()">Home</div>
+      <div class="nav-btn pwd-btn" onclick="openPwdModal()">🔑 Wachtwoord</div>
       <div class="nav-btn admin-btn" id="adminMenuBtn" onclick="openAdmin()" style="display: none;">⚙️ Beheer</div>
       <div class="nav-btn logout-btn" onclick="logout()">Uitloggen</div>
     </div>
@@ -102,6 +127,26 @@
     <iframe id="gameFrame" src="Home.html" title="Minigame Hub"></iframe>
   </main>
 
+  <!-- WACHTWOORD WIJZIGEN MODAL POP-UP -->
+  <div class="modal-overlay" id="pwdModal">
+    <div class="modal-card">
+      <h2>🔑 Wachtwoord Wijzigen</h2>
+      <div class="modal-group">
+        <label>Huidig Wachtwoord</label>
+        <input type="password" id="oldPwd" placeholder="••••••••">
+      </div>
+      <div class="modal-group">
+        <label>Nieuw Wachtwoord</label>
+        <input type="password" id="newPwd" placeholder="••••••••">
+      </div>
+      <div class="modal-msg" id="pwdMsg"></div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="closePwdModal()">Annuleren</button>
+        <button class="modal-btn modal-btn-save" onclick="changePassword()">Opslaan</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const _trackerSupabase = supabase.createClient("https://suimuvzfrhtqxprzzojy.supabase.co", "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ");
@@ -120,11 +165,9 @@
 
     function loadGame(element, url) {
       document.getElementById("gameFrame").src = url;
-
       const items = document.querySelectorAll(".nav-item");
       items.forEach(function(item) { item.classList.remove("active"); });
       if (element) element.classList.add("active");
-
       _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Geopend: " + url }]);
     }
 
@@ -150,6 +193,62 @@
       });
       document.getElementById("gameFrame").src = url;
       _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Geopend via Home: " + url }]);
+    }
+
+    /* Modal logica */
+    function openPwdModal() {
+      document.getElementById("pwdModal").style.display = "flex";
+      document.getElementById("oldPwd").value = "";
+      document.getElementById("newPwd").value = "";
+      document.getElementById("pwdMsg").innerText = "";
+    }
+
+    function closePwdModal() {
+      document.getElementById("pwdModal").style.display = "none";
+    }
+
+    async function changePassword() {
+      const oldPwd = document.getElementById("oldPwd").value;
+      const newPwd = document.getElementById("newPwd").value;
+      const msg = document.getElementById("pwdMsg");
+
+      if (!oldPwd || !newPwd) {
+        msg.style.color = "#ef4444";
+        msg.innerText = "Vul alle velden in!";
+        return;
+      }
+
+      msg.style.color = "#94a3b8";
+      msg.innerText = "Verifiëren...";
+
+      // Controleer oud wachtwoord
+      const { data, error } = await _trackerSupabase
+        .from('users')
+        .select('*')
+        .ilike('username', currentUser)
+        .single();
+
+      if (error || !data || data.password !== oldPwd) {
+        msg.style.color = "#ef4444";
+        msg.innerText = "Huidig wachtwoord is onjuist!";
+        return;
+      }
+
+      // Update naar nieuw wachtwoord
+      const { error: updateErr } = await _trackerSupabase
+        .from('users')
+        .update({ password: newPwd })
+        .eq('id', data.id);
+
+      if (updateErr) {
+        msg.style.color = "#ef4444";
+        msg.innerText = "Fout bij opslaan van nieuw wachtwoord!";
+      } else {
+        msg.style.color = "#22c55e";
+        msg.innerText = "Wachtwoord succesvol gewijzigd!";
+        _trackerSupabase.from('activity_logs').insert([{ username: currentUser, action: "Wachtwoord gewijzigd" }]);
+        setTimeout(() => closePwdModal(), 1500);
+      }
     }
 
     function logout() {
