@@ -28,6 +28,17 @@
       padding: 32px;
       margin-bottom: 32px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .welcome-logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      border-radius: 12px;
+      flex-shrink: 0;
     }
 
     .welcome-banner h1 {
@@ -52,7 +63,6 @@
       margin-bottom: 20px;
     }
 
-    /* Grid geforceerd op 4 kolommen per rij */
     .games-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -69,6 +79,10 @@
     @media (max-width: 700px) {
       .games-grid {
         grid-template-columns: repeat(1, 1fr);
+      }
+      .welcome-banner {
+        flex-direction: column;
+        text-align: center;
       }
     }
 
@@ -139,8 +153,11 @@
 <body>
 
   <div class="welcome-banner">
-    <h1>Welkom bij Fusilados hub 👋</h1>
-    <p>Oefen hier al je Vijfhuizen hacks. Kies een minigame uit het zijmenu of klik op een van de kaarten hieronder om direct te starten.</p>
+    <img src="fusilados.png" alt="Fusilados Logo" class="welcome-logo">
+    <div>
+      <h1>Welkom bij Fusilados hub 👋</h1>
+      <p>Oefen hier al je Vijfhuizen hacks. Kies een minigame uit het zijmenu of klik op een van de kaarten hieronder om direct te starten.</p>
+    </div>
   </div>
 
   <div class="section-title">Beschikbare Minigames</div>
