@@ -9,7 +9,6 @@
   <link rel="icon" type="image/png" href="fusilados.png">
 
   <script>
-    // Controleer of de gebruiker ingelogd is, zo niet -> stuur door naar Login.html
     if (sessionStorage.getItem("isLoggedIn") !== "true") {
       window.location.href = "Login.html";
     }
@@ -70,29 +69,46 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
     }
 
-    .home-btn {
-      font-size: 0.9rem;
+    .user-badge {
+      background: #1e222b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #232730;
+      font-size: 0.8rem;
       color: #94a3b8;
-      cursor: pointer;
-      transition: color 0.2s;
     }
 
-    .home-btn:hover {
+    .role-tag {
       color: #fbbf24;
+      font-weight: bold;
     }
 
-    .logout-btn {
+    .nav-btn {
       font-size: 0.85rem;
-      color: #ef4444;
+      color: #94a3b8;
       cursor: pointer;
       background: #1e222b;
       padding: 6px 12px;
       border-radius: 6px;
       border: 1px solid #232730;
       transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      color: #fbbf24;
+      border-color: #fbbf24;
+    }
+
+    .admin-btn {
+      color: #fbbf24;
+      border-color: #fbbf24;
+    }
+
+    .logout-btn {
+      color: #ef4444;
     }
 
     .logout-btn:hover {
@@ -193,8 +209,12 @@
     </div>
 
     <div class="header-actions">
-      <div class="home-btn" onclick="openHome()">Home</div>
-      <div class="logout-btn" onclick="logout()">Uitloggen</div>
+      <div class="user-badge">
+        <span id="displayUser">...</span> [<span class="role-tag" id="displayRole">...</span>]
+      </div>
+      <div class="nav-btn" onclick="openHome()">Home</div>
+      <div class="nav-btn admin-btn" id="adminMenuBtn" onclick="openAdmin()" style="display: none;">⚙️ Beheer</div>
+      <div class="nav-btn logout-btn" onclick="logout()">Uitloggen</div>
     </div>
   </header>
 
@@ -241,6 +261,16 @@
   </main>
 
   <script>
+    const currentUser = sessionStorage.getItem("currentUser") || "Jesus Gonzales";
+    const currentRole = sessionStorage.getItem("currentRole") || "Opper Gringo";
+
+    document.getElementById("displayUser").innerText = currentUser;
+    document.getElementById("displayRole").innerText = currentRole;
+
+    if (currentRole === "Opper Gringo") {
+      document.getElementById("adminMenuBtn").style.display = "inline-block";
+    }
+
     function loadGame(element, url) {
       document.getElementById("gameFrame").src = url;
 
@@ -262,6 +292,14 @@
       });
     }
 
+    function openAdmin() {
+      document.getElementById("gameFrame").src = "Admin.html";
+      const items = document.querySelectorAll(".nav-item");
+      items.forEach(function(item) {
+        item.classList.remove("active");
+      });
+    }
+
     function loadGameFromHome(url) {
       const items = document.querySelectorAll(".nav-item");
       items.forEach(function(item) {
@@ -274,7 +312,7 @@
     }
 
     function logout() {
-      sessionStorage.removeItem("isLoggedIn");
+      sessionStorage.clear();
       window.location.href = "Login.html";
     }
   </script>
