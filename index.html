@@ -37,6 +37,19 @@
       z-index: 10;
     }
 
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      height: 38px;
+      width: 38px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
     .brand {
       font-weight: 600;
       font-size: 1.1rem;
@@ -141,7 +154,10 @@
 <body>
 
   <header>
-    <div class="brand">Fusilados hub</div>
+    <div class="brand-container">
+      <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
+      <div class="brand">Fusilados hub</div>
+    </div>
     <div class="home-btn" onclick="openHome()">Home</div>
   </header>
 
