@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusilados Hub</title>
+  <title>Fusilados hub - Wiet Ingave</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="fusilados.png">
@@ -12,407 +12,422 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #0f1013; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; }
+    .container { width: 100%; max-width: 1100px; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #22c55e; }
+    .back-btn { background: #16181d; border: 1px solid #232730; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .back-btn:hover { color: #22c55e; border-color: #22c55e; }
 
-    body {
-      background-color: #0f1013;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
+    /* TABBLADEN */
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { background: #16181d; border: 1px solid #232730; color: #94a3b8; padding: 10px 18px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: #22c55e; color: #0f1013; border-color: #22c55e; }
 
-    /* SIDEBAR STYLING */
-    .sidebar {
-      width: 260px;
-      background-color: #16181d;
-      border-right: 1px solid #232730;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 16px;
-      flex-shrink: 0;
-    }
+    .card { background-color: #16181d; border: 1px solid #232730; border-radius: 14px; padding: 28px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    .card h2 { font-size: 1.2rem; color: #ffffff; margin-bottom: 20px; }
 
-    /* BRAND SECTION (KLIKBAAR MAKEN NAAR KRUISPUNT) */
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #232730;
-      margin-bottom: 20px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 8px;
-      transition: background-color 0.2s ease;
-    }
+    /* INVOERFORMULIER GRID */
+    .form-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.5fr auto; gap: 14px; align-items: end; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; }
+    .form-group input, .form-group select { width: 100%; padding: 12px 14px; background: #0f1013; border: 1px solid #232730; border-radius: 8px; color: #ffffff; font-size: 0.95rem; outline: none; }
+    .form-group select option { background: #16181d; color: #fff; }
+    .form-group input:focus, .form-group select:focus { border-color: #22c55e; }
+    .btn-submit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
 
-    .brand-section:hover {
-      background-color: #232730;
-    }
+    /* BENDE TOTAAL GRID */
+    .grand-totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .grand-box { background: rgba(34, 197, 94, 0.08); border: 1px solid #22c55e; border-radius: 10px; padding: 18px; }
+    .grand-strain { font-size: 1rem; font-weight: bold; color: #4ade80; margin-bottom: 8px; }
+    .grand-detail { font-size: 0.85rem; color: #cbd5e1; display: flex; justify-content: space-between; margin-bottom: 4px; }
 
-    .brand-logo {
-      width: 38px;
-      height: 38px;
-      object-fit: contain;
-      border-radius: 8px;
-    }
+    /* TOTALE WAARDE BANNER */
+    .total-value-banner { background: #0f1013; border: 1px solid #fbbf24; border-radius: 10px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .total-value-title { font-size: 0.9rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; }
+    .total-value-amount { font-size: 1.5rem; font-weight: 800; color: #22c55e; }
 
-    .brand-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 0.03em;
-    }
+    /* KWEKER GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .stat-box { background: #0f1013; border: 1px solid #232730; border-radius: 10px; padding: 18px; }
+    .stat-user-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #232730; padding-bottom: 8px; margin-bottom: 12px; }
+    .stat-user { font-size: 1rem; font-weight: bold; color: #fbbf24; }
+    .stat-user-value { font-size: 0.85rem; font-weight: 800; color: #22c55e; }
+    .strain-summary { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #1e222b; }
+    .strain-summary:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .strain-name { font-size: 0.85rem; font-weight: bold; color: #4ade80; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .stat-detail { font-size: 0.8rem; color: #cbd5e1; display: flex; justify-content: space-between; }
 
-    .nav-section-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #64748b;
-      margin-bottom: 10px;
-      padding-left: 8px;
-    }
+    /* TABEL OVERZICHT */
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 14px 18px; border-bottom: 1px solid #232730; font-size: 0.9rem; }
+    th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
+    .strain-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
+    .amount-badge { font-weight: bold; color: #fbbf24; }
+    .btn-delete { background: #ef4444; color: #ffffff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
 
-    .nav-list {
-      list-style: none;
-      margin-bottom: 24px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 8px;
-      color: #94a3b8;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-bottom: 4px;
-    }
-
-    .nav-item:hover {
-      background-color: #232730;
-      color: #ffffff;
-    }
-
-    .nav-item.active {
-      background-color: #232730;
-      color: #fbbf24;
-      font-weight: 600;
-    }
-
-    .nav-item.active-wiet {
-      background-color: #232730;
-      color: #22c55e;
-      font-weight: 600;
-    }
-
-    .nav-item.active-finance {
-      background-color: #232730;
-      color: #38bdf8;
-      font-weight: 600;
-    }
-
-    .nav-item .arrow {
-      font-size: 0.75rem;
-      color: #475569;
-    }
-
-    /* USER PROFILE SECTION */
-    .user-section {
-      padding-top: 16px;
-      border-top: 1px solid #232730;
-    }
-
-    .user-card {
-      background-color: #0f1013;
-      border: 1px solid #232730;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    .user-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 2px;
-    }
-
-    .user-role {
-      font-size: 0.75rem;
-      color: #fbbf24;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .btn-password {
-      width: 100%;
-      background: transparent;
-      border: 1px solid #232730;
-      color: #94a3b8;
-      padding: 6px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-password:hover {
-      border-color: #fbbf24;
-      color: #fbbf24;
-    }
-
-    .admin-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      color: #fbbf24;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-bottom: 8px;
-      transition: background 0.2s;
-    }
-
-    .admin-link:hover {
-      background: rgba(251, 191, 36, 0.1);
-    }
-
-    .btn-logout {
-      width: 100%;
-      background: #ef4444;
-      color: #ffffff;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-logout:hover {
-      background: #dc2626;
-    }
-
-    /* MAIN CONTENT IFRAME */
-    .content-area {
-      flex: 1;
-      height: 100vh;
-      background-color: #0f1013;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* PASSWORD MODAL */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.75);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal {
-      background: #16181d;
-      border: 1px solid #232730;
-      border-radius: 12px;
-      padding: 24px;
-      width: 320px;
-    }
-
-    .modal h3 {
-      font-size: 1rem;
-      color: #fff;
-      margin-bottom: 16px;
-    }
-
-    .modal input {
-      width: 100%;
-      padding: 10px;
-      background: #0f1013;
-      border: 1px solid #232730;
-      border-radius: 6px;
-      color: #fff;
-      margin-bottom: 16px;
-      outline: none;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    .modal-btn {
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-cancel { background: #232730; color: #94a3b8; }
-    .btn-save { background: #fbbf24; color: #0f1013; }
+    .watermark { position: fixed; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; pointer-events: none; }
   </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div>
-      <!-- KLIKBAAR LOGO + TITEL TERUG NAAR KRUISPUNT -->
-      <div class="brand-section" onclick="openHome()" title="Ga naar Kruispunt">
-        <img src="fusilados.png" alt="Fusilados Logo" class="brand-logo">
-        <span class="brand-title">Fusilados Hub</span>
-      </div>
+  <div class="container">
 
-      <div class="nav-section-title">CATEGORIEËN</div>
-      <ul class="nav-list">
-        <li class="nav-item active" id="navMinigames" onclick="loadGame(this, 'MinigamesHome.html')">
-          <span>🎮 Minigames Hub</span>
-          <span class="arrow">&gt;</span>
-        </li>
-        <li class="nav-item" id="navWiet" onclick="loadGame(this, 'Wiet_Ingave.html?v=3')">
-          <span>🌿 Wiet Ingave Systeem</span>
-          <span class="arrow">&gt;</span>
-        </li>
-        <li class="nav-item" id="navFinancien" onclick="loadGame(this, 'Financien.html')">
-          <span>💰 Bende Financiën</span>
-          <span class="arrow">&gt;</span>
-        </li>
-      </ul>
+    <div class="header-bar">
+      <div class="section-title">🌿 WIET INGAVE SYSTEEM</div>
+      <button class="back-btn" onclick="goToKruispunt()">← Terug naar Kruispunt</button>
     </div>
 
-    <!-- GEBRUIKERSPROFIEL ONDERAAN -->
-    <div class="user-section">
-      <div class="user-card">
-        <div class="user-name" id="displayUsername">Laden...</div>
-        <div class="user-role" id="displayRole">...</div>
-        <button class="btn-password" onclick="openPasswordModal()">Wachtwoord Wijzigen</button>
-      </div>
-
-      <!-- Alleen zichtbaar voor Opper Gringo -->
-      <div class="admin-link" id="adminPanelLink" style="display: none;" onclick="loadGame(null, 'Admin.html')">
-        ⚙️ Admin Beheer
-      </div>
-
-      <button class="btn-logout" onclick="logout()">Uitloggen</button>
+    <!-- TABBLADEN NAVIGATIE -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="tabInputBtn" onclick="switchTab('input')">📝 Invoeren & Mijn Historie</button>
+      <button class="tab-btn" id="tabAdminBtn" onclick="switchTab('admin')" style="display: none;">📊 Totaaloverzicht Per Categorie</button>
     </div>
-  </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="content-area">
-    <iframe id="mainFrame" src="MinigamesHome.html"></iframe>
-  </div>
+    <!-- TAB 1: INVOEREN & EIGEN HISTORIE -->
+    <div id="tabInputView">
+      <div class="card">
+        <h2>📝 Nieuwe Ingave Registreren</h2>
+        <form onsubmit="submitEntry(event)" class="form-grid">
+          <div class="form-group">
+            <label>Soort Wiet</label>
+            <select id="strainSelect" required>
+              <option value="Marihuana">Marihuana (€110/stk)</option>
+              <option value="Familie">Familie (€140/stk)</option>
+              <option value="Lemon Haze">Lemon Haze (€170/stk)</option>
+              <option value="Royal Domina">Royal Domina (€0/stk)</option>
+            </select>
+          </div>
 
-  <!-- WACHTWOORD MODAL -->
-  <div class="modal-overlay" id="passwordModal">
-    <div class="modal">
-      <h3>Nieuw Wachtwoord Instellen</h3>
-      <input type="password" id="newPasswordInput" placeholder="Voer nieuw wachtwoord in">
-      <div class="modal-actions">
-        <button class="modal-btn btn-cancel" onclick="closePasswordModal()">Annuleren</button>
-        <button class="modal-btn btn-save" onclick="saveNewPassword()">Opslaan</button>
+          <div class="form-group">
+            <label>Aantal</label>
+            <input type="number" id="amountInput" min="1" required placeholder="bijv. 5">
+          </div>
+
+          <div class="form-group">
+            <label>Eenheid</label>
+            <select id="unitSelect" required>
+              <option value="Zakje">Zakje</option>
+              <option value="Toppen">Toppen</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Opmerking / Locatie</label>
+            <input type="text" id="notesInput" placeholder="bijv. Loods 1">
+          </div>
+
+          <button type="submit" class="btn-submit">+ Opslaan</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>📋 Mijn Invoer Historie</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Datum / Tijd</th>
+              <th>Soort Wiet</th>
+              <th>Aantal & Eenheid</th>
+              <th>Geschatte Waarde</th>
+              <th>Opmerking</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="myTableBody">
+            <tr><td colspan="6" style="color: #94a3b8;">Laden...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+
+    <!-- TAB 2: BEHEERDERS OVERZICHT (Alleen voor Opper Gringo & Higher Gringo) -->
+    <div id="tabAdminView" style="display: none;">
+      
+      <!-- 1. GROTE TOTAALSOM ALLE GEBRUIKERS SAMEN -->
+      <div class="card">
+        <h2>🏆 Totale Bende-Voorraad Per Categorie (Alle Leden Samen)</h2>
+        <div class="grand-totals-grid" id="grandTotalsGrid">
+          <div style="color: #94a3b8;">Berekenen...</div>
+        </div>
+
+        <div class="total-value-banner">
+          <span class="total-value-title">💵 Totale Geschatte Bende Waarde:</span>
+          <span class="total-value-amount" id="grandTotalValueDisplay">€ 0</span>
+        </div>
+      </div>
+
+      <!-- 2. PER KWEKER SPECIFIEK -->
+      <div class="card">
+        <h2>👑 Totale Voorraad & Waarde Per Kweker</h2>
+        <div class="stats-grid" id="adminStatsGrid">
+          <div style="color: #94a3b8;">Berekenen...</div>
+        </div>
+      </div>
+
+      <!-- 3. ALLE INGAVES TABEL -->
+      <div class="card">
+        <h2>📂 Alle Ingaves Van Iedereen</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Datum / Tijd</th>
+              <th>Kweker / Lid</th>
+              <th>Soort Wiet</th>
+              <th>Aantal & Eenheid</th>
+              <th>Geschatte Waarde</th>
+              <th>Opmerking</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="allTableBody">
+            <tr><td colspan="7" style="color: #94a3b8;">Laden...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
+
+  <div class="watermark">Created by RubDeDup</div>
 
 <script>
   const SUPABASE_URL = "https://suimuvzfrhtqxprzzojy.supabase.co";
   const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
   const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const currentUser = sessionStorage.getItem("currentUser");
-  const currentRole = sessionStorage.getItem("currentRole");
+  // PRIJZEN PER VERPAKTE EENHEID (ZAKJE OF TOP)
+  const STRAIN_PRICES = {
+    'Marihuana': 110,
+    'Familie': 140,
+    'Lemon Haze': 170,
+    'Royal Domina': 0
+  };
 
-  // Beveiliging: als er niet is ingelogd, stuur door naar Login.html
-  if (!currentUser) {
-    window.location.href = "Login.html";
-  } else {
-    document.getElementById("displayUsername").innerText = currentUser;
-    document.getElementById("displayRole").innerText = currentRole || "Gringo";
+  const currentUser = sessionStorage.getItem("currentUser") || "Onbekend";
+  const currentRole = sessionStorage.getItem("currentRole") || "Gringo";
+  const canViewAll = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
 
-    if (currentRole === "Opper Gringo") {
-      document.getElementById("adminPanelLink").style.display = "flex";
+  if (canViewAll) {
+    document.getElementById("tabAdminBtn").style.display = "inline-block";
+  }
+
+  function switchTab(tab) {
+    if (tab === 'input') {
+      document.getElementById("tabInputView").style.display = "block";
+      document.getElementById("tabAdminView").style.display = "none";
+      document.getElementById("tabInputBtn").classList.add("active");
+      document.getElementById("tabAdminBtn").classList.remove("active");
+    } else {
+      document.getElementById("tabInputView").style.display = "none";
+      document.getElementById("tabAdminView").style.display = "block";
+      document.getElementById("tabInputBtn").classList.remove("active");
+      document.getElementById("tabAdminBtn").classList.add("active");
+      loadAdminView();
     }
   }
 
-  function loadGame(element, url) {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-wiet', 'active-finance'));
-    
-    if (element) {
-      if (url.includes('Wiet_Ingave')) {
-        element.classList.add('active-wiet');
-      } else if (url.includes('Financien')) {
-        element.classList.add('active-finance');
-      } else {
-        element.classList.add('active');
-      }
-    }
-    
-    document.getElementById("mainFrame").src = url;
-  }
+  async function loadMyHistory() {
+    const tbody = document.getElementById("myTableBody");
+    const { data, error } = await _supabase
+      .from('wiet_inventory')
+      .select('*')
+      .eq('username', currentUser)
+      .order('created_at', { ascending: false });
 
-  function openHome() {
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-wiet', 'active-finance'));
-    document.getElementById("mainFrame").src = "Home.html";
-  }
-
-  function openPasswordModal() {
-    document.getElementById("passwordModal").style.display = "flex";
-  }
-
-  function closePasswordModal() {
-    document.getElementById("passwordModal").style.display = "none";
-    document.getElementById("newPasswordInput").value = "";
-  }
-
-  async function saveNewPassword() {
-    const newPassword = document.getElementById("newPasswordInput").value.trim();
-    if (!newPassword) {
-      alert("Voer een geldig wachtwoord in!");
+    if (error || !data || data.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='6' style='color:#64748b;'>Nog geen ingaves door jou gedaan.</td></tr>";
       return;
     }
 
+    tbody.innerHTML = "";
+    data.forEach(item => {
+      const date = new Date(item.created_at).toLocaleString('nl-NL');
+      const unit = item.unit || 'Zakje';
+      const strain = item.strain || 'Marihuana';
+      const amount = parseInt(item.amount || 0);
+      const pricePerUnit = STRAIN_PRICES[strain] || 0;
+      const itemValue = amount * pricePerUnit;
+
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
+        <td><span class="strain-badge">${strain}</span></td>
+        <td><span class="amount-badge">${amount} ${unit}</span></td>
+        <td style="color:#22c55e; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
+        <td style="color:#94a3b8;">${item.notes || '-'}</td>
+        <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function loadAdminView() {
+    const tbody = document.getElementById("allTableBody");
+    const grid = document.getElementById("adminStatsGrid");
+    const grandGrid = document.getElementById("grandTotalsGrid");
+
+    const { data, error } = await _supabase.from('wiet_inventory').select('*').order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='7' style='color:#64748b;'>Geen ingaves aanwezig.</td></tr>";
+      grid.innerHTML = "<div style='color:#94a3b8;'>Nog geen gegevens.</div>";
+      grandGrid.innerHTML = "<div style='color:#94a3b8;'>Nog geen gegevens.</div>";
+      document.getElementById("grandTotalValueDisplay").innerText = "€ 0";
+      return;
+    }
+
+    tbody.innerHTML = "";
+    
+    const totals = {};
+    const grandTotals = {
+      'Marihuana': { zakjes: 0, toppen: 0 },
+      'Familie': { zakjes: 0, toppen: 0 },
+      'Lemon Haze': { zakjes: 0, toppen: 0 },
+      'Royal Domina': { zakjes: 0, toppen: 0 }
+    };
+
+    let grandTotalValue = 0;
+
+    data.forEach(item => {
+      const date = new Date(item.created_at).toLocaleString('nl-NL');
+      const unit = item.unit || 'Zakje';
+      const strain = item.strain || 'Marihuana';
+      const amount = parseInt(item.amount || 0);
+      const pricePerUnit = STRAIN_PRICES[strain] || 0;
+      const itemValue = amount * pricePerUnit;
+
+      grandTotalValue += itemValue;
+
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
+        <td><strong>${item.username}</strong></td>
+        <td><span class="strain-badge">${strain}</span></td>
+        <td><span class="amount-badge">${amount} ${unit}</span></td>
+        <td style="color:#22c55e; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
+        <td style="color:#94a3b8;">${item.notes || '-'}</td>
+        <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
+      `;
+      tbody.appendChild(tr);
+
+      // Groeperen per gebruiker
+      if (!totals[item.username]) totals[item.username] = { strains: {}, userTotalValue: 0 };
+      if (!totals[item.username].strains[strain]) totals[item.username].strains[strain] = { zakjes: 0, toppen: 0 };
+
+      totals[item.username].userTotalValue += itemValue;
+
+      // Groeperen bende totaal
+      if (!grandTotals[strain]) grandTotals[strain] = { zakjes: 0, toppen: 0 };
+
+      if (unit === 'Toppen') {
+        totals[item.username].strains[strain].toppen += amount;
+        grandTotals[strain].toppen += amount;
+      } else {
+        totals[item.username].strains[strain].zakjes += amount;
+        grandTotals[strain].zakjes += amount;
+      }
+    });
+
+    // Update Grote Bende Waarde
+    document.getElementById("grandTotalValueDisplay").innerText = "€ " + grandTotalValue.toLocaleString('nl-NL');
+
+    // 1. Vul Grote Bende Totals (Bovenaan)
+    grandGrid.innerHTML = "";
+    Object.keys(grandTotals).forEach(sName => {
+      const gBox = document.createElement("div");
+      gBox.className = "grand-box";
+      const totalUnits = grandTotals[sName].zakjes + grandTotals[sName].toppen;
+      const strainValue = totalUnits * (STRAIN_PRICES[sName] || 0);
+
+      gBox.innerHTML = `
+        <div class="grand-strain">🌿 ${sName}</div>
+        <div class="grand-detail"><span>🛍️ Zakjes:</span> <strong>${grandTotals[sName].zakjes} stuks</strong></div>
+        <div class="grand-detail"><span>✂️ Toppen:</span> <strong>${grandTotals[sName].toppen} stuks</strong></div>
+        <div class="grand-detail" style="border-top: 1px solid rgba(34,197,94,0.3); padding-top:4px; margin-top:4px;">
+          <span>💵 Waarde:</span> <strong style="color:#22c55e;">€ ${strainValue.toLocaleString('nl-NL')}</strong>
+        </div>
+      `;
+      grandGrid.appendChild(gBox);
+    });
+
+    // 2. Vul Statistieken Grid Per Kweker
+    grid.innerHTML = "";
+    Object.keys(totals).forEach(user => {
+      const box = document.createElement("div");
+      box.className = "stat-box";
+
+      let strainsHtml = '';
+      Object.keys(totals[user].strains).forEach(sName => {
+        const userStrainUnits = totals[user].strains[sName].zakjes + totals[user].strains[sName].toppen;
+        const userStrainVal = userStrainUnits * (STRAIN_PRICES[sName] || 0);
+
+        strainsHtml += `
+          <div class="strain-summary">
+            <div class="strain-name">
+              <span>🌿 ${sName}</span>
+              <span style="color:#22c55e; font-size:0.75rem;">€ ${userStrainVal.toLocaleString('nl-NL')}</span>
+            </div>
+            <div class="stat-detail">
+              <span>🛍️ Zakjes: <strong>${totals[user].strains[sName].zakjes} stuks</strong></span>
+              <span>✂️ Toppen: <strong>${totals[user].strains[sName].toppen} stuks</strong></span>
+            </div>
+          </div>
+        `;
+      });
+
+      box.innerHTML = `
+        <div class="stat-user-header">
+          <span class="stat-user">👤 ${user}</span>
+          <span class="stat-user-value">€ ${totals[user].userTotalValue.toLocaleString('nl-NL')}</span>
+        </div>
+        ${strainsHtml}
+      `;
+      grid.appendChild(box);
+    });
+  }
+
+  async function submitEntry(e) {
+    e.preventDefault();
+    const strain = document.getElementById("strainSelect").value;
+    const amount = parseInt(document.getElementById("amountInput").value);
+    const unit = document.getElementById("unitSelect").value;
+    const notes = document.getElementById("notesInput").value.trim();
+
     const { error } = await _supabase
-      .from('users')
-      .update({ password: newPassword })
-      .eq('username', currentUser);
+      .from('wiet_inventory')
+      .insert([{ username: currentUser, strain, amount, unit, amount_grams: amount, notes }]);
 
     if (error) {
-      alert("Fout bij wijzigen wachtwoord: " + error.message);
-    } else {
-      alert("Wachtwoord succesvol gewijzigd!");
-      closePasswordModal();
+      alert("Fout bij opslaan: " + error.message);
+      return;
+    }
+
+    document.getElementById("amountInput").value = "";
+    document.getElementById("notesInput").value = "";
+    loadMyHistory();
+    if (canViewAll) loadAdminView();
+  }
+
+  async function deleteEntry(id) {
+    if (confirm("Weet je zeker dat je deze ingave wilt verwijderen?")) {
+      await _supabase.from('wiet_inventory').delete().eq('id', id);
+      loadMyHistory();
+      if (canViewAll) loadAdminView();
     }
   }
 
-  function logout() {
-    sessionStorage.clear();
-    window.location.href = "Login.html";
+  function goToKruispunt() {
+    if (window.parent && window.parent.openHome) {
+      window.parent.openHome();
+    } else {
+      window.location.href = 'Home.html';
+    }
   }
+
+  loadMyHistory();
 </script>
 
 </body>
