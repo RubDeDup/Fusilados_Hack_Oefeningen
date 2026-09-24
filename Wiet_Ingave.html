@@ -35,6 +35,7 @@
     .form-group select option { background: #16181d; color: #fff; }
     .form-group input:focus, .form-group select:focus { border-color: #22c55e; }
     .btn-submit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
+    .btn-transfer { padding: 12px 24px; background: #38bdf8; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
 
     /* BENDE TOTAAL GRID */
     .grand-totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
@@ -64,6 +65,7 @@
     th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
     .strain-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .amount-badge { font-weight: bold; color: #fbbf24; }
+    .amount-badge-negative { font-weight: bold; color: #ef4444; }
     .btn-delete { background: #ef4444; color: #ffffff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
 
     .watermark { position: fixed; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; pointer-events: none; }
@@ -86,8 +88,10 @@
 
     <!-- TAB 1: INVOEREN & EIGEN HISTORIE -->
     <div id="tabInputView">
+      
+      <!-- 1. NIEUWE INGAVE REGISTREREN -->
       <div class="card">
-        <h2>📝 Nieuwe Ingave Registreren</h2>
+        <h2>📝 Nieuwe Oogst / Ingave Registreren</h2>
         <form onsubmit="submitEntry(event)" class="form-grid">
           <div class="form-group">
             <label>Soort Wiet</label>
@@ -121,8 +125,47 @@
         </form>
       </div>
 
+      <!-- 2. VOORRAAD OVERDRAGEN AAN BENDE LID -->
       <div class="card">
-        <h2>📋 Mijn Invoer Historie</h2>
+        <h2>🔄 Voorraad Overdragen Aan Bendelid</h2>
+        <form onsubmit="handleTransfer(event)" class="form-grid">
+          <div class="form-group">
+            <label>Soort Wiet</label>
+            <select id="transferStrainSelect" required>
+              <option value="Marihuana">Marihuana</option>
+              <option value="Familie">Familie</option>
+              <option value="Lemon Haze">Lemon Haze</option>
+              <option value="Royal Domina">Royal Domina</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Aantal Overdragen</label>
+            <input type="number" id="transferAmountInput" min="1" required placeholder="bijv. 2">
+          </div>
+
+          <div class="form-group">
+            <label>Eenheid</label>
+            <select id="transferUnitSelect" required>
+              <option value="Zakje">Zakje</option>
+              <option value="Toppen">Toppen</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Ontvanger (Bendelid)</label>
+            <select id="transferRecipientSelect" required>
+              <option value="">Laden van leden...</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-transfer">🔄 Overdragen</button>
+        </form>
+      </div>
+
+      <!-- 3. MIJN EIGEN HISTORIE TABEL -->
+      <div class="card">
+        <h2>📋 Mijn Invoer & Overdracht Historie</h2>
         <table>
           <thead>
             <tr>
@@ -141,7 +184,7 @@
       </div>
     </div>
 
-    <!-- TAB 2: BEHEERDERS OVERZICHT (Alleen voor Opper Gringo & Higher Gringo) -->
+    <!-- TAB 2: BEHEERDERS OVERZICHT -->
     <div id="tabAdminView" style="display: none;">
       
       <!-- 1. GROTE TOTAALSOM ALLE GEBRUIKERS SAMEN -->
@@ -196,7 +239,6 @@
   const SUPABASE_KEY = "sb_publishable_LTp-t_e2PX8kF-L-Du1dDw_cY9QNfKJ";
   const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // PRIJZEN PER VERPAKTE EENHEID (ZAKJE OF TOP)
   const STRAIN_PRICES = {
     'Marihuana': 110,
     'Familie': 140,
@@ -227,6 +269,27 @@
     }
   }
 
+  // Laad alle gebruikers in voor het overdracht dropdown-menu
+  async function loadUsersForTransfer() {
+    const recipientSelect = document.getElementById("transferRecipientSelect");
+    const { data, error } = await _supabase.from('users').select('username').order('username', { ascending: true });
+
+    if (error || !data) {
+      recipientSelect.innerHTML = "<option value=''>Fout bij laden leden</option>";
+      return;
+    }
+
+    recipientSelect.innerHTML = "<option value=''>-- Kies Bendelid --</option>";
+    data.forEach(user => {
+      if (user.username !== currentUser) {
+        const option = document.createElement("option");
+        option.value = user.username;
+        option.textContent = user.username;
+        recipientSelect.appendChild(option);
+      }
+    });
+  }
+
   async function loadMyHistory() {
     const tbody = document.getElementById("myTableBody");
     const { data, error } = await _supabase
@@ -251,11 +314,14 @@
 
       const tr = document.createElement("tr");
 
+      const badgeClass = amount >= 0 ? "amount-badge" : "amount-badge-negative";
+      const displayAmount = amount >= 0 ? `${amount} ${unit}` : `${amount} ${unit}`;
+
       tr.innerHTML = `
         <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
         <td><span class="strain-badge">${strain}</span></td>
-        <td><span class="amount-badge">${amount} ${unit}</span></td>
-        <td style="color:#22c55e; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
+        <td><span class="${badgeClass}">${displayAmount}</span></td>
+        <td style="color:${amount >= 0 ? '#22c55e' : '#ef4444'}; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
         <td style="color:#94a3b8;">${item.notes || '-'}</td>
         <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
       `;
@@ -301,13 +367,14 @@
       grandTotalValue += itemValue;
 
       const tr = document.createElement("tr");
+      const badgeClass = amount >= 0 ? "amount-badge" : "amount-badge-negative";
 
       tr.innerHTML = `
         <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
         <td><strong>${item.username}</strong></td>
         <td><span class="strain-badge">${strain}</span></td>
-        <td><span class="amount-badge">${amount} ${unit}</span></td>
-        <td style="color:#22c55e; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
+        <td><span class="${badgeClass}">${amount} ${unit}</span></td>
+        <td style="color:${amount >= 0 ? '#22c55e' : '#ef4444'}; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
         <td style="color:#94a3b8;">${item.notes || '-'}</td>
         <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
       `;
@@ -331,10 +398,9 @@
       }
     });
 
-    // Update Grote Bende Waarde
     document.getElementById("grandTotalValueDisplay").innerText = "€ " + grandTotalValue.toLocaleString('nl-NL');
 
-    // 1. Vul Grote Bende Totals (Bovenaan)
+    // 1. Vul Grote Bende Totals
     grandGrid.innerHTML = "";
     Object.keys(grandTotals).forEach(sName => {
       const gBox = document.createElement("div");
@@ -411,6 +477,52 @@
     if (canViewAll) loadAdminView();
   }
 
+  // NIEUWE OVERDRACHT FUNCTIE
+  async function handleTransfer(e) {
+    e.preventDefault();
+    const strain = document.getElementById("transferStrainSelect").value;
+    const amount = parseInt(document.getElementById("transferAmountInput").value);
+    const unit = document.getElementById("transferUnitSelect").value;
+    const recipient = document.getElementById("transferRecipientSelect").value;
+
+    if (!recipient) {
+      alert("Kies a.u.b. een bendelid waaraan je wilt overdragen!");
+      return;
+    }
+
+    // 1. Trek af van huidige gebruiker
+    const { error: err1 } = await _supabase.from('wiet_inventory').insert([{
+      username: currentUser,
+      strain,
+      amount: -amount,
+      unit,
+      amount_grams: -amount,
+      notes: `Overgedragen aan ${recipient}`
+    }]);
+
+    // 2. Voeg toe aan de ontvanger
+    const { error: err2 } = await _supabase.from('wiet_inventory').insert([{
+      username: recipient,
+      strain,
+      amount: amount,
+      unit,
+      amount_grams: amount,
+      notes: `Ontvangen van ${currentUser}`
+    }]);
+
+    if (err1 || err2) {
+      alert("Fout bij overdragen: " + (err1?.message || err2?.message));
+      return;
+    }
+
+    document.getElementById("transferAmountInput").value = "";
+    document.getElementById("transferRecipientSelect").value = "";
+    alert(`Succesvol ${amount} ${unit} ${strain} overgedragen aan ${recipient}!`);
+
+    loadMyHistory();
+    if (canViewAll) loadAdminView();
+  }
+
   async function deleteEntry(id) {
     if (confirm("Weet je zeker dat je deze ingave wilt verwijderen?")) {
       await _supabase.from('wiet_inventory').delete().eq('id', id);
@@ -427,6 +539,7 @@
     }
   }
 
+  loadUsersForTransfer();
   loadMyHistory();
 </script>
 
