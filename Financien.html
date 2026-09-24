@@ -114,7 +114,7 @@
       </form>
     </div>
 
-    <!-- WITWASSEN FORMULIER (ALLEEN VOOR OPPER GRINGO) -->
+    <!-- WITWASSEN FORMULIER (ALLEEN VOOR OPPER GRINGO & HIGHER GRINGO) -->
     <div class="card" id="washCard" style="display: none;">
       <h2>🧼 Zwart Geld Witwassen (30% Fee -> 70% Netto)</h2>
       <form onsubmit="handleWashMoney(event)" class="form-grid">
@@ -193,20 +193,32 @@
   const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const currentUser = sessionStorage.getItem("currentUser") || "Onbekend";
-  const currentRole = sessionStorage.getItem("currentRole") || "Gringo";
-
-  const isHigherGringoOrAdmin = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
-  const isOpperGringo = (currentRole === "Opper Gringo");
-
+  let currentRole = sessionStorage.getItem("currentRole") || "Gringo";
   let currentBlackBalance = 0;
 
-  if (isHigherGringoOrAdmin) {
-    document.getElementById("balanceCardsGrid").style.display = "grid";
-  }
+  // Haal de meest actuele rol op van Supabase om rechten direct toe te passen
+  async function checkUserPermissions() {
+    if (currentUser !== "Onbekend") {
+      const { data } = await _supabase.from('users').select('role').eq('username', currentUser).single();
+      if (data && data.role) {
+        currentRole = data.role;
+        sessionStorage.setItem("currentRole", currentRole);
+      }
+    }
 
-  if (isOpperGringo) {
-    document.getElementById("withdrawCard").style.display = "block";
-    document.getElementById("washCard").style.display = "block";
+    const isHigherGringoOrAdmin = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
+    const isOpperGringo = (currentRole === "Opper Gringo");
+
+    if (isHigherGringoOrAdmin) {
+      document.getElementById("balanceCardsGrid").style.display = "grid";
+      document.getElementById("washCard").style.display = "block";
+    }
+
+    if (isOpperGringo) {
+      document.getElementById("withdrawCard").style.display = "block";
+    }
+
+    loadFinances();
   }
 
   function calculateWashPreview() {
@@ -272,6 +284,7 @@
 
     currentBlackBalance = blackTotal;
 
+    const isHigherGringoOrAdmin = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
     if (isHigherGringoOrAdmin) {
       document.getElementById("whiteBalanceDisplay").innerText = "€ " + whiteTotal.toLocaleString('nl-NL');
       document.getElementById("blackBalanceDisplay").innerText = "€ " + blackTotal.toLocaleString('nl-NL');
@@ -389,7 +402,7 @@
     }
   }
 
-  loadFinances();
+  checkUserPermissions();
 </script>
 
 </body>
