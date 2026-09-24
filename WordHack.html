@@ -82,12 +82,13 @@
   let currentColIndex = 0;
   let timerInterval = null;
   let animFrameId = null;
-  let timeLeft = 8000; // Exact 8 seconden
+  let timeLeft = 8000;
   let isPlaying = false;
   
   let columnsData = [];
 
-  function generateUniqueLetterList(targetChar, length = 10) {
+  // MINDER VARIATIE: Slechts 5 karakters per lijst voor snelle herhaling
+  function generateUniqueLetterList(targetChar, length = 5) {
     let list = [targetChar];
     const availableChars = ALPHABET.split('').filter(c => c !== targetChar);
     
@@ -133,7 +134,7 @@
       strip.className = "letter-strip";
       strip.id = `strip-${i}`;
 
-      const baseLetters = generateUniqueLetterList(targetChar, 10);
+      const baseLetters = generateUniqueLetterList(targetChar, 5);
       const fullList = [...baseLetters, ...baseLetters];
 
       fullList.forEach((char) => {
@@ -153,8 +154,7 @@
         element: strip,
         colElement: col,
         pos: 0,
-        // Snelheid met 25% verhoogd
-        speed: 3.5 + (i * 0.5),
+        speed: 3.2 + (i * 0.4),
         isLocked: false,
         letters: fullList,
         listLength: baseLetters.length
