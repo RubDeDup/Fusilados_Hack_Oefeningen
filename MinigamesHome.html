@@ -3,185 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusilados hub - Minigames Hub</title>
+  <title>Fusilados Hub - Minigames</title>
   
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="fusilados.png">
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #0f1013; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; }
+    .container { width: 100%; max-width: 1150px; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .section-title { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #fbbf24; display: flex; align-items: center; gap: 10px; }
 
-    body {
-      background-color: #0f1013;
-      color: #e2e8f0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
-      padding: 40px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    .category-section { margin-bottom: 36px; }
+    .category-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid #232730; padding-bottom: 8px; }
+    .category-title { font-size: 1rem; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em; }
+    .category-count { font-size: 0.75rem; background: #232730; color: #94a3b8; padding: 2px 8px; border-radius: 12px; font-weight: 600; }
 
-    .container {
-      width: 100%;
-      max-width: 1200px;
-    }
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+    .game-card { background-color: #16181d; border: 1px solid #232730; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease; }
+    .game-card:hover { border-color: #fbbf24; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .game-card-header { display: flex; gap: 14px; margin-bottom: 16px; }
+    .game-icon { font-size: 2.2rem; background: #0f1013; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #232730; flex-shrink: 0; }
+    .game-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .game-desc { font-size: 0.8rem; color: #94a3b8; line-height: 1.4; }
+    .game-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid #232730; }
+    .play-btn { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid #fbbf24; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+    .play-btn:hover { background: #fbbf24; color: #0f1013; }
+    .game-controls { font-size: 0.7rem; color: #64748b; background: #0f1013; padding: 4px 8px; border-radius: 4px; border: 1px solid #232730; }
 
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .page-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .back-btn {
-      background: #16181d;
-      border: 1px solid #232730;
-      color: #94a3b8;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .back-btn:hover {
-      color: #fbbf24;
-      border-color: #fbbf24;
-    }
-
-    /* SECTIE STYLING PER CATEGORIE */
-    .category-section {
-      margin-bottom: 36px;
-    }
-
-    .category-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #232730;
-      padding-bottom: 8px;
-    }
-
-    .category-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #fbbf24;
-    }
-
-    .category-badge {
-      font-size: 0.7rem;
-      color: #64748b;
-      background: #16181d;
-      padding: 2px 8px;
-      border-radius: 4px;
-      border: 1px solid #232730;
-    }
-
-    /* GRID LAYOUT FOR GAMES */
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-    }
-
-    .game-card {
-      background-color: #16181d;
-      border: 1px solid #232730;
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .game-card:hover {
-      transform: translateY(-3px);
-      border-color: #fbbf24;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.4);
-    }
-
-    .game-icon {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-    }
-
-    .game-title {
-      font-size: 1rem;
-      color: #ffffff;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .game-desc {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      line-height: 1.4;
-      margin-bottom: 14px;
-    }
-
-    .game-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .play-link {
-      font-size: 0.8rem;
-      color: #38bdf8;
-      font-weight: 600;
-    }
-
-    .controls-badge {
-      font-size: 0.68rem;
-      color: #64748b;
-      background: #0f1013;
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1px solid #232730;
-    }
-
-    .empty-card {
-      background-color: rgba(22, 24, 29, 0.4);
-      border: 1px dashed #232730;
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #475569;
-      font-size: 0.85rem;
-      font-style: italic;
-    }
-
-    .watermark {
-      position: fixed;
-      bottom: 15px;
-      right: 20px;
-      font-size: 0.75rem;
-      color: #475569;
-      letter-spacing: 1px;
-      pointer-events: none;
-    }
+    .watermark { position: fixed; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -189,212 +39,156 @@
   <div class="container">
 
     <div class="header-bar">
-      <div class="page-title">🎮 MINIGAMES HUB</div>
-      <button class="back-btn" onclick="goToKruispunt()">← Terug naar Kruispunt</button>
+      <div class="section-title">🎮 MINIGAMES HUB</div>
     </div>
 
-    <!-- 1. BOOSTING -->
+    <!-- BOOSTING -->
     <div class="category-section">
       <div class="category-header">
-        <span class="category-title">🚗 Boosting</span>
-        <span class="category-badge">1 Minigame</span>
+        <div class="category-title">🚗 BOOSTING</div>
+        <span class="category-count">1 Minigame</span>
       </div>
       <div class="games-grid">
-        <div class="game-card" onclick="openGame('GPS_Hack.html')">
-          <div>
+        <div class="game-card">
+          <div class="game-card-header">
             <div class="game-icon">📡</div>
-            <div class="game-title">GPS Hack</div>
-            <div class="game-desc">Vind de juiste 4-delige code in de omgekeerde matrix om het signaal te verstoren.</div>
+            <div class="game-info">
+              <div class="game-title">GPS Hack</div>
+              <div class="game-desc">Vind de juiste 4-delige code in de omgekeerde matrix om het signaal te verstoren.</div>
+            </div>
           </div>
-          <div class="game-footer">
-            <span class="play-link">Speel Nu →</span>
-            <span class="controls-badge">Pijltoetsen + Enter</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. ATM -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🏧 ATM</span>
-        <span class="category-badge">Binnenkort</span>
-      </div>
-      <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 3. WT -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🎛️ WT</span>
-        <span class="category-badge">1 Minigame</span>
-      </div>
-      <div class="games-grid">
-        <div class="game-card" onclick="openGame('WT_Hack.html')">
-          <div>
-            <div class="game-icon">📻</div>
-            <div class="game-title">WT Hack</div>
-            <div class="game-desc">Zoek de twee constante codes in de ruis met WASD en Pijltoetsen.</div>
-          </div>
-          <div class="game-footer">
-            <span class="play-link">Speel Nu →</span>
-            <span class="controls-badge">WASD / Pijlen</span>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('https://snepzz.github.io/gpshack/')">Speel Nu →</button>
+            <span class="game-controls">Pijltoetsen + Enter</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 4. WINKEL -->
+    <!-- ATM -->
     <div class="category-section">
       <div class="category-header">
-        <span class="category-title">🏪 Winkel</span>
-        <span class="category-badge">2 Minigames</span>
+        <div class="category-title">🏧 ATM</div>
+        <span class="category-count">1 Minigame</span>
       </div>
       <div class="games-grid">
-        <!-- Winkel DVD Hack -->
-        <div class="game-card" onclick="openGame('Winkel_DVD_Hack.html')">
-          <div>
-            <div class="game-icon">📀</div>
-            <div class="game-title">Winkel DVD Hack</div>
-            <div class="game-desc">Volg de stuiterende blokjes, onthoud hun nummering en klik ze in volgorde aan.</div>
-          </div>
-          <div class="game-footer">
-            <span class="play-link">Speel Nu →</span>
-            <span class="controls-badge">Muis</span>
-          </div>
-        </div>
-
-        <!-- Number Hack -->
-        <div class="game-card" onclick="openGame('NumberHack.html')">
-          <div>
+        <div class="game-card">
+          <div class="game-card-header">
             <div class="game-icon">🔢</div>
-            <div class="game-title">Number Hack</div>
-            <div class="game-desc">Vind de getallenreeks in het schuifraster voor de tijd om is.</div>
+            <div class="game-info">
+              <div class="game-title">Number Hack</div>
+              <div class="game-desc">Typ snel de verschijnende nummers over voordat de tijd omloopt.</div>
+            </div>
           </div>
-          <div class="game-footer">
-            <span class="play-link">Speel Nu →</span>
-            <span class="controls-badge">Pijlen + Enter</span>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('https://snepzz.github.io/numberhack/')">Speel Nu →</button>
+            <span class="game-controls">Nummerblok</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 5. TELEFOON WINKEL -->
+    <!-- WT -->
     <div class="category-section">
       <div class="category-header">
-        <span class="category-title">📱 Telefoon Winkel</span>
-        <span class="category-badge">Binnenkort</span>
+        <div class="category-title">📻 WT</div>
+        <span class="category-count">1 Minigame</span>
       </div>
       <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
+        <div class="game-card">
+          <div class="game-card-header">
+            <div class="game-icon">📻</div>
+            <div class="game-info">
+              <div class="game-title">WT Hack</div>
+              <div class="game-desc">Zoek de twee constante codes in de ruis met WASD en Pijltoetsen.</div>
+            </div>
+          </div>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('https://snepzz.github.io/wthack/')">Speel Nu →</button>
+            <span class="game-controls">WASD / Pijlen</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 6. KLEINE BANK -->
+    <!-- WINKEL -->
     <div class="category-section">
       <div class="category-header">
-        <span class="category-title">🏦 Kleine Bank</span>
-        <span class="category-badge">1 Minigame</span>
+        <div class="category-title">🏪 WINKEL</div>
+        <span class="category-count">1 Minigame</span>
       </div>
       <div class="games-grid">
-        <div class="game-card" onclick="openGame('Memory.html')">
-          <div>
+        <div class="game-card">
+          <div class="game-card-header">
+            <div class="game-icon">📀</div>
+            <div class="game-info">
+              <div class="game-title">Winkel DVD Hack</div>
+              <div class="game-desc">Bestuur de DVD-speler om op het juiste moment in de hoek te kaatsen.</div>
+            </div>
+          </div>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('https://snepzz.github.io/dvdhack/')">Speel Nu →</button>
+            <span class="game-controls">Spatiebalk / Muis</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KLEINE BANK -->
+    <div class="category-section">
+      <div class="category-header">
+        <div class="category-title">🏦 KLEINE BANK</div>
+        <span class="category-count">2 Minigames</span>
+      </div>
+      <div class="games-grid">
+        <div class="game-card">
+          <div class="game-card-header">
             <div class="game-icon">🧠</div>
-            <div class="game-title">Memory Grid</div>
-            <div class="game-desc">Onthoud de witte vakjes op het 6x6 raster en klik ze uit het geheugen aan.</div>
+            <div class="game-info">
+              <div class="game-title">Memory Grid</div>
+              <div class="game-desc">Onthoud de juiste volgorde van de oplichtende vakjes in het geheugenraster.</div>
+            </div>
           </div>
-          <div class="game-footer">
-            <span class="play-link">Speel Nu →</span>
-            <span class="controls-badge">Muis</span>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('https://snepzz.github.io/memorygrid/')">Speel Nu →</button>
+            <span class="game-controls">Geheugen</span>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div class="game-card-header">
+            <div class="game-icon">🔤</div>
+            <div class="game-info">
+              <div class="game-title">Word Hack (BruteForce)</div>
+              <div class="game-desc">Vind het juiste woord in de bewegende lettermatrix binnen de tijd limiet.</div>
+            </div>
+          </div>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('WordHack.html')">Speel Nu →</button>
+            <span class="game-controls">Spatie / Enter</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 7. JUWELIER -->
+    <!-- BOBCAT -->
     <div class="category-section">
       <div class="category-header">
-        <span class="category-title">💎 Juwelier</span>
-        <span class="category-badge">Binnenkort</span>
+        <div class="category-title">🐱 BOBCAT</div>
+        <span class="category-count">1 Minigame</span>
       </div>
       <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 8. WAREHOUSE -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">📦 Warehouse</span>
-        <span class="category-badge">Binnenkort</span>
-      </div>
-      <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 9. GROTE BANK -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🏛️ Grote Bank</span>
-        <span class="category-badge">Binnenkort</span>
-      </div>
-      <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 10. FIB -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🏢 FIB</span>
-        <span class="category-badge">Binnenkort</span>
-      </div>
-      <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 11. JACHT -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🛥️ Jacht</span>
-        <span class="category-badge">Binnenkort</span>
-      </div>
-      <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 12. OLIE-PLATFORM -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🛢️ Olie-platform</span>
-        <span class="category-badge">Binnenkort</span>
-      </div>
-      <div class="games-grid">
-        <div class="empty-card">Binnenkort beschikbaar...</div>
-      </div>
-    </div>
-
-    <!-- 13. BOBCAT -->
-    <div class="category-section">
-      <div class="category-header">
-        <span class="category-title">🟩 Bobcat</span>
-        <span class="category-badge">1 Minigame</span>
-      </div>
-      <div class="games-grid">
-        <div class="game-card" onclick="openGame('Bobcat_1.html')">
-          <div>
-            <div class="game-icon">🟩</div>
-            <div class="game-title">Bobcat 1</div>
-            <div class="game-desc">Raad de 5-cijferige geheime combinatie in maximaal 6 pogingen.</div>
+        <div class="game-card">
+          <div class="game-card-header">
+            <div class="game-icon">💥</div>
+            <div class="game-info">
+              <div class="game-title">Bobcat 1</div>
+              <div class="game-desc">Los de dynamische beveiligingspuzzel op om de kluis van de Bobcat te kraken.</div>
+            </div>
           </div>
-          <div class="game-footer">
-            <span class="play-link">Speel Nu →</span>
-            <span class="controls-badge">Toetsenbord / Muis</span>
+          <div class="game-card-footer">
+            <button class="play-btn" onclick="openGame('https://snepzz.github.io/bobcathack/')">Speel Nu →</button>
+            <span class="game-controls">Toetsenbord</span>
           </div>
         </div>
       </div>
@@ -406,19 +200,7 @@
 
 <script>
   function openGame(url) {
-    if (window.parent && window.parent.loadGame) {
-      window.parent.loadGame(null, url);
-    } else {
-      window.location.href = url;
-    }
-  }
-
-  function goToKruispunt() {
-    if (window.parent && window.parent.openHome) {
-      window.parent.openHome();
-    } else {
-      window.location.href = 'Home.html';
-    }
+    window.open(url, '_blank');
   }
 </script>
 
