@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRUTEFORCE - Word Hack</title>
+  <link rel="icon" type="image/png" href="fusilados.png">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body { background-color: #08090b; color: #38bdf8; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+    .laptop-frame { width: 750px; background: #0f172a; border: 2px solid #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+
+    .header-title { text-align: center; color: #38bdf8; font-size: 1.8rem; font-weight: 900; letter-spacing: 0.1em; margin-bottom: 2px; }
+    .header-sub { text-align: center; color: #64748b; font-size: 0.75rem; letter-spacing: 0.2em; margin-bottom: 20px; }
+
+    .timer-bar { text-align: center; font-size: 1.4rem; font-weight: bold; color: #fbbf24; margin-bottom: 20px; }
+
+    .matrix-container { display: flex; justify-content: center; gap: 12px; background: #020617; padding: 24px 16px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 20px; position: relative; }
+
+    .column { width: 60px; height: 260px; overflow: hidden; background: #090d16; border: 1px solid #1e293b; border-radius: 6px; position: relative; display: flex; flex-direction: column; align-items: center; }
+
+    .column.active { border-color: #fbbf24; box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
+
+    .letter-strip { display: flex; flex-direction: column; align-items: center; position: absolute; top: 0; transition: top 0.05s linear; }
+
+    .letter { width: 60px; height: 50px; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; font-weight: bold; color: #334155; }
+
+    /* DE HORIZONTALE TARGET SELEKTIEBALK */
+    .target-box { position: absolute; top: 129px; left: 0; right: 0; height: 50px; border-top: 2px solid #ef4444; border-bottom: 2px solid #ef4444; background: rgba(239, 68, 68, 0.1); pointer-events: none; }
+
+    .column.locked .letter-strip { animation: none !important; }
+    .column.locked .target-letter { color: #22c55e !important; text-shadow: 0 0 10px #22c55e; }
+
+    .instructions { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 14px; }
+    .btn-action { display: block; margin: 16px auto 0; padding: 10px 24px; background: #38bdf8; color: #020617; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
+    .btn-action:hover { background: #0284c7; color: #fff; }
+
+    .status-msg { text-align: center; font-size: 1.2rem; font-weight: bold; height: 30px; margin-top: 10px; }
+    .success { color: #22c55e; }
+    .failed { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+  <div class="laptop-frame">
+    <div class="header-title">⚡ BRUTEFORCE ⚡</div>
+    <div class="header-sub">- BUSTING THROUGH THE BACKDOOR SINCE 1998 -</div>
+
+    <div class="timer-bar" id="timerDisplay">00:15:000</div>
+
+    <div class="matrix-container">
+      <div class="target-box"></div>
+      <div id="matrixGrid" style="display: flex; gap: 12px;"></div>
+    </div>
+
+    <div class="status-msg" id="statusMsg"></div>
+    <div class="instructions">Druk op <strong>SPATIEBALK</strong> of <strong>ENTER</strong> wanneer de juiste letter in het rode vak staat!</div>
+    <button class="btn-action" onclick="startGame()">▶ Opnieuw Starten</button>
+  </div>
+
+<script>
+  const WORDS = ["HUIZEN", "BANKEN", "KLUIS", "ROBERY", "HACKER", "SYSTEM", "PASSWD", "MATRIX"];
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  
+  let targetWord = "";
+  let currentColIndex = 0;
+  let timerInterval = null;
+  let scrollIntervals = [];
+  let timeLeft = 15000; // 15 seconden
+  let isPlaying = false;
+  let colPositions = [];
+
+  function startGame() {
+    clearInterval(timerInterval);
+    scrollIntervals.forEach(i => clearInterval(i));
+    scrollIntervals = [];
+    
+    colPositions = [];
+    currentColIndex = 0;
+    timeLeft = 15000;
+    isPlaying = true;
+
+    document.getElementById("statusMsg").innerText = "";
+    document.getElementById("statusMsg").className = "status-msg";
+
+    targetWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+    const grid = document.getElementById("matrixGrid");
+    grid.innerHTML = "";
+
+    for (let i = 0; i < targetWord.length; i++) {
+      const col = document.createElement("div");
+      col.className = `column ${i === 0 ? 'active' : ''}`;
+      col.id = `col-${i}`;
+
+      const strip = document.createElement("div");
+      strip.className = "letter-strip";
+      strip.id = `strip-${i}`;
+
+      // Maak een lange lijst met willekeurige letters en de target letter erin
+      let lettersArr = [];
+      for (let j = 0; j < 15; j++) {
+        lettersArr.push(ALPHABET[Math.floor(Math.random() * ALPHABET.length)]);
+      }
+      lettersArr[7] = targetWord[i]; // Target vastzetten op bekende positie
+
+      lettersArr.forEach((char, idx) => {
+        const lDiv = document.createElement("div");
+        lDiv.className = "letter";
+        if (idx === 7) lDiv.classList.add("target-char");
+        lDiv.innerText = char;
+        strip.appendChild(lDiv);
+      });
+
+      col.appendChild(strip);
+      grid.appendChild(col);
+
+      colPositions[i] = 0;
+      startColumnScroll(i);
+    }
+
+    startTimer();
+  }
+
+  function startColumnScroll(colIdx) {
+    const strip = document.getElementById(`strip-${colIdx}`);
+    const speed = 15 + Math.random() * 20; // Verschillende snelheden per kolom
+
+    const interval = setInterval(() => {
+      if (!isPlaying) return;
+      colPositions[colIdx] -= 4;
+      if (colPositions[colIdx] < -500) {
+        colPositions[colIdx] = 0;
+      }
+      strip.style.top = colPositions[colIdx] + "px";
+    }, speed);
+
+    scrollIntervals.push(interval);
+  }
+
+  function startTimer() {
+    const display = document.getElementById("timerDisplay");
+    const startTime = Date.now();
+
+    timerInterval = setInterval(() => {
+      if (!isPlaying) return;
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, timeLeft - elapsed);
+
+      const sec = Math.floor(remaining / 1000).toString().padStart(2, '0');
+      const ms = (remaining % 1000).toString().padStart(3, '0');
+      display.innerText = `00:${sec}:${ms}`;
+
+      if (remaining <= 0) {
+        failGame("TIJD IS OM! HACK MISLUKT.");
+      }
+    }, 10);
+  }
+
+  function handleKeyPress(e) {
+    if (!isPlaying) return;
+    if (e.code === "Space" || e.code === "Enter") {
+      e.preventDefault();
+      checkCurrentColumn();
+    }
+  }
+
+  function checkCurrentColumn() {
+    const col = document.getElementById(`col-${currentColIndex}`);
+    const strip = document.getElementById(`strip-${currentColIndex}`);
+    
+    // Bereken welke letter zich op de rode lijn bevindt
+    const currentTop = Math.abs(colPositions[currentColIndex]);
+    const hitIndex = Math.round((currentTop + 105) / 50);
+    const letters = strip.getElementsByClassName("letter");
+
+    if (letters[hitIndex] && letters[hitIndex].innerText === targetWord[currentColIndex]) {
+      col.classList.remove("active");
+      col.classList.add("locked");
+      letters[hitIndex].classList.add("target-letter");
+      clearInterval(scrollIntervals[currentColIndex]);
+
+      currentColIndex++;
+
+      if (currentColIndex >= targetWord.length) {
+        winGame();
+      } else {
+        document.getElementById(`col-${currentColIndex}`).classList.add("active");
+      }
+    } else {
+      failGame("FOUTIEVE LETTER! TOEGANG GEWEIGERD.");
+    }
+  }
+
+  function winGame() {
+    isPlaying = false;
+    clearInterval(timerInterval);
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = "SUCCESSFULLY ACQUIRED THE PASSWORD!";
+    msg.className = "status-msg success";
+  }
+
+  function failGame(reason) {
+    isPlaying = false;
+    clearInterval(timerInterval);
+    scrollIntervals.forEach(i => clearInterval(i));
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = reason;
+    msg.className = "status-msg failed";
+  }
+
+  window.addEventListener("keydown", handleKeyPress);
+  startGame();
+</script>
+
+</body>
+</html>
