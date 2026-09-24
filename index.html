@@ -60,7 +60,6 @@
 </head>
 <body>
 
-  <!-- Voorkom dat index.html IN een iframe geladen wordt -->
   <script>
     if (window.top !== window.self) {
       window.top.location.href = window.location.href;
@@ -76,7 +75,7 @@
 
       <div class="nav-section-title">CATEGORIEËN</div>
       <ul class="nav-list">
-        <li class="nav-item active" id="navMinigames" onclick="loadGame(this, 'MinigamesHome.html')">
+        <li class="nav-item active" id="navMinigames" onclick="loadGame(this, 'MinigamesHome.html?v=2')">
           <span>🎮 Minigames Hub</span>
           <span class="arrow">&gt;</span>
         </li>
@@ -107,7 +106,7 @@
   </div>
 
   <div class="content-area">
-    <iframe id="mainFrame" name="mainFrame" src="Home.html"></iframe>
+    <iframe id="mainFrame" name="mainFrame" src="Home.html?v=2"></iframe>
   </div>
 
   <div class="modal-overlay" id="passwordModal">
