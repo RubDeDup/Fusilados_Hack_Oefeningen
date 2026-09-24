@@ -28,7 +28,7 @@
     .balance-amount.white { color: #38bdf8; }
     .balance-amount.black { color: #ef4444; }
     .balance-amount.total { color: #22c55e; }
-    .balance-amount.potential { color: #a855f7; }
+    .balance-amount.netto { color: #a855f7; }
 
     .card { background-color: #16181d; border: 1px solid #232730; border-radius: 14px; padding: 28px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
     .card h2 { font-size: 1.2rem; color: #ffffff; margin-bottom: 20px; }
@@ -79,12 +79,12 @@
         <div class="balance-amount black" id="blackBalanceDisplay">€ 0</div>
       </div>
       <div class="balance-card">
-        <div class="balance-title">🔄 Witgewassen Waarde (70%)</div>
-        <div class="balance-amount potential" id="washedPotentialDisplay">€ 0</div>
+        <div class="balance-title">🏦 Totale Bende Kapitaal (Bruto)</div>
+        <div class="balance-amount total" id="totalBalanceDisplay">€ 0</div>
       </div>
       <div class="balance-card">
-        <div class="balance-title">🏦 Totale Bende Kapitaal</div>
-        <div class="balance-amount total" id="totalBalanceDisplay">€ 0</div>
+        <div class="balance-title">✨ Netto Kapitaal (70% Witwas)</div>
+        <div class="balance-amount netto" id="nettoBalanceDisplay">€ 0</div>
       </div>
     </div>
 
@@ -196,7 +196,6 @@
   let currentRole = sessionStorage.getItem("currentRole") || "Gringo";
   let currentBlackBalance = 0;
 
-  // Haal de meest actuele rol op van Supabase om rechten direct toe te passen
   async function checkUserPermissions() {
     if (currentUser !== "Onbekend") {
       const { data } = await _supabase.from('users').select('role').eq('username', currentUser).single();
@@ -288,11 +287,11 @@
     if (isHigherGringoOrAdmin) {
       document.getElementById("whiteBalanceDisplay").innerText = "€ " + whiteTotal.toLocaleString('nl-NL');
       document.getElementById("blackBalanceDisplay").innerText = "€ " + blackTotal.toLocaleString('nl-NL');
-      
-      const potentialWashed = Math.floor(blackTotal * 0.70);
-      document.getElementById("washedPotentialDisplay").innerText = "€ " + potentialWashed.toLocaleString('nl-NL');
-
       document.getElementById("totalBalanceDisplay").innerText = "€ " + (whiteTotal + blackTotal).toLocaleString('nl-NL');
+
+      // BEREKENING: (Zwart geld * 70%) + Wit geld
+      const nettoKapitaal = Math.floor(blackTotal * 0.70) + whiteTotal;
+      document.getElementById("nettoBalanceDisplay").innerText = "€ " + nettoKapitaal.toLocaleString('nl-NL');
     }
   }
 
@@ -338,7 +337,6 @@
 
     const netAmount = Math.floor(rawAmount * 0.70);
 
-    // 1. Trek het zwarte geld af uit de Zwart Geld Kas
     const { error: err1 } = await _supabase.from('gang_finances').insert([{
       username: currentUser,
       transaction_type: 'Opname',
@@ -347,7 +345,6 @@
       notes: `Witwassen (30% fee) - ${notes}`
     }]);
 
-    // 2. Stort 70% netto in de Wit Geld Kas
     const { error: err2 } = await _supabase.from('gang_finances').insert([{
       username: currentUser,
       transaction_type: 'Witgewassen',
