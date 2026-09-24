@@ -10,7 +10,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body { background-color: #08090b; color: #38bdf8; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-    .laptop-frame { width: 780px; background: #0f172a; border: 2px solid #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .laptop-frame { width: 800px; background: #0f172a; border: 2px solid #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
 
     .header-title { text-align: center; color: #38bdf8; font-size: 1.8rem; font-weight: 900; letter-spacing: 0.1em; margin-bottom: 2px; }
     .header-sub { text-align: center; color: #64748b; font-size: 0.75rem; letter-spacing: 0.2em; margin-bottom: 20px; }
@@ -19,19 +19,32 @@
 
     .matrix-container { display: flex; justify-content: center; gap: 10px; background: #020617; padding: 24px 16px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 20px; position: relative; }
 
-    .column { width: 62px; height: 260px; overflow: hidden; background: #090d16; border: 1px solid #1e293b; border-radius: 6px; position: relative; display: flex; flex-direction: column; align-items: center; }
+    .column { width: 66px; height: 260px; overflow: hidden; background: #090d16; border: 1px solid #1e293b; border-radius: 6px; position: relative; }
 
     .column.active { border-color: #fbbf24; box-shadow: 0 0 12px rgba(251, 191, 36, 0.4); }
 
-    .letter-strip { display: flex; flex-direction: column; align-items: center; position: absolute; top: 0; transition: top 0.04s linear; }
+    .letter-strip { display: flex; flex-direction: column; align-items: center; position: absolute; left: 0; width: 100%; top: 0; }
 
-    .letter { width: 62px; height: 50px; display: flex; justify-content: center; align-items: center; font-size: 1.7rem; font-weight: bold; color: #334155; }
+    /* NORMALE LETTERS */
+    .letter { width: 66px; height: 52px; display: flex; justify-content: center; align-items: center; font-size: 1.7rem; font-weight: 700; color: #334155; }
+
+    /* ENKEL DE DOEL-LETTER DIE GEZOCHT MOET WORDEN IS ORANJE */
+    .letter.target-seek { 
+      color: #f97316 !important; 
+      text-shadow: 0 0 8px #f97316, 0 0 15px #ea580c !important; 
+      font-weight: 900;
+    }
 
     /* DE HORIZONTALE TARGET SELECTIEBALK */
-    .target-box { position: absolute; top: 129px; left: 0; right: 0; height: 50px; border-top: 2px solid #ef4444; border-bottom: 2px solid #ef4444; background: rgba(239, 68, 68, 0.1); pointer-events: none; }
+    .target-box { position: absolute; top: 128px; left: 0; right: 0; height: 52px; border-top: 2px solid #ef4444; border-bottom: 2px solid #ef4444; background: rgba(239, 68, 68, 0.12); pointer-events: none; z-index: 10; }
 
-    /* LICHTGEVENDE CORRECTE LETTER */
-    .column.locked .target-letter { color: #4ade80 !important; text-shadow: 0 0 12px #4ade80, 0 0 25px #22c55e !important; font-size: 1.9rem; }
+    /* FEL GROENE LICHTGEVENDE LETTER BIJ BEVESTIGING */
+    .column.locked .target-letter { 
+      color: #22c55e !important; 
+      text-shadow: 0 0 12px #22c55e, 0 0 25px #4ade80, 0 0 35px #15803d !important; 
+      font-size: 2.1rem; 
+      font-weight: 900;
+    }
 
     .instructions { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 14px; }
     .btn-action { display: block; margin: 16px auto 0; padding: 10px 24px; background: #38bdf8; color: #020617; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
@@ -61,23 +74,45 @@
   </div>
 
 <script>
-  // VAST WACHTWOORD UIT DE FIVE M VIDEO
   const TARGET_WORD = "5HUIZEN?";
   const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?";
+  const ITEM_HEIGHT = 52;
+  const TARGET_BOX_Y = 104;
   
   let currentColIndex = 0;
   let timerInterval = null;
-  let scrollIntervals = [];
+  let animFrameId = null;
   let timeLeft = 15000;
   let isPlaying = false;
-  let colPositions = [];
+  
+  let columnsData = [];
+
+  function generateUniqueLetterList(targetChar, length = 10) {
+    let list = [targetChar];
+    const availableChars = ALPHABET.split('').filter(c => c !== targetChar);
+    
+    for (let i = availableChars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availableChars[i], availableChars[j]] = [availableChars[j], availableChars[i]];
+    }
+
+    for (let i = 0; i < length - 1; i++) {
+      list.push(availableChars[i]);
+    }
+
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+
+    return list;
+  }
 
   function startGame() {
     clearInterval(timerInterval);
-    scrollIntervals.forEach(i => clearInterval(i));
-    scrollIntervals = [];
+    if (animFrameId) cancelAnimationFrame(animFrameId);
     
-    colPositions = [];
+    columnsData = [];
     currentColIndex = 0;
     timeLeft = 15000;
     isPlaying = true;
@@ -89,6 +124,7 @@
     grid.innerHTML = "";
 
     for (let i = 0; i < TARGET_WORD.length; i++) {
+      const targetChar = TARGET_WORD[i];
       const col = document.createElement("div");
       col.className = `column ${i === 0 ? 'active' : ''}`;
       col.id = `col-${i}`;
@@ -97,15 +133,15 @@
       strip.className = "letter-strip";
       strip.id = `strip-${i}`;
 
-      let lettersArr = [];
-      for (let j = 0; j < 15; j++) {
-        lettersArr.push(ALPHABET[Math.floor(Math.random() * ALPHABET.length)]);
-      }
-      lettersArr[7] = TARGET_WORD[i]; // Zet de target letter op index 7
+      const baseLetters = generateUniqueLetterList(targetChar, 10);
+      const fullList = [...baseLetters, ...baseLetters];
 
-      lettersArr.forEach((char, idx) => {
+      fullList.forEach((char) => {
         const lDiv = document.createElement("div");
         lDiv.className = "letter";
+        if (char === targetChar) {
+          lDiv.classList.add("target-seek");
+        }
         lDiv.innerText = char;
         strip.appendChild(lDiv);
       });
@@ -113,27 +149,47 @@
       col.appendChild(strip);
       grid.appendChild(col);
 
-      colPositions[i] = 0;
-      startColumnScroll(i);
+      columnsData.push({
+        element: strip,
+        colElement: col,
+        pos: 0,
+        // Snelheid verhoogd voor snellere rotatie
+        speed: 2.8 + (i * 0.4),
+        isLocked: false,
+        letters: fullList,
+        listLength: baseLetters.length
+      });
     }
 
+    startAnimationLoop();
     startTimer();
   }
 
-  function startColumnScroll(colIdx) {
-    const strip = document.getElementById(`strip-${colIdx}`);
-    const speed = 14 + (colIdx * 3); // Gevarieerde snelheden per kolom
+  function startAnimationLoop() {
+    let lastTime = performance.now();
 
-    const interval = setInterval(() => {
+    function update(now) {
       if (!isPlaying) return;
-      colPositions[colIdx] -= 4;
-      if (colPositions[colIdx] < -500) {
-        colPositions[colIdx] = 0;
-      }
-      strip.style.top = colPositions[colIdx] + "px";
-    }, speed);
 
-    scrollIntervals.push(interval);
+      const delta = (now - lastTime) / 16.66;
+      lastTime = now;
+
+      columnsData.forEach((col) => {
+        if (!col.isLocked) {
+          col.pos -= col.speed * delta;
+          const maxScroll = col.listLength * ITEM_HEIGHT;
+          
+          if (col.pos <= -maxScroll) {
+            col.pos += maxScroll;
+          }
+          col.element.style.transform = `translateY(${col.pos}px)`;
+        }
+      });
+
+      animFrameId = requestAnimationFrame(update);
+    }
+
+    animFrameId = requestAnimationFrame(update);
   }
 
   function startTimer() {
@@ -164,25 +220,35 @@
   }
 
   function checkCurrentColumn() {
-    const col = document.getElementById(`col-${currentColIndex}`);
-    const strip = document.getElementById(`strip-${currentColIndex}`);
-    
-    const currentTop = Math.abs(colPositions[currentColIndex]);
-    const hitIndex = Math.round((currentTop + 105) / 50);
-    const letters = strip.getElementsByClassName("letter");
+    const col = columnsData[currentColIndex];
+    if (!col || col.isLocked) return;
 
-    if (letters[hitIndex] && letters[hitIndex].innerText === TARGET_WORD[currentColIndex]) {
-      col.classList.remove("active");
-      col.classList.add("locked");
-      letters[hitIndex].classList.add("target-letter");
-      clearInterval(scrollIntervals[currentColIndex]);
+    const currentScroll = Math.abs(col.pos);
+    const hitIndex = Math.round((currentScroll + TARGET_BOX_Y) / ITEM_HEIGHT);
+    
+    const letterDivs = col.element.getElementsByClassName("letter");
+    const hitLetter = letterDivs[hitIndex] ? letterDivs[hitIndex].innerText : "";
+
+    if (hitLetter === TARGET_WORD[currentColIndex]) {
+      col.isLocked = true;
+      col.colElement.classList.remove("active");
+      col.colElement.classList.add("locked");
+
+      const snappedPos = -(hitIndex * ITEM_HEIGHT - TARGET_BOX_Y);
+      col.pos = snappedPos;
+      col.element.style.transform = `translateY(${snappedPos}px)`;
+
+      if (letterDivs[hitIndex]) {
+        letterDivs[hitIndex].classList.remove("target-seek");
+        letterDivs[hitIndex].classList.add("target-letter");
+      }
 
       currentColIndex++;
 
       if (currentColIndex >= TARGET_WORD.length) {
         winGame();
       } else {
-        document.getElementById(`col-${currentColIndex}`).classList.add("active");
+        columnsData[currentColIndex].colElement.classList.add("active");
       }
     } else {
       failGame("FOUTIEVE LETTER! TOEGANG GEWEIGERD.");
@@ -200,7 +266,6 @@
   function failGame(reason) {
     isPlaying = false;
     clearInterval(timerInterval);
-    scrollIntervals.forEach(i => clearInterval(i));
     const msg = document.getElementById("statusMsg");
     msg.innerText = reason;
     msg.className = "status-msg failed";
