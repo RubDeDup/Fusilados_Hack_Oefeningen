@@ -40,9 +40,15 @@
     .form-group select option { background: #16181d; color: #fff; }
     .form-group input:focus, .form-group select:focus { border-color: #fbbf24; }
     
-    .btn-deposit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
-    .btn-withdraw { padding: 12px 24px; background: #ef4444; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
-    .btn-wash { padding: 12px 24px; background: #a855f7; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
+    /* KNOPPEN STYLING */
+    .btn-submit-green { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+    .btn-submit-green:hover { background: #16a34a; }
+
+    .btn-withdraw { padding: 12px 24px; background: #ef4444; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+    .btn-withdraw:hover { background: #dc2626; }
+
+    .btn-wash { padding: 12px 24px; background: #a855f7; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+    .btn-wash:hover { background: #9333ea; }
 
     /* TABEL OVERZICHT */
     table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -110,7 +116,7 @@
           <input type="text" id="depositNotes" placeholder="bijv. Overval buit / Donatie">
         </div>
 
-        <button type="submit" class="btn-submit">+ Geld Storten</button>
+        <button type="submit" class="btn-submit-green">+ Geld Storten</button>
       </form>
     </div>
 
@@ -124,8 +130,8 @@
         </div>
 
         <div class="form-group">
-          <label>Netto Wit Geld (+70%)</label>
-          <input type="text" id="washPreviewInput" readonly placeholder="€ 0" style="color: #4ade80; font-weight: bold;">
+          <label>Automatisch Netto Wit Geld (+70%)</label>
+          <input type="text" id="washPreviewInput" readonly placeholder="€ 0 (Automatisch berekend)" style="color: #4ade80; font-weight: bold; background: #0f1013; cursor: not-allowed;">
         </div>
 
         <div class="form-group">
@@ -220,6 +226,7 @@
     loadFinances();
   }
 
+  // AUTOMATISCHE BEREKENING VAN DE +70% NETTO OPBRENGST
   function calculateWashPreview() {
     const rawVal = parseFloat(document.getElementById("washAmountInput").value) || 0;
     const netVal = Math.floor(rawVal * 0.70);
@@ -289,7 +296,7 @@
       document.getElementById("blackBalanceDisplay").innerText = "€ " + blackTotal.toLocaleString('nl-NL');
       document.getElementById("totalBalanceDisplay").innerText = "€ " + (whiteTotal + blackTotal).toLocaleString('nl-NL');
 
-      // BEREKENING: (Zwart geld * 70%) + Wit geld
+      // AUTOMATISCHE TOTAALFORMULE: (Zwart Geld * 70%) + Wit Geld
       const nettoKapitaal = Math.floor(blackTotal * 0.70) + whiteTotal;
       document.getElementById("nettoBalanceDisplay").innerText = "€ " + nettoKapitaal.toLocaleString('nl-NL');
     }
