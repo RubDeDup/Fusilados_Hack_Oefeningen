@@ -58,7 +58,7 @@
             </div>
           </div>
           <div class="game-card-footer">
-            <button class="play-btn" onclick="openGame('https://snepzz.github.io/gpshack/')">Speel Nu →</button>
+            <button class="play-btn" onclick="openGame('GpsHack.html')">Speel Nu →</button>
             <span class="game-controls">Pijltoetsen + Enter</span>
           </div>
         </div>
@@ -81,7 +81,7 @@
             </div>
           </div>
           <div class="game-card-footer">
-            <button class="play-btn" onclick="openGame('https://snepzz.github.io/numberhack/')">Speel Nu →</button>
+            <button class="play-btn" onclick="openGame('NumberHack.html')">Speel Nu →</button>
             <span class="game-controls">Nummerblok</span>
           </div>
         </div>
@@ -104,7 +104,7 @@
             </div>
           </div>
           <div class="game-card-footer">
-            <button class="play-btn" onclick="openGame('https://snepzz.github.io/wthack/')">Speel Nu →</button>
+            <button class="play-btn" onclick="openGame('WtHack.html')">Speel Nu →</button>
             <span class="game-controls">WASD / Pijlen</span>
           </div>
         </div>
@@ -127,7 +127,7 @@
             </div>
           </div>
           <div class="game-card-footer">
-            <button class="play-btn" onclick="openGame('https://snepzz.github.io/dvdhack/')">Speel Nu →</button>
+            <button class="play-btn" onclick="openGame('DvdHack.html')">Speel Nu →</button>
             <span class="game-controls">Spatiebalk / Muis</span>
           </div>
         </div>
@@ -150,7 +150,7 @@
             </div>
           </div>
           <div class="game-card-footer">
-            <button class="play-btn" onclick="openGame('https://snepzz.github.io/memorygrid/')">Speel Nu →</button>
+            <button class="play-btn" onclick="openGame('MemoryGrid.html')">Speel Nu →</button>
             <span class="game-controls">Geheugen</span>
           </div>
         </div>
@@ -187,7 +187,7 @@
             </div>
           </div>
           <div class="game-card-footer">
-            <button class="play-btn" onclick="openGame('https://snepzz.github.io/bobcathack/')">Speel Nu →</button>
+            <button class="play-btn" onclick="openGame('BobcatHack.html')">Speel Nu →</button>
             <span class="game-controls">Toetsenbord</span>
           </div>
         </div>
@@ -200,7 +200,8 @@
 
 <script>
   function openGame(url) {
-    window.open(url, '_blank');
+    // Open de game direct binnen het hoofdscherm van de hub (geen nieuw tabblad)
+    window.location.href = url;
   }
 </script>
 
