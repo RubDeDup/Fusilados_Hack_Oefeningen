@@ -21,13 +21,14 @@
     .back-btn:hover { color: #fbbf24; border-color: #fbbf24; }
 
     /* BALANS CARDS */
-    .balance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .balance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
     .balance-card { background: #16181d; border: 1px solid #232730; border-radius: 14px; padding: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
     .balance-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
     .balance-amount { font-size: 1.8rem; font-weight: 800; }
     .balance-amount.white { color: #38bdf8; }
     .balance-amount.black { color: #ef4444; }
     .balance-amount.total { color: #22c55e; }
+    .balance-amount.potential { color: #a855f7; }
 
     .card { background-color: #16181d; border: 1px solid #232730; border-radius: 14px; padding: 28px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
     .card h2 { font-size: 1.2rem; color: #ffffff; margin-bottom: 20px; }
@@ -41,6 +42,7 @@
     
     .btn-deposit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
     .btn-withdraw { padding: 12px 24px; background: #ef4444; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
+    .btn-wash { padding: 12px 24px; background: #a855f7; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
 
     /* TABEL OVERZICHT */
     table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -49,6 +51,7 @@
 
     .badge-deposit { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .badge-withdraw { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+    .badge-wash { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
     
     .money-white { color: #38bdf8; font-weight: bold; }
     .money-black { color: #ef4444; font-weight: bold; }
@@ -74,6 +77,10 @@
       <div class="balance-card">
         <div class="balance-title">🕶️ Zwart Geld Kas</div>
         <div class="balance-amount black" id="blackBalanceDisplay">€ 0</div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-title">🔄 Witgewassen Waarde (70%)</div>
+        <div class="balance-amount potential" id="washedPotentialDisplay">€ 0</div>
       </div>
       <div class="balance-card">
         <div class="balance-title">🏦 Totale Bende Kapitaal</div>
@@ -103,7 +110,30 @@
           <input type="text" id="depositNotes" placeholder="bijv. Overval buit / Donatie">
         </div>
 
-        <button type="submit" class="btn-deposit">+ Geld Storten</button>
+        <button type="submit" class="btn-submit">+ Geld Storten</button>
+      </form>
+    </div>
+
+    <!-- WITWASSEN FORMULIER (ALLEEN VOOR OPPER GRINGO) -->
+    <div class="card" id="washCard" style="display: none;">
+      <h2>🧼 Zwart Geld Witwassen (30% Fee -> 70% Netto)</h2>
+      <form onsubmit="handleWashMoney(event)" class="form-grid">
+        <div class="form-group">
+          <label>Zwart Geld Bedrag (€)</label>
+          <input type="number" id="washAmountInput" min="1" required placeholder="bijv. 100000" oninput="calculateWashPreview()">
+        </div>
+
+        <div class="form-group">
+          <label>Netto Wit Geld (+70%)</label>
+          <input type="text" id="washPreviewInput" readonly placeholder="€ 0" style="color: #4ade80; font-weight: bold;">
+        </div>
+
+        <div class="form-group">
+          <label>Opmerking / Locatie Witwassen</label>
+          <input type="text" id="washNotesInput" placeholder="bijv. Wasmachine / Wasserij">
+        </div>
+
+        <button type="submit" class="btn-wash">🧼 Geld Witwassen</button>
       </form>
     </div>
 
@@ -168,13 +198,21 @@
   const isHigherGringoOrAdmin = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
   const isOpperGringo = (currentRole === "Opper Gringo");
 
-  // Rechten toepassen op UI
+  let currentBlackBalance = 0;
+
   if (isHigherGringoOrAdmin) {
     document.getElementById("balanceCardsGrid").style.display = "grid";
   }
 
   if (isOpperGringo) {
     document.getElementById("withdrawCard").style.display = "block";
+    document.getElementById("washCard").style.display = "block";
+  }
+
+  function calculateWashPreview() {
+    const rawVal = parseFloat(document.getElementById("washAmountInput").value) || 0;
+    const netVal = Math.floor(rawVal * 0.70);
+    document.getElementById("washPreviewInput").value = "€ " + netVal.toLocaleString('nl-NL');
   }
 
   async function loadFinances() {
@@ -202,8 +240,7 @@
       const date = new Date(item.created_at).toLocaleString('nl-NL');
       const amountNum = parseFloat(item.amount || 0);
 
-      // Balans berekenen
-      if (item.transaction_type === 'Storting') {
+      if (item.transaction_type === 'Storting' || item.transaction_type === 'Witgewassen') {
         if (item.money_type === 'Wit') whiteTotal += amountNum;
         if (item.money_type === 'Zwart') blackTotal += amountNum;
       } else if (item.transaction_type === 'Opname') {
@@ -212,9 +249,13 @@
       }
 
       const tr = document.createElement("tr");
-      const actionBadge = item.transaction_type === 'Storting' ? 
-        `<span class="badge-deposit">+ Storting</span>` : 
-        `<span class="badge-withdraw">- Opname</span>`;
+      let actionBadge = `<span class="badge-deposit">+ Storting</span>`;
+      
+      if (item.transaction_type === 'Opname') {
+        actionBadge = `<span class="badge-withdraw">- Opname</span>`;
+      } else if (item.transaction_type === 'Witgewassen') {
+        actionBadge = `<span class="badge-wash">🧼 Witgewassen</span>`;
+      }
 
       const moneyClass = item.money_type === 'Wit' ? 'money-white' : 'money-black';
 
@@ -229,10 +270,15 @@
       tbody.appendChild(tr);
     });
 
-    // Update Saldo Weergave voor Beheerders
+    currentBlackBalance = blackTotal;
+
     if (isHigherGringoOrAdmin) {
       document.getElementById("whiteBalanceDisplay").innerText = "€ " + whiteTotal.toLocaleString('nl-NL');
       document.getElementById("blackBalanceDisplay").innerText = "€ " + blackTotal.toLocaleString('nl-NL');
+      
+      const potentialWashed = Math.floor(blackTotal * 0.70);
+      document.getElementById("washedPotentialDisplay").innerText = "€ " + potentialWashed.toLocaleString('nl-NL');
+
       document.getElementById("totalBalanceDisplay").innerText = "€ " + (whiteTotal + blackTotal).toLocaleString('nl-NL');
     }
   }
@@ -259,6 +305,54 @@
     document.getElementById("depositAmount").value = "";
     document.getElementById("depositNotes").value = "";
     alert("Geld succesvol gestort!");
+    loadFinances();
+  }
+
+  async function handleWashMoney(e) {
+    e.preventDefault();
+    const rawAmount = parseFloat(document.getElementById("washAmountInput").value);
+    const notes = document.getElementById("washNotesInput").value.trim() || "Witgewassen via wasserij";
+
+    if (isNaN(rawAmount) || rawAmount <= 0) {
+      alert("Voer een geldig bedrag in!");
+      return;
+    }
+
+    if (rawAmount > currentBlackBalance) {
+      alert(`Er staat slechts € ${currentBlackBalance.toLocaleString('nl-NL')} aan zwart geld in de kas! Je kunt niet meer witwassen dan er aanwezig is.`);
+      return;
+    }
+
+    const netAmount = Math.floor(rawAmount * 0.70);
+
+    // 1. Trek het zwarte geld af uit de Zwart Geld Kas
+    const { error: err1 } = await _supabase.from('gang_finances').insert([{
+      username: currentUser,
+      transaction_type: 'Opname',
+      money_type: 'Zwart',
+      amount: rawAmount,
+      notes: `Witwassen (30% fee) - ${notes}`
+    }]);
+
+    // 2. Stort 70% netto in de Wit Geld Kas
+    const { error: err2 } = await _supabase.from('gang_finances').insert([{
+      username: currentUser,
+      transaction_type: 'Witgewassen',
+      money_type: 'Wit',
+      amount: netAmount,
+      notes: `Opbrengst witwassen van € ${rawAmount.toLocaleString('nl-NL')} zwart geld`
+    }]);
+
+    if (err1 || err2) {
+      alert("Fout bij witwassen: " + (err1?.message || err2?.message));
+      return;
+    }
+
+    document.getElementById("washAmountInput").value = "";
+    document.getElementById("washPreviewInput").value = "€ 0";
+    document.getElementById("washNotesInput").value = "";
+
+    alert(`Succesvol € ${rawAmount.toLocaleString('nl-NL')} zwart geld gewassen! Er is € ${netAmount.toLocaleString('nl-NL')} aan wit geld bijgeschreven.`);
     loadFinances();
   }
 
