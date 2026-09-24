@@ -14,7 +14,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background-color: #0f1013; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; }
-    .container { width: 100%; max-width: 1100px; }
+    .container { width: 100%; max-width: 1150px; }
     .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .section-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #22c55e; }
     .back-btn { background: #16181d; border: 1px solid #232730; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
@@ -35,7 +35,6 @@
     .form-group select option { background: #16181d; color: #fff; }
     .form-group input:focus, .form-group select:focus { border-color: #22c55e; }
     .btn-submit { padding: 12px 24px; background: #22c55e; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
-    .btn-transfer { padding: 12px 24px; background: #38bdf8; color: #0f1013; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
 
     /* BENDE TOTAAL GRID */
     .grand-totals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
@@ -65,8 +64,23 @@
     th { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; }
     .strain-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .amount-badge { font-weight: bold; color: #fbbf24; }
-    .amount-badge-negative { font-weight: bold; color: #ef4444; }
+    
+    .action-btns { display: flex; gap: 8px; }
+    .btn-transfer { background: #38bdf8; color: #0f1013; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+    .btn-transfer:hover { background: #0284c7; color: #fff; }
     .btn-delete { background: #ef4444; color: #ffffff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+
+    /* MODAL OVERDRAGEN */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal { background: #16181d; border: 1px solid #232730; border-radius: 12px; padding: 24px; width: 360px; }
+    .modal h3 { font-size: 1.1rem; color: #fff; margin-bottom: 14px; }
+    .modal p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px; }
+    .modal label { display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+    .modal input, .modal select { width: 100%; padding: 10px; background: #0f1013; border: 1px solid #232730; border-radius: 6px; color: #fff; margin-bottom: 16px; outline: none; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-btn { padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: none; }
+    .btn-cancel { background: #232730; color: #94a3b8; }
+    .btn-confirm { background: #38bdf8; color: #0f1013; }
 
     .watermark { position: fixed; bottom: 15px; right: 20px; font-size: 0.75rem; color: #475569; pointer-events: none; }
   </style>
@@ -125,47 +139,9 @@
         </form>
       </div>
 
-      <!-- 2. VOORRAAD OVERDRAGEN AAN BENDE LID -->
+      <!-- 2. MIJN EIGEN HISTORIE TABEL -->
       <div class="card">
-        <h2>🔄 Voorraad Overdragen Aan Bendelid</h2>
-        <form onsubmit="handleTransfer(event)" class="form-grid">
-          <div class="form-group">
-            <label>Soort Wiet</label>
-            <select id="transferStrainSelect" required>
-              <option value="Marihuana">Marihuana</option>
-              <option value="Familie">Familie</option>
-              <option value="Lemon Haze">Lemon Haze</option>
-              <option value="Royal Domina">Royal Domina</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Aantal Overdragen</label>
-            <input type="number" id="transferAmountInput" min="1" required placeholder="bijv. 2">
-          </div>
-
-          <div class="form-group">
-            <label>Eenheid</label>
-            <select id="transferUnitSelect" required>
-              <option value="Zakje">Zakje</option>
-              <option value="Toppen">Toppen</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Ontvanger (Bendelid)</label>
-            <select id="transferRecipientSelect" required>
-              <option value="">Laden van leden...</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn-transfer">🔄 Overdragen</button>
-        </form>
-      </div>
-
-      <!-- 3. MIJN EIGEN HISTORIE TABEL -->
-      <div class="card">
-        <h2>📋 Mijn Invoer & Overdracht Historie</h2>
+        <h2>📋 Mijn Invoer Historie</h2>
         <table>
           <thead>
             <tr>
@@ -232,6 +208,27 @@
 
   </div>
 
+  <!-- OVERDRACHT MODAL -->
+  <div class="modal-overlay" id="transferModal">
+    <div class="modal">
+      <h3>🔄 Voorraad Overdragen</h3>
+      <p id="transferItemInfo">Laden gegevens...</p>
+      
+      <label>Aantal Overdragen</label>
+      <input type="number" id="modalTransferAmount" min="1" placeholder="Aantal">
+
+      <label>Ontvanger (Bendelid)</label>
+      <select id="modalTransferRecipient">
+        <option value="">Laden van leden...</option>
+      </select>
+
+      <div class="modal-actions">
+        <button class="modal-btn btn-cancel" onclick="closeTransferModal()">Annuleren</button>
+        <button class="modal-btn btn-confirm" onclick="confirmTransfer()">Overdragen</button>
+      </div>
+    </div>
+  </div>
+
   <div class="watermark">Created by RubDeDup</div>
 
 <script>
@@ -249,6 +246,8 @@
   const currentUser = sessionStorage.getItem("currentUser") || "Onbekend";
   const currentRole = sessionStorage.getItem("currentRole") || "Gringo";
   const canViewAll = (currentRole === "Opper Gringo" || currentRole === "Higher Gringo");
+
+  let activeTransferItem = null;
 
   if (canViewAll) {
     document.getElementById("tabAdminBtn").style.display = "inline-block";
@@ -269,37 +268,17 @@
     }
   }
 
-  // Laad alle gebruikers in voor het overdracht dropdown-menu
-  async function loadUsersForTransfer() {
-    const recipientSelect = document.getElementById("transferRecipientSelect");
-    const { data, error } = await _supabase.from('users').select('username').order('username', { ascending: true });
-
-    if (error || !data) {
-      recipientSelect.innerHTML = "<option value=''>Fout bij laden leden</option>";
-      return;
-    }
-
-    recipientSelect.innerHTML = "<option value=''>-- Kies Bendelid --</option>";
-    data.forEach(user => {
-      if (user.username !== currentUser) {
-        const option = document.createElement("option");
-        option.value = user.username;
-        option.textContent = user.username;
-        recipientSelect.appendChild(option);
-      }
-    });
-  }
-
   async function loadMyHistory() {
     const tbody = document.getElementById("myTableBody");
     const { data, error } = await _supabase
       .from('wiet_inventory')
       .select('*')
       .eq('username', currentUser)
+      .gt('amount', 0) // Alleen positieve voorraad tonen
       .order('created_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='6' style='color:#64748b;'>Nog geen ingaves door jou gedaan.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='6' style='color:#64748b;'>Je hebt momenteel geen actieve wietvoorraad.</td></tr>";
       return;
     }
 
@@ -314,16 +293,18 @@
 
       const tr = document.createElement("tr");
 
-      const badgeClass = amount >= 0 ? "amount-badge" : "amount-badge-negative";
-      const displayAmount = amount >= 0 ? `${amount} ${unit}` : `${amount} ${unit}`;
-
       tr.innerHTML = `
         <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
         <td><span class="strain-badge">${strain}</span></td>
-        <td><span class="${badgeClass}">${displayAmount}</span></td>
-        <td style="color:${amount >= 0 ? '#22c55e' : '#ef4444'}; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
+        <td><span class="amount-badge">${amount} ${unit}</span></td>
+        <td style="color:#22c55e; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
         <td style="color:#94a3b8;">${item.notes || '-'}</td>
-        <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-transfer" onclick='openTransferModal(${JSON.stringify(item)})'>🔄 Overdragen</button>
+            <button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button>
+          </div>
+        </td>
       `;
       tbody.appendChild(tr);
     });
@@ -334,7 +315,7 @@
     const grid = document.getElementById("adminStatsGrid");
     const grandGrid = document.getElementById("grandTotalsGrid");
 
-    const { data, error } = await _supabase.from('wiet_inventory').select('*').order('created_at', { ascending: false });
+    const { data, error } = await _supabase.from('wiet_inventory').select('*').gt('amount', 0).order('created_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
       tbody.innerHTML = "<tr><td colspan='7' style='color:#64748b;'>Geen ingaves aanwezig.</td></tr>";
@@ -367,26 +348,23 @@
       grandTotalValue += itemValue;
 
       const tr = document.createElement("tr");
-      const badgeClass = amount >= 0 ? "amount-badge" : "amount-badge-negative";
 
       tr.innerHTML = `
         <td style="color:#94a3b8; font-size:0.8rem;">${date}</td>
         <td><strong>${item.username}</strong></td>
         <td><span class="strain-badge">${strain}</span></td>
-        <td><span class="${badgeClass}">${amount} ${unit}</span></td>
-        <td style="color:${amount >= 0 ? '#22c55e' : '#ef4444'}; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
+        <td><span class="amount-badge">${amount} ${unit}</span></td>
+        <td style="color:#22c55e; font-weight:bold;">€ ${itemValue.toLocaleString('nl-NL')}</td>
         <td style="color:#94a3b8;">${item.notes || '-'}</td>
         <td><button class="btn-delete" onclick="deleteEntry(${item.id})">Verwijderen</button></td>
       `;
       tbody.appendChild(tr);
 
-      // Groeperen per gebruiker
       if (!totals[item.username]) totals[item.username] = { strains: {}, userTotalValue: 0 };
       if (!totals[item.username].strains[strain]) totals[item.username].strains[strain] = { zakjes: 0, toppen: 0 };
 
       totals[item.username].userTotalValue += itemValue;
 
-      // Groeperen bende totaal
       if (!grandTotals[strain]) grandTotals[strain] = { zakjes: 0, toppen: 0 };
 
       if (unit === 'Toppen') {
@@ -400,7 +378,6 @@
 
     document.getElementById("grandTotalValueDisplay").innerText = "€ " + grandTotalValue.toLocaleString('nl-NL');
 
-    // 1. Vul Grote Bende Totals
     grandGrid.innerHTML = "";
     Object.keys(grandTotals).forEach(sName => {
       const gBox = document.createElement("div");
@@ -419,7 +396,6 @@
       grandGrid.appendChild(gBox);
     });
 
-    // 2. Vul Statistieken Grid Per Kweker
     grid.innerHTML = "";
     Object.keys(totals).forEach(user => {
       const box = document.createElement("div");
@@ -477,47 +453,84 @@
     if (canViewAll) loadAdminView();
   }
 
-  // NIEUWE OVERDRACHT FUNCTIE
-  async function handleTransfer(e) {
-    e.preventDefault();
-    const strain = document.getElementById("transferStrainSelect").value;
-    const amount = parseInt(document.getElementById("transferAmountInput").value);
-    const unit = document.getElementById("transferUnitSelect").value;
-    const recipient = document.getElementById("transferRecipientSelect").value;
+  /* MODAL FUNCTIES VOOR OVERDRAGEN */
+  async function openTransferModal(item) {
+    activeTransferItem = item;
+    document.getElementById("transferItemInfo").innerHTML = `Je hebt <strong>${item.amount} ${item.unit} ${item.strain}</strong>. Hoeveel wil je overdragen?`;
+    document.getElementById("modalTransferAmount").max = item.amount;
+    document.getElementById("modalTransferAmount").value = item.amount;
+
+    const recipientSelect = document.getElementById("modalTransferRecipient");
+    recipientSelect.innerHTML = "<option value=''>Laden...</option>";
+
+    const { data } = await _supabase.from('users').select('username').order('username', { ascending: true });
+    
+    recipientSelect.innerHTML = "<option value=''>-- Kies Bendelid --</option>";
+    if (data) {
+      data.forEach(u => {
+        if (u.username !== currentUser) {
+          const opt = document.createElement("option");
+          opt.value = u.username;
+          opt.textContent = u.username;
+          recipientSelect.appendChild(opt);
+        }
+      });
+    }
+
+    document.getElementById("transferModal").style.display = "flex";
+  }
+
+  function closeTransferModal() {
+    document.getElementById("transferModal").style.display = "none";
+    activeTransferItem = null;
+  }
+
+  async function confirmTransfer() {
+    if (!activeTransferItem) return;
+
+    const transferAmount = parseInt(document.getElementById("modalTransferAmount").value);
+    const recipient = document.getElementById("modalTransferRecipient").value;
 
     if (!recipient) {
-      alert("Kies a.u.b. een bendelid waaraan je wilt overdragen!");
+      alert("Selecteer een bendelid!");
       return;
     }
 
-    // 1. Trek af van huidige gebruiker
-    const { error: err1 } = await _supabase.from('wiet_inventory').insert([{
-      username: currentUser,
-      strain,
-      amount: -amount,
-      unit,
-      amount_grams: -amount,
-      notes: `Overgedragen aan ${recipient}`
-    }]);
+    if (isNaN(transferAmount) || transferAmount <= 0) {
+      alert("Voer een geldig aantal in!");
+      return;
+    }
+
+    // Beveiliging: Check dat je niet meer kunt overdragen dan je hebt
+    if (transferAmount > activeTransferItem.amount) {
+      alert(`Je hebt maar ${activeTransferItem.amount} ${activeTransferItem.unit}! Je kunt niet meer overdragen dan je hebt.`);
+      return;
+    }
+
+    const remainingAmount = activeTransferItem.amount - transferAmount;
+
+    // 1. Werk de eigen voorraad bij (of verwijder als 0 overblijft)
+    if (remainingAmount === 0) {
+      await _supabase.from('wiet_inventory').delete().eq('id', activeTransferItem.id);
+    } else {
+      await _supabase.from('wiet_inventory').update({ 
+        amount: remainingAmount, 
+        amount_grams: remainingAmount 
+      }).eq('id', activeTransferItem.id);
+    }
 
     // 2. Voeg toe aan de ontvanger
-    const { error: err2 } = await _supabase.from('wiet_inventory').insert([{
+    await _supabase.from('wiet_inventory').insert([{
       username: recipient,
-      strain,
-      amount: amount,
-      unit,
-      amount_grams: amount,
+      strain: activeTransferItem.strain,
+      amount: transferAmount,
+      unit: activeTransferItem.unit,
+      amount_grams: transferAmount,
       notes: `Ontvangen van ${currentUser}`
     }]);
 
-    if (err1 || err2) {
-      alert("Fout bij overdragen: " + (err1?.message || err2?.message));
-      return;
-    }
-
-    document.getElementById("transferAmountInput").value = "";
-    document.getElementById("transferRecipientSelect").value = "";
-    alert(`Succesvol ${amount} ${unit} ${strain} overgedragen aan ${recipient}!`);
+    alert(`Succesvol ${transferAmount} ${activeTransferItem.unit} ${activeTransferItem.strain} overgedragen aan ${recipient}!`);
+    closeTransferModal();
 
     loadMyHistory();
     if (canViewAll) loadAdminView();
@@ -539,7 +552,6 @@
     }
   }
 
-  loadUsersForTransfer();
   loadMyHistory();
 </script>
 
