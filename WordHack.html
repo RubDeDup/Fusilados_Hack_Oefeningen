@@ -61,7 +61,7 @@
     <div class="header-title">⚡ BRUTEFORCE ⚡</div>
     <div class="header-sub">- BUSTING THROUGH THE BACKDOOR SINCE 1998 -</div>
 
-    <div class="timer-bar" id="timerDisplay">00:15:000</div>
+    <div class="timer-bar" id="timerDisplay">00:08:000</div>
 
     <div class="matrix-container">
       <div class="target-box"></div>
@@ -82,7 +82,7 @@
   let currentColIndex = 0;
   let timerInterval = null;
   let animFrameId = null;
-  let timeLeft = 15000;
+  let timeLeft = 8000; // Exact 8 seconden
   let isPlaying = false;
   
   let columnsData = [];
@@ -114,7 +114,7 @@
     
     columnsData = [];
     currentColIndex = 0;
-    timeLeft = 15000;
+    timeLeft = 8000;
     isPlaying = true;
 
     document.getElementById("statusMsg").innerText = "";
@@ -153,8 +153,8 @@
         element: strip,
         colElement: col,
         pos: 0,
-        // Snelheid verhoogd voor snellere rotatie
-        speed: 2.8 + (i * 0.4),
+        // Snelheid met 25% verhoogd
+        speed: 3.5 + (i * 0.5),
         isLocked: false,
         letters: fullList,
         listLength: baseLetters.length
